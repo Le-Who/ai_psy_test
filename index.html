@@ -238,92 +238,119 @@
 
     // 3. API Adapter Layer
     const api = {
-        detectProvider(key) {
-            if (key.startsWith('AIza')) return 'gemini';
-            return 'openrouter';
-        },
+    detectProvider(key) {
+        if (key.startsWith('AIza')) return 'gemini';
+        return 'openrouter';
+    },
 
-        // Helper to convert OpenAI JSON Schema wrapper to Gemini Schema
-        convertSchemaToGemini(openAISchema) {
-            // OpenAI wrapper: { type: "json_schema", json_schema: { schema: { ... } } }
-            // Gemini wants: { ... } (just the inner schema object)
-            if (openAISchema.json_schema && openAISchema.json_schema.schema) {
-                return openAISchema.json_schema.schema;
-            }
-            return openAISchema;
-        },
+    // Исправленный конвертер схем
+    convertSchemaToGemini(openAISchema) {
+        // 1. Unwrap OpenAI format
+        let schema = (openAISchema.json_schema && openAISchema.json_schema.schema) 
+            ? openAISchema.json_schema.schema 
+            : openAISchema;
 
-        async call(systemPrompt, userPrompt, schema, modelType) {
-            const provider = state.provider;
-            
-            if (CONFIG.ui.debugMode) {
-                console.log(`📡 Call ${provider.toUpperCase()} [${modelType}]`);
-            }
+        // 2. Clone to avoid mutation
+        schema = JSON.parse(JSON.stringify(schema));
 
-            if (provider === 'gemini') {
-                return this.callGemini(systemPrompt, userPrompt, schema, modelType);
-            } else {
-                return this.callOpenRouter(systemPrompt, userPrompt, schema, modelType);
-            }
-        },
+        // 3. Recursive cleanup for Gemini compatibility
+        function clean(obj) {
+            if (typeof obj !== 'object' || obj === null) return;
 
-        async callOpenRouter(systemPrompt, userPrompt, schema, modelType) {
-            const model = CONFIG.providers.openrouter.models[modelType];
-            
-            const response = await fetch(CONFIG.providers.openrouter.endpoint, {
-                method: 'POST',
-                headers: CONFIG.providers.openrouter.headers(state.apiKey),
-                body: JSON.stringify({
-                    model: model,
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: userPrompt }
-                    ],
-                    response_format: schema,
-                    temperature: CONFIG.generation.temperature
-                })
-            });
-
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error?.message || 'OpenRouter API Error');
+            // Gemini API throw error on 'additionalProperties'
+            if ('additionalProperties' in obj) {
+                delete obj.additionalProperties;
             }
 
-            const data = await response.json();
-            return JSON.parse(data.choices[0].message.content);
-        },
-
-        async callGemini(systemPrompt, userPrompt, schema, modelType) {
-            const model = CONFIG.providers.gemini.models[modelType];
-            const url = `${CONFIG.providers.gemini.endpoint}${model}:generateContent?key=${state.apiKey}`;
-            
-            const geminiSchema = this.convertSchemaToGemini(schema);
-
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: systemPrompt + "\n\nЗАДАЧА:\n" + userPrompt }]
-                    }],
-                    generationConfig: {
-                        temperature: CONFIG.generation.temperature,
-                        response_mime_type: "application/json",
-                        response_schema: geminiSchema
-                    }
-                })
-            });
-
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error?.message || 'Gemini API Error');
+            // Recurse into properties
+            if (obj.properties) {
+                for (const key in obj.properties) {
+                    clean(obj.properties[key]);
+                }
             }
 
-            const data = await response.json();
-            const text = data.candidates[0].content.parts[0].text;
-            return JSON.parse(text);
+            // Recurse into array items
+            if (obj.items) {
+                clean(obj.items);
+            }
         }
-    };
+
+        clean(schema);
+        return schema;
+    },
+
+    async call(systemPrompt, userPrompt, schema, modelType) {
+        const provider = state.provider;
+        
+        if (CONFIG.ui.debugMode) {
+            console.log(`📡 Call ${provider.toUpperCase()} [${modelType}]`);
+        }
+
+        if (provider === 'gemini') {
+            return this.callGemini(systemPrompt, userPrompt, schema, modelType);
+        } else {
+            return this.callOpenRouter(systemPrompt, userPrompt, schema, modelType);
+        }
+    },
+
+    async callOpenRouter(systemPrompt, userPrompt, schema, modelType) {
+        const model = CONFIG.providers.openrouter.models[modelType];
+        
+        const response = await fetch(CONFIG.providers.openrouter.endpoint, {
+            method: 'POST',
+            headers: CONFIG.providers.openrouter.headers(state.apiKey),
+            body: JSON.stringify({
+                model: model,
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userPrompt }
+                ],
+                response_format: schema,
+                temperature: CONFIG.generation.temperature
+            })
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error?.message || 'OpenRouter API Error');
+        }
+
+        const data = await response.json();
+        return JSON.parse(data.choices[0].message.content);
+    },
+
+    async callGemini(systemPrompt, userPrompt, schema, modelType) {
+        const model = CONFIG.providers.gemini.models[modelType];
+        const url = `${CONFIG.providers.gemini.endpoint}${model}:generateContent?key=${state.apiKey}`;
+        
+        // Используем очищенную схему
+        const geminiSchema = this.convertSchemaToGemini(schema);
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: systemPrompt + "\n\nЗАДАЧА:\n" + userPrompt }]
+                }],
+                generationConfig: {
+                    temperature: CONFIG.generation.temperature,
+                    response_mime_type: "application/json",
+                    response_schema: geminiSchema
+                }
+            })
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error?.message || 'Gemini API Error');
+        }
+
+        const data = await response.json();
+        const text = data.candidates[0].content.parts[0].text;
+        return JSON.parse(text);
+    }
+};
 
     // 4. App Logic
     const app = {
