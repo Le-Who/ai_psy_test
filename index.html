@@ -6,519 +6,440 @@
     <title>Евдокия Тестикова</title>
     <style>
         :root {
-            --color-primary: #2563eb;
-            --color-primary-hover: #1d4ed8;
-            --color-bg: #f8fafc;
-            --color-surface: #ffffff;
-            --color-border: #e2e8f0;
-            --color-text: #1e293b;
-            --color-text-secondary: #64748b;
-            --space-20: 20px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
         }
 
         * { box-sizing: border-box; }
+        body { margin: 0; font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
         
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--color-bg);
-            color: var(--color-text);
-            line-height: 1.5;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: var(--space-20);
-        }
-
-        /* Header */
-        header {
-            background: var(--color-surface);
-            border-bottom: 1px solid var(--color-border);
-            padding: 16px 0;
-            margin-bottom: 32px;
-        }
-
-        .header-content {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 var(--space-20);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        h1 { margin: 0; font-size: 20px; }
-        .badge { background: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+        /* UI Components */
+        .card { background: var(--surface); padding: 30px; border-radius: var(--radius); box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid var(--border); }
+        .btn { background: var(--primary); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { opacity: 0.6; cursor: wait; }
+        
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid var(--border); border-radius: 8px; }
+        label { font-weight: 600; font-size: 14px; display: block; margin-top: 15px; }
 
         /* Views */
         .view { display: none; }
-        .view.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .view.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Components */
-        .card {
-            background: var(--color-surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--color-border);
-            padding: 32px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            margin-bottom: 24px;
-        }
+        /* Test UI */
+        .likert-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 25px 0; }
+        .likert-opt { border: 2px solid var(--border); padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .likert-opt:hover { border-color: var(--primary); background: #eff6ff; }
+        .likert-opt.selected { background: var(--primary); color: white; border-color: var(--primary); }
 
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-weight: 600; margin-bottom: 8px; }
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            font-size: 14px;
-        }
-        
-        .btn {
-            background: var(--color-primary);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.2s;
-        }
-        .btn:hover { background: var(--color-primary-hover); }
-        .btn-secondary { background: var(--color-border); color: var(--color-text); }
-        .btn-secondary:hover { background: #cbd5e1; }
+        .progress { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 20px; }
+        .bar { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
 
-        /* Loader */
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--color-primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loading-container { text-align: center; padding: 40px; }
+        /* Results */
+        .res-item { margin-bottom: 15px; }
+        .res-bar-bg { background: #f1f5f9; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+        .res-bar-fill { background: var(--primary); height: 100%; }
 
-        /* Test Interface */
-        .likert-scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 20px; }
-        .likert-opt {
-            border: 2px solid var(--color-border);
-            padding: 15px;
-            text-align: center;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .likert-opt:hover { border-color: var(--color-primary); background: #eff6ff; }
-        .likert-opt.selected { background: var(--color-primary); color: white; border-color: var(--color-primary); }
-        
-        .progress-bar { height: 6px; background: var(--color-border); border-radius: 999px; overflow: hidden; margin-bottom: 20px; }
-        .progress-fill { height: 100%; background: var(--color-primary); width: 0%; transition: width 0.3s; }
-        
-        .error-box { background: #fef2f2; border: 1px solid #fee2e2; color: #991b1b; padding: 15px; border-radius: var(--radius-md); margin-bottom: 20px; display: none; }
-        
-        /* Helper for small text */
-        .hint { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
+        /* Loading */
+        .loader { width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite; margin: 0 auto 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="header-content">
+<div class="container">
+    <div style="text-align: center; margin-bottom: 30px;">
         <h1>🔮 Генератор Тестов имени Дуни Пахучей <span class="badge">💅</span></h1>
         <div style="font-size: 12px; color: var(--color-text-secondary);">Поверед бай Хлопья с молоком</div>
     </div>
-</header>
 
-<div class="container">
-    
-    <!-- ERROR BOX -->
-    <div id="errorBox" class="error-box"></div>
+    <div id="errorBox" style="background:#fef2f2; color:#991b1b; padding:15px; border-radius:8px; display:none; margin-bottom:20px;"></div>
 
-    <!-- VIEW: SETUP -->
+    <!-- SETUP -->
     <div id="setupView" class="view active">
         <div class="card">
-            <h2 style="margin-top: 0;">Создать новый тест</h2>
-            <p style="color: var(--color-text-secondary); margin-bottom: 24px;">
-                Система автоматически выберет провайдера (OpenRouter или Gemini) в зависимости от вашего ключа.
-            </p>
             <form id="setupForm">
-                <div class="form-group">
-                    <label>Тема теста</label>
-                    <input type="text" id="themeInput" placeholder="Например: Кто ты из Смешариков? или Уровень выгорания" required>
-                </div>
-                <div class="form-group">
-                    <label>Аудитория</label>
-                    <input type="text" id="audienceInput" value="Общая" placeholder="Для кого этот тест?">
-                </div>
-                <div class="form-group">
-                    <label>Количество вопросов</label>
-                    <select id="qCountInput">
-                        <option value="5">5 (Быстрый)</option>
-                        <option value="10" selected>10 (Оптимально)</option>
-                        <option value="15">15 (Подробный)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>API Key</label>
-                    <input type="password" id="apiKeyInput" placeholder="sk-or-... (OpenRouter) или AIza... (Gemini)" required>
-                    <div class="hint">Ключ определяет, какая модель будет использована.</div>
-                </div>
-                <button type="submit" class="btn">🚀 Сгенерировать</button>
+                <label>Тема теста</label>
+                <input type="text" id="themeInput" placeholder="Например: Какой ты хлеб?" required>
+                
+                <label>Аудитория</label>
+                <input type="text" id="audienceInput" value="Общая">
+                
+                <label>Вопросов</label>
+                <select id="qCountInput">
+                    <option value="5">5 (Зачем?)</option>
+                    <option value="10" selected>10 (Быстрый)</option>
+                    <option value="15">15 (Стандарт)</option>
+                    <option value="25" selected>10 (Детальный)</option>
+                    <option value="69" selected>69 (Вирт)</option>
+                </select>
+
+                <label>API Ключ (OpenRouter или Gemini)</label>
+                <input type="password" id="apiKeyInput" placeholder="sk-or-... или AIza..." required>
+                
+                <button type="submit" class="btn" style="margin-top: 25px;">Начать генерацию</button>
             </form>
         </div>
     </div>
 
-    <!-- VIEW: LOADING -->
-    <div id="loadingView" class="view">
-        <div class="loading-container">
-            <div class="loader"></div>
-            <h3 id="loadingTitle">Анализ...</h3>
-            <p id="loadingSubtitle" style="color: #64748b;">Искусственный интеллект думает</p>
-        </div>
+    <!-- LOADING -->
+    <div id="loadingView" class="view" style="text-align: center; padding-top: 50px;">
+        <div class="loader"></div>
+        <h3 id="loadTitle">Запуск...</h3>
+        <p id="loadDesc" style="color: var(--text-light);">Инициализация моделей</p>
     </div>
 
-    <!-- VIEW: TEST -->
+    <!-- TEST -->
     <div id="testView" class="view">
-        <div class="progress-bar"><div id="progressBar" class="progress-fill"></div></div>
+        <div class="progress"><div id="progressBar" class="bar"></div></div>
         <div class="card">
-            <div style="font-size: 12px; color: #64748b; margin-bottom: 10px;">Вопрос <span id="qCurrent">1</span> из <span id="qTotal">10</span></div>
-            <h3 id="questionText" style="margin-bottom: 30px;">...</h3>
+            <div style="font-size: 12px; color: var(--text-light); margin-bottom: 10px;">ВОПРОС <span id="qNum">1</span></div>
+            <h3 id="qText" style="font-size: 20px; margin-bottom: 30px;">...</h3>
             
-            <div class="likert-scale">
+            <div class="likert-grid">
                 <div class="likert-opt" onclick="app.answer(1)">1</div>
                 <div class="likert-opt" onclick="app.answer(2)">2</div>
                 <div class="likert-opt" onclick="app.answer(3)">3</div>
                 <div class="likert-opt" onclick="app.answer(4)">4</div>
                 <div class="likert-opt" onclick="app.answer(5)">5</div>
             </div>
-            <div style="display:flex; justify-content:space-between; font-size:12px; color:#64748b; margin-top:8px; padding: 0 5px;">
-                <span>Нет / Не согласен</span><span>Да / Согласен</span>
+            <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-light); padding:0 5px;">
+                <span>Нет / Никогда</span>
+                <span>Да / Всегда</span>
             </div>
         </div>
     </div>
 
-    <!-- VIEW: RESULTS -->
+    <!-- RESULTS -->
     <div id="resultsView" class="view">
-        <div class="card" id="resultsContent"></div>
-        <button class="btn btn-secondary" onclick="location.reload()">Создать новый тест</button>
+        <div class="card" id="resContent"></div>
+        <button class="btn" onclick="location.reload()">Создать новый</button>
     </div>
-
 </div>
 
-<!-- CONFIG LOADING -->
 <script src="app-settings.js"></script>
-
 <script>
-    // 1. Проверка загрузки конфига
-    if (typeof CONFIG === 'undefined') {
-        const errDiv = document.getElementById('errorBox');
-        errDiv.style.display = 'block';
-        errDiv.innerHTML = '❌ <b>Ошибка:</b> Файл app-settings.js не найден.<br>Убедитесь, что app-settings.js лежит в одной папке с index.html.';
-        throw new Error("Config missing");
-    }
-
-    // 2. State
-    const state = {
-        apiKey: null,
-        provider: 'openrouter',
-        blueprint: null,
-        questions: [],
-        responses: [],
-        currentStep: 0
+// --- ПАТЧ КОНФИГА ---
+// Принудительно ставим нужные модели, игнорируя то, что в файле
+if (typeof CONFIG !== 'undefined') {
+    CONFIG.providers = CONFIG.providers || {};
+    // Настройка OpenRouter
+    CONFIG.providers.openrouter = {
+        endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+        models: {
+            architect: 'xiaomi/mimo-v2-flash:free',
+            generator: 'xiaomi/mimo-v2-flash:free'
+        },
+        headers: (key) => ({
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': window.location.href,
+        })
     };
+    // Настройка Gemini
+    CONFIG.providers.gemini = {
+        endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
+        models: {
+            architect: 'gemini-2.5-flash', // Актуальная быстрая версия
+            generator: 'gemini-2.5-flash'
+        }
+    };
+} else {
+    alert("Ошибка: app-settings.js не найден!");
+}
 
-    // 3. API Adapter Layer
-    const api = {
+const api = {
     detectProvider(key) {
-        if (key.startsWith('AIza')) return 'gemini';
-        return 'openrouter';
+        return key.startsWith('AIza') ? 'gemini' : 'openrouter';
     },
 
-    // Исправленный конвертер схем
-    convertSchemaToGemini(openAISchema) {
-        // 1. Unwrap OpenAI format
-        let schema = (openAISchema.json_schema && openAISchema.json_schema.schema) 
-            ? openAISchema.json_schema.schema 
-            : openAISchema;
-
-        // 2. Clone to avoid mutation
-        schema = JSON.parse(JSON.stringify(schema));
-
-        // 3. Recursive cleanup for Gemini compatibility
-        function clean(obj) {
-            if (typeof obj !== 'object' || obj === null) return;
-
-            // Gemini API throw error on 'additionalProperties'
-            if ('additionalProperties' in obj) {
-                delete obj.additionalProperties;
+    // Парсер, который выживает при ошибках модели
+    safeParseJSON(text) {
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            console.warn("JSON parse fail, trying regex...");
+            // Ищем { ... } или [ ... ]
+            const match = text.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+            if (match) {
+                try { return JSON.parse(match[0]); } catch (e2) {}
             }
-
-            // Recurse into properties
-            if (obj.properties) {
-                for (const key in obj.properties) {
-                    clean(obj.properties[key]);
-                }
+            // Если модель вернула Markdown ```json ... ```
+            const mdMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+            if (mdMatch) {
+                try { return JSON.parse(mdMatch[1]); } catch (e3) {}
             }
-
-            // Recurse into array items
-            if (obj.items) {
-                clean(obj.items);
-            }
+            throw new Error("Не удалось извлечь JSON из ответа модели: " + text.substring(0, 50) + "...");
         }
-
-        clean(schema);
-        return schema;
     },
 
-    async call(systemPrompt, userPrompt, schema, modelType) {
-        const provider = state.provider;
-        
-        if (CONFIG.ui.debugMode) {
-            console.log(`📡 Call ${provider.toUpperCase()} [${modelType}]`);
-        }
+    async call(systemPrompt, userPrompt, schema, modelType, apiKey) {
+        const provider = this.detectProvider(apiKey);
+        console.log(`📡 API: ${provider} -> ${modelType}`);
+
+        // Для OpenRouter (Xiaomi) отключаем strict mode, он ломает free модели
+        // Для Gemini чистим схему
+        const cleanSchema = this.prepareSchema(schema, provider);
 
         if (provider === 'gemini') {
-            return this.callGemini(systemPrompt, userPrompt, schema, modelType);
+            return this.callGemini(systemPrompt, userPrompt, cleanSchema, modelType, apiKey);
         } else {
-            return this.callOpenRouter(systemPrompt, userPrompt, schema, modelType);
+            return this.callOpenRouter(systemPrompt, userPrompt, cleanSchema, modelType, apiKey);
         }
     },
 
-    async callOpenRouter(systemPrompt, userPrompt, schema, modelType) {
-        const model = CONFIG.providers.openrouter.models[modelType];
-        
-        const response = await fetch(CONFIG.providers.openrouter.endpoint, {
-            method: 'POST',
-            headers: CONFIG.providers.openrouter.headers(state.apiKey),
-            body: JSON.stringify({
-                model: model,
-                messages: [
-                    { role: 'system', content: systemPrompt },
-                    { role: 'user', content: userPrompt }
-                ],
-                response_format: schema,
-                temperature: CONFIG.generation.temperature
-            })
-        });
+    prepareSchema(schema, provider) {
+        let s = JSON.parse(JSON.stringify(schema));
+        if (s.json_schema && s.json_schema.schema) s = s.json_schema.schema; // Unwrap
 
-        if (!response.ok) {
-            const err = await response.json();
-            throw new Error(err.error?.message || 'OpenRouter API Error');
-        }
-
-        const data = await response.json();
-        return JSON.parse(data.choices[0].message.content);
+        // Рекурсивная чистка
+        const clean = (obj) => {
+            if (!obj || typeof obj !== 'object') return;
+            // Gemini и Xiaomi Free не любят additionalProperties
+            if ('additionalProperties' in obj) delete obj.additionalProperties;
+            if (obj.properties) Object.values(obj.properties).forEach(clean);
+            if (obj.items) clean(obj.items);
+        };
+        clean(s);
+        return s;
     },
 
-    async callGemini(systemPrompt, userPrompt, schema, modelType) {
-        const model = CONFIG.providers.gemini.models[modelType];
-        const url = `${CONFIG.providers.gemini.endpoint}${model}:generateContent?key=${state.apiKey}`;
+    async callOpenRouter(sys, user, schema, type, key) {
+        const model = CONFIG.providers.openrouter.models[type];
         
-        // Используем очищенную схему
-        const geminiSchema = this.convertSchemaToGemini(schema);
+        try {
+            const res = await fetch(CONFIG.providers.openrouter.endpoint, {
+                method: 'POST',
+                headers: CONFIG.providers.openrouter.headers(key),
+                body: JSON.stringify({
+                    model: model,
+                    messages: [{role: 'system', content: sys}, {role: 'user', content: user}],
+                    // Важно: Xiaomi Free может падать если response_format сложный
+                    // Посылаем его, но если ошибка 400 - пробуем без него в catch?
+                    // Пока шлем как есть, но schema очищена.
+                    response_format: { type: "json_object" }, // Упрощаем до json_object
+                    temperature: 0.7
+                })
+            });
+            
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error?.message || 'API Error');
+            }
+            
+            const data = await res.json();
+            return this.safeParseJSON(data.choices[0].message.content);
 
-        const response = await fetch(url, {
+        } catch (e) {
+            console.error("OR Error:", e);
+            throw e;
+        }
+    },
+
+    async callGemini(sys, user, schema, type, key) {
+        const model = CONFIG.providers.gemini.models[type];
+        const url = `${CONFIG.providers.gemini.endpoint}${model}:generateContent?key=${key}`;
+
+        // Добавляем инструкцию про JSON в промпт, так надежнее для Gemini
+        const prompt = `${sys}\n\nОТВЕТЬ СТРОГО В FORMAT JSON, СОГЛАСНО СХЕМЕ:\n${JSON.stringify(schema)}\n\nЗАДАЧА: ${user}`;
+
+        const res = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: systemPrompt + "\n\nЗАДАЧА:\n" + userPrompt }]
-                }],
+                contents: [{ parts: [{ text: prompt }] }],
                 generationConfig: {
-                    temperature: CONFIG.generation.temperature,
-                    response_mime_type: "application/json",
-                    response_schema: geminiSchema
+                    temperature: 0.7,
+                    response_mime_type: "application/json"
                 }
             })
         });
 
-        if (!response.ok) {
-            const err = await response.json();
-            throw new Error(err.error?.message || 'Gemini API Error');
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error?.message || 'Gemini Error');
         }
 
-        const data = await response.json();
-        const text = data.candidates[0].content.parts[0].text;
-        return JSON.parse(text);
+        const data = await res.json();
+        return this.safeParseJSON(data.candidates[0].content.parts[0].text);
     }
 };
 
-    // 4. App Logic
-    const app = {
-        async start(e) {
-            e.preventDefault();
-            const key = document.getElementById('apiKeyInput').value.trim();
-            const theme = document.getElementById('themeInput').value;
-            const count = document.getElementById('qCountInput').value;
+// --- APP LOGIC ---
+const app = {
+    state: { step: 0, answers: [], questions: [], blueprint: {}, apiKey: '' },
 
-            if (!key) return alert("Введите API ключ");
+    async start(e) {
+        e.preventDefault();
+        this.state.apiKey = document.getElementById('apiKeyInput').value;
+        const theme = document.getElementById('themeInput').value;
+        const count = document.getElementById('qCountInput').value;
 
-            // Init
-            state.apiKey = key;
-            state.provider = api.detectProvider(key);
-            console.log(`🔌 Provider detected: ${state.provider}`);
+        if(!this.state.apiKey) return alert("Нужен ключ!");
 
-            this.switchView('loading');
-            document.getElementById('errorBox').style.display = 'none';
+        this.setLoading(true, "Архитектор планирует тест...");
+        document.getElementById('errorBox').style.display = 'none';
+
+        try {
+            // 1. Blueprint
+            const blueprint = await api.call(
+                PROMPTS.architect,
+                `Тема: "${theme}". Придумай структуру.`,
+                SCHEMAS.blueprint,
+                'architect',
+                this.state.apiKey
+            );
+            this.state.blueprint = blueprint;
+
+            // 2. Questions
+            this.setLoading(true, "Генератор пишет вопросы...");
             
-            try {
-                // Step 1: Blueprint
-                document.getElementById('loadingTitle').innerText = `Архитектор (${state.provider === 'gemini' ? 'Gemini' : 'OpenRouter'})...`;
-                const blueprint = await api.call(
-                    PROMPTS.architect, 
-                    `Тема: ${theme}`, 
-                    SCHEMAS.blueprint, 
-                    'architect'
-                );
-                state.blueprint = blueprint;
-
-                // Step 2: Content
-                document.getElementById('loadingTitle').innerText = "Генерация вопросов...";
-                const content = await api.call(
-                    PROMPTS.generator,
-                    `Тема: ${theme}. Тип: ${blueprint.testType}. Результаты: ${JSON.stringify(blueprint.outcomes)}. Кол-во: ${count}`,
-                    SCHEMAS.questions,
-                    'generator'
-                );
-                state.questions = content.questions;
-
-                // Start
-                state.currentStep = 0;
-                state.responses = [];
-                this.renderQuestion();
-                this.switchView('test');
-
-            } catch (err) {
-                console.error(err);
-                document.getElementById('errorBox').style.display = 'block';
-                document.getElementById('errorBox').innerText = `Ошибка (${state.provider}): ${err.message}`;
-                this.switchView('setup');
-            }
-        },
-
-        renderQuestion() {
-            const q = state.questions[state.currentStep];
-            document.getElementById('qCurrent').innerText = state.currentStep + 1;
-            document.getElementById('qTotal').innerText = state.questions.length;
-            document.getElementById('questionText').innerText = q.text;
+            // Хак для Gemini/Xiaomi: явно просим размазывать веса
+            const genPrompt = `Тема: ${theme}. Тип: ${blueprint.testType}.
+            Результаты: ${JSON.stringify(blueprint.outcomes)}.
+            Сгенерируй ${count} вопросов.
             
-            const pct = (state.currentStep / state.questions.length) * 100;
-            document.getElementById('progressBar').style.width = pct + '%';
+            ВАЖНО ПРО ВЕСА:
+            Не делай так, чтобы один вопрос давал баллы только одному результату.
+            Распределяй веса! Если вопрос "Я люблю шум", это:
+            - Шумный персонаж: +1.0
+            - Тихий персонаж: -1.0
+            - Средний персонаж: +0.2`;
+
+            const content = await api.call(
+                PROMPTS.generator,
+                genPrompt,
+                SCHEMAS.questions,
+                'generator',
+                this.state.apiKey
+            );
             
-            document.querySelectorAll('.likert-opt').forEach(el => el.classList.remove('selected'));
-        },
-
-        answer(val) {
-            document.querySelectorAll('.likert-opt')[val-1].classList.add('selected');
-            state.responses[state.currentStep] = val;
+            this.state.questions = content.questions;
             
-            setTimeout(() => {
-                state.currentStep++;
-                if (state.currentStep < state.questions.length) {
-                    this.renderQuestion();
-                } else {
-                    this.finish();
-                }
-            }, CONFIG.ui.answerDelayMs);
-        },
+            // Run
+            this.state.step = 0;
+            this.state.answers = [];
+            this.renderQ();
+            this.setView('test');
 
-        finish() {
-            this.switchView('loading');
-            document.getElementById('loadingTitle').innerText = "Анализ результатов...";
-            
-            setTimeout(() => {
-                this.calcResults();
-                this.switchView('results');
-            }, CONFIG.ui.resultsAnimationDelay);
-        },
-
-        calcResults() {
-            const scores = {};
-            state.blueprint.outcomes.forEach(o => scores[o.id] = 0);
-
-            state.questions.forEach((q, idx) => {
-                const val = state.responses[idx] - 3; // -2..+2
-                q.mapping.forEach(m => {
-                    if (scores[m.outcomeId] !== undefined) {
-                        scores[m.outcomeId] += m.weight * val;
-                    }
-                });
-            });
-
-            const container = document.getElementById('resultsContent');
-            let html = '';
-
-            if (state.blueprint.testType === 'categorical') {
-                const sorted = state.blueprint.outcomes.sort((a, b) => scores[b.id] - scores[a.id]);
-                const winner = sorted[0];
-                const maxScore = Math.max(...Object.values(scores), 1);
-                
-                html = `
-                    <div style="text-align:center; margin-bottom:32px;">
-                        <div style="font-size: 14px; color: #64748b; margin-bottom: 10px; text-transform:uppercase; letter-spacing:1px;">Ваш Результат</div>
-                        <h2 style="color:var(--color-primary); font-size:32px; margin:0 0 10px 0;">${winner.name}</h2>
-                        <p style="font-size: 18px; line-height:1.6;">${winner.description}</p>
-                    </div>
-                    <hr style="margin: 24px 0; border: 0; border-top: 1px solid #e2e8f0;">
-                    <h4 style="margin-bottom: 16px; color: #64748b;">Другие совпадения:</h4>
-                `;
-                
-                sorted.slice(1).forEach(o => {
-                    const rel = Math.max(0, (scores[o.id] / maxScore) * 100);
-                    html += `
-                        <div style="margin-bottom: 16px;">
-                            <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:4px;">
-                                <span>${o.name}</span>
-                            </div>
-                            <div style="background:#f1f5f9; height:8px; border-radius:4px; overflow:hidden;">
-                                <div style="width:${rel}%; background:#cbd5e1; height:100%;"></div>
-                            </div>
-                        </div>
-                    `;
-                });
-            } else {
-                html = `<div style="text-align:center; margin-bottom:24px;"><h2>Ваш Профиль</h2></div>`;
-                state.blueprint.outcomes.forEach(o => {
-                    const raw = scores[o.id];
-                    const percent = Math.min(100, Math.max(0, 50 + (raw * 5)));
-                    
-                    html += `
-                        <div style="margin-bottom: 24px;">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                                <strong>${o.name}</strong>
-                                <span style="font-size:12px; color:${raw > 0 ? 'green' : raw < 0 ? 'red' : 'gray'}">
-                                    ${raw > 0 ? 'Высокий' : raw < 0 ? 'Низкий' : 'Средний'}
-                                </span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${percent}%"></div>
-                            </div>
-                            <div style="font-size: 13px; color: #64748b;">${o.description}</div>
-                        </div>
-                    `;
-                });
-            }
-            container.innerHTML = html;
-        },
-
-        switchView(id) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(id + 'View').classList.add('active');
+        } catch (err) {
+            document.getElementById('errorBox').style.display = 'block';
+            document.getElementById('errorBox').innerText = "Ошибка: " + err.message;
+            this.setView('setup');
         }
-    };
+    },
 
-    // 5. Init
-    document.getElementById('setupForm').addEventListener('submit', (e) => app.start(e));
+    renderQ() {
+        const q = this.state.questions[this.state.step];
+        document.getElementById('qNum').innerText = `${this.state.step + 1} / ${this.state.questions.length}`;
+        document.getElementById('qText').innerText = q.text;
+        
+        const pct = (this.state.step / this.state.questions.length) * 100;
+        document.getElementById('progressBar').style.width = pct + '%';
+        
+        document.querySelectorAll('.likert-opt').forEach(d => d.classList.remove('selected'));
+    },
+
+    answer(val) {
+        this.state.answers[this.state.step] = val;
+        document.querySelectorAll('.likert-opt')[val-1].classList.add('selected');
+        
+        setTimeout(() => {
+            this.state.step++;
+            if(this.state.step < this.state.questions.length) {
+                this.renderQ();
+            } else {
+                this.finish();
+            }
+        }, 200);
+    },
+
+    finish() {
+        this.setLoading(true, "Считаем итоги...");
+        this.setView('loading');
+        
+        setTimeout(() => {
+            this.calc();
+            this.setView('results');
+        }, 500);
+    },
+
+    calc() {
+        const scores = {};
+        this.state.blueprint.outcomes.forEach(o => scores[o.id] = 0);
+
+        this.state.questions.forEach((q, idx) => {
+            const userVal = this.state.answers[idx] - 3; // -2..+2
+            q.mapping.forEach(m => {
+                if(scores[m.outcomeId] !== undefined) {
+                    scores[m.outcomeId] += (m.weight * userVal);
+                }
+            });
+        });
+
+        // Render
+        const container = document.getElementById('resContent');
+        let html = '';
+        
+        if(this.state.blueprint.testType === 'categorical') {
+            const sorted = this.state.blueprint.outcomes.sort((a,b) => scores[b.id] - scores[a.id]);
+            const win = sorted[0];
+            const max = Math.max(...Object.values(scores), 1); // Avoid div/0
+
+            html = `<div style="text-align:center">
+                <h2>${win.name}</h2>
+                <p>${win.description}</p>
+            </div><hr style="margin:20px 0; border:0; border-top:1px solid #eee">`;
+            
+            sorted.slice(1).forEach(o => {
+                // Если max < 0 (все минуса), формула ломается, берем Math.abs или просто 0
+                let pct = 0;
+                if(max > 0) pct = Math.max(0, (scores[o.id] / max) * 100);
+                
+                html += `<div class="res-item">
+                    <div style="display:flex; justify-content:space-between; font-size:14px;">
+                        <span>${o.name}</span>
+                    </div>
+                    <div class="res-bar-bg"><div class="res-bar-fill" style="width:${pct}%"></div></div>
+                </div>`;
+            });
+        } else {
+            this.state.blueprint.outcomes.forEach(o => {
+                const s = scores[o.id];
+                // Шкалы: -10..+10 -> 0..100
+                const pct = Math.min(100, Math.max(0, 50 + (s * 5)));
+                html += `<div class="res-item">
+                    <strong>${o.name}</strong>
+                    <div class="res-bar-bg"><div class="res-bar-fill" style="width:${pct}%"></div></div>
+                    <small style="color:#666">${o.description}</small>
+                </div>`;
+            });
+        }
+        container.innerHTML = html;
+    },
+
+    setView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(id+'View').classList.add('active');
+    },
+    
+    setLoading(active, msg) {
+        if(active) {
+            this.setView('loading');
+            document.getElementById('loadTitle').innerText = msg;
+        }
+    }
+};
+
+document.getElementById('setupForm').addEventListener('submit', (e) => app.start(e));
 </script>
-
 </body>
 </html>
