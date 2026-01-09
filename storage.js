@@ -94,7 +94,7 @@ const Storage = {
                     </div>
                 `).join('')}
             </div>
-            <button class="btn btn-secondary" onclick="app.switchView('setup')" style="margin-top: 30px;">← Вернуться в меню</button>
+            <button class="btn btn-secondary" onclick="app.setView('setup')" style="margin-top: 30px;">← Вернуться в меню</button>
         `;
     }
 };
