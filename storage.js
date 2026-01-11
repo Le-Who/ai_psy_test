@@ -1,69 +1,72 @@
 /**
- * Storage Manager
- * ============================
- * Отвечает за сохранение тестов в localStorage и управление библиотекой.
+ * AI Universal Test Generator - Storage v4.0 (Final)
+ * =================================================
+ * Handles local saving, loading, and library rendering
  */
 
 const Storage = {
-    KEY: 'ai_test_gen_library_v1',
-
-    // === DATA LOGIC ===
+    KEY: 'ai_tests_library_v2',
 
     /**
-     * Получить все сохраненные тесты
+     * Получить весь список тестов
      */
     getAll() {
-        const raw = localStorage.getItem(this.KEY);
-        return raw ? JSON.parse(raw) : [];
-    },
-
-    /**
-     * Сохранить текущий тест
-     */
-    save(blueprint, questions, themeName) {
-        const library = this.getAll();
-        
-        // Проверка на дубликаты (простая)
-        const exists = library.some(t => t.theme === themeName && t.questions.length === questions.length);
-        if (exists) return false; // Уже есть
-
-        const newTest = {
-            id: 'test_' + Date.now(),
-            date: new Date().toLocaleDateString(),
-            theme: themeName,
-            blueprint: blueprint,
-            questions: questions
-        };
-
-        library.unshift(newTest); // Добавляем в начало
-        localStorage.setItem(this.KEY, JSON.stringify(library));
-        return true;
-    },
-
-    /**
-     * Удалить тест по ID
-     */
-    delete(id) {
-        let library = this.getAll();
-        library = library.filter(t => t.id !== id);
-        localStorage.setItem(this.KEY, JSON.stringify(library));
+        const data = localStorage.getItem(this.KEY);
+        return data ? JSON.parse(data) : [];
     },
 
     /**
      * Найти тест по ID
      */
     getById(id) {
-        const library = this.getAll();
-        return library.find(t => t.id === id);
+        const list = this.getAll();
+        return list.find(t => t.id === id);
     },
 
-    // === UI RENDERING ===
+    /**
+     * Сохранить текущий тест (с авто-переименованием дубликатов)
+     * Возвращает итоговое имя теста
+     */
+    save(blueprint, questions, themeName) {
+        const library = this.getAll();
+        
+        // Логика авто-переименования: "Тест" -> "Тест (2)" -> "Тест (3)"
+        let finalName = themeName;
+        let counter = 2;
+
+        while (library.some(t => t.theme === finalName)) {
+            finalName = `${themeName} (${counter})`;
+            counter++;
+        }
+
+        const newTest = {
+            id: 'test_' + Date.now(),
+            date: new Date().toLocaleDateString('ru-RU', {
+                day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+            }),
+            theme: finalName,
+            blueprint: blueprint,
+            questions: questions
+        };
+
+        // Добавляем в начало списка
+        library.unshift(newTest);
+        localStorage.setItem(this.KEY, JSON.stringify(library));
+        
+        return finalName;
+    },
 
     /**
-     * Генерирует HTML список для Library View
+     * Удалить тест по ID
      */
+    delete(id) {
+        const list = this.getAll();
+        const newList = list.filter(t => t.id !== id);
+        localStorage.setItem(this.KEY, JSON.stringify(newList));
+    },
+
     /**
-     * Генерация HTML для списка библиотеки
+     * Генерация HTML для списка библиотеки (UI)
      */
     renderLibraryHTML() {
         const list = this.getAll();
@@ -75,36 +78,39 @@ const Storage = {
         }
 
         return list.map(test => {
-            // Определяем иконку по типу
-            const icon = (test.blueprint.testType === 'quiz') ? '🧠' : '🧩';
+            // Определяем иконку по типу теста (quiz vs psy)
+            // Если поле testType отсутствует (старые тесты), считаем psy
+            const type = test.blueprint.testType || 'categorical'; 
+            const isQuiz = (type === 'quiz');
+            const icon = isQuiz ? '🧠' : '🧩';
+            
             const count = test.questions ? test.questions.length : 0;
             
             return `
             <div class="card" style="padding: 20px; display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                <div style="font-size: 24px;">${icon}</div>
+                <div style="font-size: 24px; flex-shrink: 0;">${icon}</div>
                 
-                <div style="flex-grow: 1;">
-                    <h3 style="margin: 0 0 5px; font-size: 16px; line-height: 1.4;">${test.theme}</h3>
+                <div style="flex-grow: 1; min-width: 0;"> <!-- min-width fix for flexbox truncation -->
+                    <h3 style="margin: 0 0 5px; font-size: 16px; line-height: 1.4; word-wrap: break-word;">${test.theme}</h3>
                     <div style="font-size: 12px; color: var(--text-muted);">
                         ${test.date} • ${count} вопросов
                     </div>
                 </div>
 
-                <div style="display:flex; gap:10px; align-items: center;">
+                <div style="display:flex; gap:10px; align-items: center; flex-shrink: 0;">
                     <button class="btn" onclick="app.loadSavedTest('${test.id}')" 
-                        style="width: auto; padding: 8px 16px; font-size: 14px; white-space: nowrap; flex-shrink: 0;">
+                        style="width: auto; padding: 8px 16px; font-size: 14px; white-space: nowrap;">
                         ▶ Начать
                     </button>
                     <button onclick="app.deleteTest('${test.id}')" 
-                        style="background:none; border:none; cursor:pointer; font-size:18px; opacity:0.5; padding: 5px; flex-shrink: 0;"
+                        style="background:none; border:none; cursor:pointer; font-size:18px; opacity:0.5; padding: 5px; color: var(--text-muted); transition: color 0.2s;"
+                        onmouseover="this.style.color=var(--danger)" 
+                        onmouseout="this.style.color='var(--text-muted)'"
                         title="Удалить">
                         🗑
                     </button>
                 </div>
             </div>`;
         }).join('');
-    }
-            <button class="btn btn-secondary" onclick="app.setView('setup')" style="margin-top: 30px;">← Вернуться в меню</button>
-        `;
     }
 };
