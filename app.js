@@ -116,7 +116,12 @@ const app = {
 
             // 2. Questions
             this.setLoading(true, "✍️ Придумываем вопросы...");
-            const genPrompt = `Тема: ${theme}. Структура: ${JSON.stringify(this.state.blueprint.outcomes)}. Кол-во: ${count}. ${notesText}`;
+            
+            // Получаем кол-во вариантов
+            const optionsCount = isQuiz ? document.getElementById('difficultyInput').value : 0;
+            const optionsInstruction = isQuiz ? `СТРОГОЕ ТРЕБОВАНИЕ: В каждом вопросе должно быть ровно ${optionsCount} варианта(ов) ответа!` : "";
+
+            const genPrompt = `Тема: ${theme}. Структура: ${JSON.stringify(this.state.blueprint.outcomes)}. Кол-во вопросов: ${count}. ${optionsInstruction} ${notesText}`;
             
             const res = await api.call('generator' + taskSuffix, genPrompt, schemaQ, apiKey);
             this.state.questions = res.questions;
