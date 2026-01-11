@@ -62,37 +62,48 @@ const Storage = {
     /**
      * Генерирует HTML список для Library View
      */
+    /**
+     * Генерация HTML для списка библиотеки
+     */
     renderLibraryHTML() {
-        const tests = this.getAll();
-        
-        if (tests.length === 0) {
-            return `
-                <div style="text-align:center; padding: 40px; color: #64748b;">
-                    <div style="font-size: 40px; margin-bottom: 10px;">📭</div>
-                    <h3>Библиотека пуста</h3>
-                    <p>Пройдите генерацию теста, и в конце вы сможете сохранить его сюда.</p>
-                    <button class="btn" onclick="app.switchView('setup')" style="margin-top:20px; max-width:200px;">Создать тест</button>
-                </div>
-            `;
+        const list = this.getAll();
+        if (list.length === 0) {
+            return `<div style="text-align:center; padding:40px; color:var(--text-muted);">
+                <div style="font-size:40px; margin-bottom:10px;">📭</div>
+                Библиотека пуста.<br>Создайте свой первый тест!
+            </div>`;
         }
 
-        return `
-            <h2 style="margin-top:0; margin-bottom: 20px;">Мои тесты (${tests.length})</h2>
-            <div style="display: grid; gap: 15px;">
-                ${tests.map(test => `
-                    <div class="card" style="margin:0; padding: 20px; display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <div style="font-weight:bold; font-size:16px;">${test.theme}</div>
-                            <div style="font-size:12px; color:#64748b; margin-top:4px;">
-                                ${test.date} • ${test.questions.length} вопросов • ${test.blueprint.testType}
-                            </div>
-                        </div>
-                        <div style="display:flex; gap:10px;">
-                            <button onclick="app.loadSavedTest('${test.id}')" class="btn" style="padding: 8px 16px; width:auto; font-size:13px;">▶ Начать</button>
-                            <button onclick="app.deleteTest('${test.id}')" class="btn btn-secondary" style="padding: 8px 12px; width:auto; color: #ef4444;">🗑</button>
-                        </div>
+        return list.map(test => {
+            // Определяем иконку по типу
+            const icon = (test.blueprint.testType === 'quiz') ? '🧠' : '🧩';
+            const count = test.questions ? test.questions.length : 0;
+            
+            return `
+            <div class="card" style="padding: 20px; display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                <div style="font-size: 24px;">${icon}</div>
+                
+                <div style="flex-grow: 1;">
+                    <h3 style="margin: 0 0 5px; font-size: 16px; line-height: 1.4;">${test.theme}</h3>
+                    <div style="font-size: 12px; color: var(--text-muted);">
+                        ${test.date} • ${count} вопросов
                     </div>
-                `).join('')}
+                </div>
+
+                <div style="display:flex; gap:10px; align-items: center;">
+                    <button class="btn" onclick="app.loadSavedTest('${test.id}')" 
+                        style="width: auto; padding: 8px 16px; font-size: 14px; white-space: nowrap; flex-shrink: 0;">
+                        ▶ Начать
+                    </button>
+                    <button onclick="app.deleteTest('${test.id}')" 
+                        style="background:none; border:none; cursor:pointer; font-size:18px; opacity:0.5; padding: 5px; flex-shrink: 0;"
+                        title="Удалить">
+                        🗑
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+    }
             </div>
             <button class="btn btn-secondary" onclick="app.setView('setup')" style="margin-top: 30px;">← Вернуться в меню</button>
         `;
