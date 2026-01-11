@@ -101,11 +101,19 @@
 
     <!-- 4. VIEW: TEST -->
     <div id="testView" class="view">
-        <div class="progress"><div id="progressBar" class="bar"></div></div>
-        <div class="card">
-            <div style="display:flex; justify-content:space-between; margin-bottom: 15px; color: var(--text-light); font-size: 13px; font-weight: 600;">
-                <span>ВОПРОС <span id="qNum">1</span></span>
+        <!-- Верхняя панель с кнопкой назад -->
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 15px;">
+            <button id="backBtn" class="btn-back" onclick="app.prevQuestion()">
+                ← Назад
+            </button>
+            <div style="color: var(--text-muted); font-size: 13px; font-weight: 600;">
+                ВОПРОС <span id="qNum">1</span>
             </div>
+        </div>
+
+        <div class="progress"><div id="progressBar" class="bar"></div></div>
+        
+        <div class="card">
             <h3 id="qText" style="font-size: 22px; margin-bottom: 30px; line-height: 1.4;">...</h3>
             
             <div class="likert-grid">
@@ -137,6 +145,7 @@
 <!-- ПОДКЛЮЧЕНИЕ СКРИПТОВ -->
 <script src="app-settings.js"></script>
 <script src="storage.js"></script> 
+<script src="app.js"></script>
 
 <script>
 // --- API КЛИЕНТ (v3.0 Updated) ---
