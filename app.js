@@ -1,5 +1,5 @@
 /**
- * AI Universal Test Generator - Core Logic v5.4 (Final Fixes)
+ * AI Universal Test Generator - Core Logic v5.5 (Final Polish)
  */
 
 const TINY_TOKEN = 'lBjFvZGQQmPD56gcBpQBgdyMlezZCxwNShVIlh9wA3W4HFtDOI0418CnoXBx'; // Не забудьте вставить!
@@ -62,7 +62,7 @@ const app = {
         const isQuiz = (this.state.blueprint.testType === 'quiz');
 
         // Тексты для разных режимов
-        const title = isQuiz ? "ВЫЗОВ ПРИНЯТ? ⚔️" : "СМОТРИ МОЙ РЕЗУЛЬТАТ! 👀";
+        const title = isQuiz ? "ВЫЗОВ ПРИНЯТ! ⚔️" : "СМОТРИ МОЙ РЕЗУЛЬТАТ! 👀";
         let desc = "";
 
         if (isQuiz) {
@@ -89,11 +89,7 @@ const app = {
         
         // Исправляем ошибку: восстанавливаем режим из blueprint
         // Если в blueprint тип 'quiz', то и режим ставим 'quiz' (или 'duel' для логики финала)
-        // Но для рендеринга важно знать тип теста
         const type = this.state.blueprint.testType || 'categorical';
-        // Если это была дуэль, оставляем 'duel', иначе 'psy'/'quiz'
-        // Важный момент: renderQ смотрит на this.state.mode === 'quiz' || 'duel'
-        // Если тест psy, нам нужно чтобы renderQ рисовал psy.
         
         if (type === 'quiz') {
             this.state.mode = 'duel'; // Это викторина-дуэль
@@ -186,14 +182,12 @@ const app = {
 
         if (isQuizMode) {
             psyDiv.style.display = 'none';
-            quizDiv.style.display = 'grid'; // Grid из CSS
+            quizDiv.style.display = 'flex'; // Flex, так как в CSS .quiz-grid display:flex
             
             let html = '';
             q.options.forEach((opt, idx) => {
-                // ИСПРАВЛЕНИЕ: Добавляем класс 'quiz-option-btn' из CSS + 'btn' для базовых стилей
-                // Если 'quiz-option-btn' нет в CSS, он возьмет стили по умолчанию. 
-                // Но лучше использовать просто стили кнопок викторины
-                html += `<button class="quiz-option-btn" onclick="app.handleQuizAnswer(${idx}, this)">${opt}</button>`;
+                // ИСПРАВЛЕНИЕ: Используем правильный класс 'quiz-opt' из CSS
+                html += `<button class="quiz-opt" onclick="app.handleQuizAnswer(${idx}, this)">${opt}</button>`;
             });
             quizDiv.innerHTML = html;
         } else {
@@ -222,10 +216,16 @@ const app = {
         if (isCorrect) { btn.classList.add('correct'); this.state.quizScore++; }
         else { 
             btn.classList.add('wrong');
-            const allBtns = document.querySelectorAll('.quiz-option-btn');
+            const allBtns = document.querySelectorAll('.quiz-opt');
             if(allBtns[q.correctIndex]) allBtns[q.correctIndex].classList.add('correct');
         }
-        document.querySelectorAll('.quiz-option-btn').forEach(b => b.disabled = true);
+        
+        // Добавляем класс disabled (в CSS он делает opacity: 0.7)
+        document.querySelectorAll('.quiz-opt').forEach(b => {
+             b.classList.add('disabled');
+             b.disabled = true; // на всякий случай
+        });
+
         setTimeout(() => this.nextQuestion(), 1200); 
     },
 
@@ -272,7 +272,7 @@ const app = {
                 else { verdict = "ТЫ ПРОИГРАЛ... 💀"; color = "#f44336"; }
                 duelBlock = `<div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin:20px 0;">
                     <h3 style="margin:0 0 10px; color:${color};">${verdict}</h3>
-                    <div style="display:flex; justify-content:space-around;"><div>👤 Ты: <strong>${score}</strong></div><div>🇺🇦 ${hostName}: <strong>${hostScore}</strong></div></div>
+                    <div style="display:flex; justify-content:space-around;"><div>👤 Ты: <strong>${score}</strong></div><div>🆚 ${hostName}: <strong>${hostScore}</strong></div></div>
                 </div>`;
             }
 
@@ -311,8 +311,8 @@ const app = {
                 </div>
                 
                 <!-- ВОССТАНОВЛЕННЫЙ БЛОК: Другие варианты -->
-                <div style="margin-top:30px; border-top:1px solid var(--border); padding-top:20px;">
-                    <h4 style="margin-bottom:15px; color:var(--text-muted);">Другие варианты:</h4>`;
+                <div class="results-secondary-block">
+                    <h4 class="results-secondary-title">Другие варианты:</h4>`;
                 
                 sorted.slice(1).forEach(o => {
                     // Рассчитываем процент "совпадения" относительно лидера
@@ -322,13 +322,13 @@ const app = {
                     if(val > 0) pct = Math.round((val / maxScore) * 100);
                     
                     html += `
-                    <div style="margin-bottom:10px;">
+                    <div class="res-item">
                         <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:5px;">
                             <span>${o.name}</span>
-                            <span style="color:var(--text-muted);">${pct}%</span>
+                            <span style="color:var(--text-muted); font-size:12px;">${pct}%</span>
                         </div>
-                        <div style="height:6px; background:var(--bg); border-radius:3px; overflow:hidden;">
-                            <div style="height:100%; width:${pct}%; background:var(--accent); opacity:0.7;"></div>
+                        <div class="res-bar-bg">
+                            <div class="res-bar-fill" style="width:${pct}%"></div>
                         </div>
                     </div>`;
                 });
@@ -339,7 +339,14 @@ const app = {
                 html = `<div style="text-align:center; margin-bottom:25px;"><h2>Ваш профиль</h2></div>`;
                 outcomes.forEach(o => {
                     const pct = Math.min(100, Math.max(0, 50 + (scores[o.id] * 5)));
-                    html += `<div style="margin-bottom:15px;"><div><strong>${o.name}</strong>: ${pct}%</div><div style="height:8px; background:var(--bg); border-radius:4px;"><div style="width:${pct}%; height:100%; background:var(--primary); border-radius:4px;"></div></div></div>`;
+                    html += `<div class="res-item">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <strong>${o.name}</strong>
+                        </div>
+                        <div class="res-bar-bg">
+                            <div class="res-bar-fill" style="width:${pct}%"></div>
+                        </div>
+                    </div>`;
                 });
             }
         }
@@ -349,7 +356,7 @@ const app = {
 
         // Кнопки
         const isQuiz = (this.state.mode === 'quiz' || (this.state.mode === 'duel' && this.state.blueprint.testType === 'quiz'));
-        const shareBtnText = isQuiz ? "⚔️ Бросить вызов" : "📤 Поделиться";
+        const shareBtnText = isQuiz ? "⚔️ Бросить вызов" : "📤 Поделиться результатом";
 
         html += `
         <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:30px;">
