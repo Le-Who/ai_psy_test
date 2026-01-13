@@ -5,7 +5,7 @@
 
 // !!! ВСТАВЬТЕ СЮДА ВАШ TINYURL API TOKEN !!!
 // (Для работы без токена используется fallback на старый API в функции createShareLink)
-const TINY_TOKEN = ''; 
+const TINY_TOKEN = 'lBjFvZGQQmPD56gcBpQBgdyMlezZCxwNShVIlh9wA3W4HFtDOI0418CnoXBx'; 
 
 // --- API Client ---
 const api = {
