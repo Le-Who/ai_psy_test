@@ -2,451 +2,226 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Test Generator</title>
-    <!-- Подключаем сжатие строк для URL -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
-    <style>
-        :root {
-            --primary: #6c5ce7;
-            --primary-dark: #5b4cc4;
-            --bg: #f8f9fa;
-            --surface: #ffffff;
-            --text: #2d3436;
-            --text-muted: #636e72;
-            --border: #dfe6e9;
-            --success: #00b894;
-            --danger: #ff7675;
-            --radius: 16px;
-            --shadow: 0 4px 20px rgba(0,0,0,0.05);
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* --- LAYOUT --- */
-        .header {
-            background: var(--surface);
-            padding: 15px 20px;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .header h1 {
-            font-size: 18px;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .container {
-            flex: 1;
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        /* --- CARDS & FORMS --- */
-        .card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 25px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-            transition: transform 0.2s;
-        }
-
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: var(--text-muted); }
-        
-        input[type="text"], input[type="number"], textarea, select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            font-size: 16px;
-            font-family: inherit;
-            transition: border-color 0.2s;
-            box-sizing: border-box;
-        }
-        
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        /* --- BUTTONS --- */
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:active { transform: scale(0.98); background: var(--primary-dark); }
-        
-        .btn-secondary { background: var(--surface); border: 2px solid var(--border); color: var(--text); }
-        .btn-secondary:active { background: var(--bg); }
-
-        /* --- TABS --- */
-        .tabs {
-            display: flex;
-            background: #e0e0e0;
-            border-radius: 14px;
-            padding: 4px;
-            margin-bottom: 25px;
-        }
-        
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-muted);
-            transition: all 0.2s;
-        }
-        
-        .tab.active {
-            background: white;
-            color: var(--text);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        /* --- TEST VIEW --- */
-        .progress-container {
-            height: 6px;
-            background: var(--border);
-            border-radius: 3px;
-            margin-bottom: 30px;
-            overflow: hidden;
-        }
-        .progress-bar {
-            height: 100%;
-            background: var(--primary);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .question-card {
-            text-align: center;
-            margin: 40px 0;
-        }
-        .question-text {
-            font-size: 22px;
-            line-height: 1.5;
-            font-weight: 600;
-            margin-bottom: 30px;
-        }
-
-        .answers-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .ans-btn {
-            background: var(--surface);
-            border: 2px solid var(--border);
-            padding: 16px;
-            border-radius: 12px;
-            text-align: left;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .ans-btn:hover { border-color: var(--primary); color: var(--primary); }
-        
-        /* Quiz specific */
-        .ans-btn.correct { background: #dff9fb; border-color: var(--success); color: var(--success); }
-        .ans-btn.wrong { background: #ff767520; border-color: var(--danger); color: var(--danger); }
-
-        /* Psy specific (Likert) */
-        .likert-scale {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        .likert-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid var(--border);
-            background: var(--surface);
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        .likert-btn:hover, .likert-btn.selected {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-            transform: scale(1.1);
-        }
-
-        /* --- RESULTS --- */
-        .results-secondary-block {
-            margin-top: 30px;
-            background: #f1f2f6;
-            padding: 20px;
-            border-radius: 12px;
-        }
-        .results-secondary-title { margin: 0 0 15px; font-size: 16px; color: var(--text-muted); }
-        
-        .res-item { margin-bottom: 12px; }
-        .res-bar-bg { height: 8px; background: #dfe6e9; border-radius: 4px; overflow: hidden; }
-        .res-bar-fill { height: 100%; background: var(--primary); border-radius: 4px; }
-        .badge { 
-            background: var(--primary); color: white; 
-            padding: 2px 8px; border-radius: 4px; font-size: 12px; 
-        }
-
-        /* DUEL BANNER */
-        .duel-banner {
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: none; /* JS will show */
-            text-align: center;
-        }
-
-        /* --- UTILS --- */
-        .hidden { display: none !important; }
-        .loading-spinner {
-            border: 4px solid rgba(0,0,0,0.1);
-            border-left-color: var(--primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        .settings-toggle {
-            font-size: 12px; color: var(--text-muted); 
-            text-align: center; margin-top: 10px; cursor: pointer; text-decoration: underline;
-        }
-        .advanced-settings { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border); }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Евдокия Тестикова</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content" style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-             <h1 style="cursor: pointer;" onclick="location.reload()" title="На главную">
-                🔮 <span class="header-title-text">Генератор Тестов им. Дуни Пахучей</span> 💅
-            </h1>
-            <button id="libraryBtn" class="btn btn-secondary" style="width:auto; padding:8px 12px; font-size:14px;">
-                📂 Библиотека
-            </button>
-        </div>
-    </header>
-
-    <div class="container">
-        
-        <!-- VIEW: SETUP -->
-        <div id="view-setup" class="fade-in">
-            
-            <!-- Duel Banner (появится если открыли ссылку с вызовом) -->
-            <div id="duelBanner" class="duel-banner">
-                <h3 style="margin:0 0 5px;">⚔️ ТЕБЯ ВЫЗВАЛИ НА ДУЭЛЬ!</h3>
-                <p style="margin:0; opacity:0.9;" id="duelText">Alex набрал 8 баллов. Сможешь лучше?</p>
-            </div>
-
-            <div class="card">
-                <div class="tabs">
-                    <div class="tab active" id="tabPsy" onclick="app.setMode('psy')">Тестикул</div>
-                    <div class="tab" id="tabQuiz" onclick="app.setMode('quiz')">Виктория</div>
-                </div>
-
-                <div class="input-group">
-                    <label>Тема</label>
-                    <input type="text" id="themeInput" placeholder="Например: Кто ты из Вселенной Гарри Поттера?">
-                </div>
-
-                <div class="input-group">
-                    <label>Уточнения <span style="font-weight:normal; opacity:0.6">(опционально)</span></label>
-                    <textarea id="notesInput" rows="2" placeholder="Смешные вопросы, или наоборот серьезные..."></textarea>
-                </div>
-
-                <!-- Mode Specific Fields -->
-                <div class="input-group" id="audienceGroup">
-                    <label>Аудитория</label>
-                    <input type="text" id="audienceInput" placeholder="Подростки, Офисные работники..." value="Любая">
-                </div>
-
-                <div class="input-group hidden" id="difficultyGroup">
-                    <label>Вариантов ответа</label>
-                    <select id="difficultyInput">
-                        <option value="2">2 (Да/Нет)</option>
-                        <option value="3">3 (Легко)</option>
-                        <option value="4" selected>4 (Стандарт)</option>
-                    </select>
-                </div>
-
-                <div class="input-group">
-                    <label>Вопросов</label>
-                    <select id="qCountInput">
-                        <option value="5">5</option>
-                        <option value="10" selected>10</option>
-                        <option value="15">15</option>
-                        <option value="20">20</option>
-                        <option value="30">30</option>
-                    </select>
-                </div>
-
-                <!-- API Keys Section -->
-                <div class="input-group">
-                    <label>API Ключ (Gemini / OpenRouter)</label>
-                    <input type="password" id="apiKeyInput" placeholder="sk-...">
-                </div>
-
-                <div class="settings-toggle" onclick="document.getElementById('advSettings').style.display = document.getElementById('advSettings').style.display === 'block' ? 'none' : 'block'">
-                    ⚙️ Настройки шаринга (TinyURL)
-                </div>
-                
-                <div id="advSettings" class="advanced-settings">
-                    <div class="input-group">
-                        <label>TinyURL API Token (для коротких ссылок)</label>
-                        <input type="password" id="tinyUrlTokenInput" placeholder="Вставь токен из tinyurl.com/app/settings/api">
-                        <small style="color:var(--text-muted); display:block; margin-top:5px;">
-                            Нужен для создания коротких ссылок-приглашений. Можно оставить пустым (тогда будет QR-код).
-                        </small>
-                    </div>
-                </div>
-
-                <button class="btn btn-primary" style="margin-top:20px;" onclick="app.start(event)">
-                    🚀 Сгенерировать
-                </button>
-                
-                <div id="errorBox" style="color:var(--danger); margin-top:15px; display:none; text-align:center;"></div>
-            </div>
+<div class="container">
+    
+    <!-- HEADER -->
+    <div class="header-row">
+        <div class="header-content">
+            <h1 style="cursor: pointer;" onclick="location.reload()" title="Дом Дуни">
+    🔮 <span class="header-title-text">Генератор Тестов им. Дуни Пахучей</span> 💅</h1>
+            <p>Работает на хлопьях с молоком 🥣</p>
         </div>
 
-        <!-- VIEW: LOADING -->
-        <div id="view-loading" class="hidden" style="text-align:center; padding:50px 0;">
-            <div class="loading-spinner"></div>
-            <h2 id="loadingText" style="margin-bottom:10px;">Запуск...</h2>
-            <p style="color:var(--text-muted);">Инициализация моделей</p>
-        </div>
+        <button class="theme-toggle-btn" onclick="toggleThemeMenu()" title="Темы оформления">
+            🎨
+        </button>
 
-        <!-- VIEW: TEST -->
-        <div id="view-test" class="hidden">
-            <div style="margin-bottom:20px;">
-                <button id="backBtn" class="btn btn-secondary" style="width:auto; padding:5px 10px; font-size:14px;" onclick="app.setView('setup')">
-                    ← Назад
-                </button>
+        <div class="theme-menu" id="themeMenu">
+            <div class="theme-opt" onclick="setTheme('light')">
+                <div class="theme-circle" style="background: #fff; border: 1px solid #ddd;"></div>
+                Светленькая
             </div>
-
-            <div class="card">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px; font-weight:600; color:var(--text-muted);">
-                    <span>ВОПРОС</span>
-                    <span id="qNum">1 / 10</span>
-                </div>
-                <div class="progress-container">
-                    <div class="progress-bar" id="progressBar"></div>
-                </div>
-
-                <div class="question-card">
-                    <div id="qText" class="question-text">...</div>
-                    
-                    <!-- PSY CONTAINER -->
-                    <div id="psyContainer" class="likert-scale">
-                        <button class="likert-btn" onclick="app.answer(1)">1</button>
-                        <button class="likert-btn" onclick="app.answer(2)">2</button>
-                        <button class="likert-btn" onclick="app.answer(3)">3</button>
-                        <button class="likert-btn" onclick="app.answer(4)">4</button>
-                        <button class="likert-btn" onclick="app.answer(5)">5</button>
-                        <div style="width:100%; display:flex; justify-content:space-between; margin-top:10px; font-size:12px; color:var(--text-muted); position:absolute; bottom:-25px; left:0;">
-                            <span>❌ Нет</span>
-                            <span>✅ Да</span>
-                        </div>
-                    </div>
-
-                    <!-- QUIZ CONTAINER -->
-                    <div id="quizContainer" class="answers-grid" style="display:none;">
-                        <!-- JS injected options -->
-                    </div>
-                </div>
+            <div class="theme-opt" onclick="setTheme('dark')">
+                <div class="theme-circle" style="background: #1e293b;"></div>
+                Темненькая
             </div>
-
-            <div id="nextBtnContainer" style="display:none; text-align:right;">
-                <button class="btn btn-primary" onclick="app.nextQuestion()" style="width:auto; margin-left:auto;">
-                    Следующий вопрос →
-                </button>
+            <div class="theme-opt" onclick="setTheme('gray')">
+                <div class="theme-circle" style="background: #e5e5e5; border: 1px solid #999;"></div>
+                Серенькая
             </div>
         </div>
+    </div>
+    
+    <div id="errorBox" style="background:#fef2f2; color:#991b1b; padding:15px; border-radius:12px; display:none; margin-bottom:20px; border:1px solid #fecaca;"></div>
 
-        <!-- VIEW: RESULTS -->
-        <div id="view-results" class="hidden">
-            <div class="card" id="resContent">
-                <!-- Results injected here -->
-            </div>
-
-            <div style="display:flex; gap:10px; flex-direction:column;">
-                <!-- Кнопки шаринга -->
-                <button id="shareBtn" class="btn btn-primary" onclick="app.shareTest()">
-                    🔗 Поделиться / Бросить вызов
-                </button>
-                
-                <button class="btn btn-secondary" onclick="location.reload()">
-                    ↺ Создать новый
-                </button>
-                
-                <button id="saveTestBtn" class="btn btn-secondary" onclick="app.saveCurrentTest()">
-                    💾 Сохранить в библиотеку
-                </button>
-            </div>
+    <!-- 1. VIEW: SETUP -->
+    <div id="setupView" class="view active">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+            <button onclick="app.openLibrary()" class="btn-text">📂 Библиотека</button>
         </div>
 
-        <!-- VIEW: LIBRARY -->
-        <div id="view-library" class="hidden">
-            <div style="margin-bottom:20px;">
-                <button class="btn btn-secondary" style="width:auto;" onclick="app.setView('setup')">← Назад</button>
-            </div>
-            <h2 style="margin-bottom:20px;">Ваши тесты</h2>
-            <div id="libraryList"></div>
-        </div>
-
+        <div id="duelView" class="container" style="display: none; text-align: center; padding-top: 50px;">
+    <div style="font-size: 60px;">⚔️</div>
+    <h1 style="color: var(--primary); margin-bottom: 10px;">ВЫЗОВ ПРИНЯТ?</h1>
+    <p style="font-size: 18px; color: var(--text-muted); margin-bottom: 30px;">
+        Пользователь <strong id="duelHostName" style="color: #fff;">...</strong> набрал 
+        <strong id="duelHostScore" style="color: var(--accent);">...</strong> баллов.
+        <br>Сможешь его победить?
+    </p>
+    
+    <div class="card" style="margin-bottom: 30px; text-align: left;">
+        <h3 id="duelThemeTitle" style="margin-top: 0;">Тема: ...</h3>
+        <p>Количество вопросов: <span id="duelQCount">...</span></p>
     </div>
 
-    <!-- SCRIPTS -->
-    <script src="app-settings.js"></script>
-    <script src="storage.js"></script>
-    <script src="app.js"></script>
+    <button class="btn" onclick="app.startDuelTest()" style="font-size: 20px; padding: 15px 40px;">
+        🚀 ПРИНЯТЬ БОЙ
+    </button>
+</div>
+
+        <div class="card">
+            <!-- HEADER WITH TABS -->
+            <div class="card-header-row">
+                <h2 class="card-title">Новый тест</h2>
+                <div class="mode-tabs">
+                    <button class="mode-tab active" id="tabPsy" onclick="app.setMode('psy')">Тестикул</button>
+                    <button class="mode-tab" id="tabQuiz" onclick="app.setMode('quiz')">Виктория</button>
+                </div>
+            </div>
+
+            <form id="setupForm">
+                <label>Тема</label>
+                <input type="text" id="themeInput" placeholder="Например: Знаток мемов 2025" required>
+                
+                <label>Уточнения <span style="font-weight:normal; opacity:0.7; font-size:12px;">(опционально)</span></label>
+                <textarea id="notesInput" rows="2" style="width:100%; padding:12px; margin-top:8px; border:1px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text); font-family:inherit; resize:vertical;" placeholder="Например: Используй сленг, делай вопросы с черным юмором, ссылайся на лор книг..."></textarea>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <!-- ОПЦИИ ДЛЯ PSY -->
+                    <div id="audienceGroup">
+                        <label>Аудитория</label>
+                        <input type="text" id="audienceInput" value="Общая" placeholder="Кто проходит?">
+                    </div>
+                    
+                    <!-- ОПЦИИ ДЛЯ QUIZ (Скрыты по дефолту) -->
+                    <div id="difficultyGroup" style="display:none;">
+                        <label>Вариантов ответа</label>
+                        <select id="difficultyInput">
+                            <option value="2">2 (Да/Нет)</option>
+                            <option value="3">3 (Легко)</option>
+                            <option value="4" selected>4 (Стандарт)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Вопросов</label>
+                        <select id="qCountInput">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="50">50</option>
+                            <option value="69">Тумач.</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label>API Ключ</label>
+                <input type="password" id="apiKeyInput" placeholder="sk-or-... или AIza..." required>
+                
+                <button type="submit" class="btn" style="margin-top: 25px;">🚀 Сгенерировать</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. VIEW: LIBRARY -->
+    <div id="libraryView" class="view">
+        <div id="libraryContent"></div>
+    </div>
+
+    <!-- 3. VIEW: LOADING -->
+    <div id="loadingView" class="view" style="text-align: center; padding-top: 50px;">
+        <div class="loader"></div>
+        <h3 id="loadTitle">Запуск...</h3>
+        <p id="loadDesc" style="color: var(--text-muted);">Инициализация моделей</p>
+    </div>
+
+    <!-- 4. VIEW: TEST -->
+    <div id="testView" class="view">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 15px;">
+            <button id="backBtn" class="btn-back" onclick="app.prevQuestion()">← Назад</button>
+            <div style="color: var(--text-muted); font-size: 13px; font-weight: 600;">
+                ВОПРОС <span id="qNum">1</span>
+            </div>
+        </div>
+
+        <div class="progress"><div id="progressBar" class="bar"></div></div>
+        
+        <div class="card">
+            <h3 id="qText" style="font-size: 22px; margin-bottom: 30px; line-height: 1.4;">...</h3>
+            
+            <!-- Контейнер для PSY (1-5) -->
+            <div id="psyContainer" class="likert-grid">
+                <div class="likert-opt" onclick="app.answer(1)">1</div>
+                <div class="likert-opt" onclick="app.answer(2)">2</div>
+                <div class="likert-opt" onclick="app.answer(3)">3</div>
+                <div class="likert-opt" onclick="app.answer(4)">4</div>
+                <div class="likert-opt" onclick="app.answer(5)">5</div>
+                <div style="grid-column:1/-1; display:flex; justify-content:space-between; font-size:13px; color:var(--text-muted); margin-top:5px;">
+                    <span>❌ Нет</span><span>✅ Да</span>
+                </div>
+            </div>
+
+            <!-- Контейнер для QUIZ (Кнопки) -->
+            <div id="quizContainer" class="quiz-grid" style="display:none;">
+                <!-- JS сгенерирует кнопки здесь -->
+            </div>
+
+            <!-- Кнопка "Далее" для QUIZ -->
+            <div id="nextBtnContainer" class="next-btn-container" style="display:none;">
+                <button class="btn-next" onclick="app.nextQuestion()">Следующий вопрос →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. VIEW: RESULTS -->
+    <div id="resultsView" class="view">
+        <div class="card" id="resContent"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <button class="btn" onclick="location.reload()">↺ Создать новый</button>
+            <button class="btn btn-secondary" id="saveTestBtn" onclick="app.saveCurrentTest()">💾 Сохранить в библиотеку</button>
+        </div>
+    </div>
+</div>
+
+<!-- ПОДКЛЮЧЕНИЕ СКРИПТОВ -->
+<script src="app-settings.js"></script> <!-- 1. Конфиг -->
+<script src="storage.js"></script>      <!-- 2. Хранилище -->
+<script src="app.js"></script>          <!-- 3. Логика приложения (api + app) -->
+
+<!-- ЛОГИКА ТЕМЫ (UI Only) -->
+<script>
+    function toggleThemeMenu() {
+        const menu = document.getElementById('themeMenu');
+        menu.classList.toggle('active');
+        if (menu.classList.contains('active')) {
+            setTimeout(() => document.addEventListener('click', closeMenuOutside), 10);
+        }
+    }
+
+    function closeMenuOutside(e) {
+        if (!e.target.closest('.theme-menu') && !e.target.closest('.theme-toggle-btn')) {
+            document.getElementById('themeMenu').classList.remove('active');
+            document.removeEventListener('click', closeMenuOutside);
+        }
+    }
+
+    function setTheme(themeName) {
+        if (themeName === 'light') {
+            document.body.removeAttribute('data-theme');
+        } else {
+            document.body.setAttribute('data-theme', themeName);
+        }
+        localStorage.setItem('user_theme', themeName);
+        document.getElementById('themeMenu').classList.remove('active');
+    }
+
+    // Инициализация при загрузке
+    (function initTheme() {
+        const saved = localStorage.getItem('user_theme');
+        if (saved) setTheme(saved);
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            setTheme('dark');
+        }
+    })();
+</script>
+
 </body>
 </html>
