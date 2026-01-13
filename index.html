@@ -8,99 +8,63 @@
 </head>
 <body>
 
-<div class="container">
-    
-    <!-- HEADER -->
-    <div class="header-row">
-        <div class="header-content">
-            <h1 style="cursor: pointer;" onclick="location.reload()" title="Дом Дуни">
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header-row">
+            <div class="header-content">
+             <h1 style="cursor: pointer;" onclick="location.reload()" title="Дом Дуни">
     🔮 <span class="header-title-text">Генератор Тестов им. Дуни Пахучей</span> 💅</h1>
             <p>Работает на хлопьях с молоком 🥣</p>
-        </div>
-
-        <button class="theme-toggle-btn" onclick="toggleThemeMenu()" title="Темы оформления">
-            🎨
-        </button>
-
-        <div class="theme-menu" id="themeMenu">
-            <div class="theme-opt" onclick="setTheme('light')">
-                <div class="theme-circle" style="background: #fff; border: 1px solid #ddd;"></div>
-                Светленькая
             </div>
-            <div class="theme-opt" onclick="setTheme('dark')">
-                <div class="theme-circle" style="background: #1e293b;"></div>
-                Темненькая
-            </div>
-            <div class="theme-opt" onclick="setTheme('gray')">
-                <div class="theme-circle" style="background: #e5e5e5; border: 1px solid #999;"></div>
-                Серенькая
+            
+            <button class="theme-toggle-btn" onclick="toggleThemeMenu()" title="Темы">🎨</button>
+            <div class="theme-menu" id="themeMenu">
+                <div class="theme-opt" onclick="setTheme('light')"><div class="theme-circle" style="background: #fff; border: 1px solid #ddd;"></div> Светленькая</div>
+                <div class="theme-opt" onclick="setTheme('dark')"><div class="theme-circle" style="background: #1e293b;"></div> Темненькая</div>
+                <div class="theme-opt" onclick="setTheme('gray')"><div class="theme-circle" style="background: #e5e5e5; border: 1px solid #999;"></div> Серенькая</div>
             </div>
         </div>
-    </div>
-    
-    <div id="errorBox" style="background:#fef2f2; color:#991b1b; padding:15px; border-radius:12px; display:none; margin-bottom:20px; border:1px solid #fecaca;"></div>
 
-    <!-- 1. VIEW: SETUP -->
-    <div id="setupView" class="view active">
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-            <button onclick="app.openLibrary()" class="btn-text">📂 Библиотека</button>
-        </div>
+        <div id="errorBox" style="background:#fef2f2; color:#991b1b; padding:15px; border-radius:12px; display:none; margin-bottom:20px; border:1px solid #fecaca;"></div>
 
-        <div id="duelView" class="container" style="display: none; text-align: center; padding-top: 50px;">
-    <div style="font-size: 60px;">⚔️</div>
-    <h1 style="color: var(--primary); margin-bottom: 10px;">ВЫЗОВ ПРИНЯТ?</h1>
-    <p style="font-size: 18px; color: var(--text-muted); margin-bottom: 30px;">
-        Пользователь <strong id="duelHostName" style="color: #fff;">...</strong> набрал 
-        <strong id="duelHostScore" style="color: var(--accent);">...</strong> баллов.
-        <br>Сможешь его победить?
-    </p>
-    
-    <div class="card" style="margin-bottom: 30px; text-align: left;">
-        <h3 id="duelThemeTitle" style="margin-top: 0;">Тема: ...</h3>
-        <p>Количество вопросов: <span id="duelQCount">...</span></p>
-    </div>
+        <!-- 1. SETUP VIEW -->
+        <div id="setupView" class="view active">
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                <button onclick="app.openLibrary()" class="btn-text">📂 Библиотека</button>
+            </div>
 
-    <button class="btn" onclick="app.startDuelTest()" style="font-size: 20px; padding: 15px 40px;">
-        🚀 ПРИНЯТЬ БОЙ
-    </button>
-</div>
-
-        <div class="card">
-            <!-- HEADER WITH TABS -->
-            <div class="card-header-row">
-                <h2 class="card-title">Новый тест</h2>
-                <div class="mode-tabs">
-                    <button class="mode-tab active" id="tabPsy" onclick="app.setMode('psy')">Тестикул</button>
-                    <button class="mode-tab" id="tabQuiz" onclick="app.setMode('quiz')">Виктория</button>
+            <div class="card">
+                <div class="card-header-row">
+                    <h2 class="card-title">Новый тест</h2>
+                    <div class="mode-tabs">
+                        <button class="mode-tab active" id="tabPsy" onclick="app.setMode('psy')">Тестикул</button>
+                        <button class="mode-tab" id="tabQuiz" onclick="app.setMode('quiz')">Виктория</button>
+                    </div>
                 </div>
-            </div>
 
-            <form id="setupForm">
-                <label>Тема</label>
-                <input type="text" id="themeInput" placeholder="Например: Знаток мемов 2025" required>
-                
-                <label>Уточнения <span style="font-weight:normal; opacity:0.7; font-size:12px;">(опционально)</span></label>
-                <textarea id="notesInput" rows="2" style="width:100%; padding:12px; margin-top:8px; border:1px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text); font-family:inherit; resize:vertical;" placeholder="Например: Используй сленг, делай вопросы с черным юмором, ссылайся на лор книг..."></textarea>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <!-- ОПЦИИ ДЛЯ PSY -->
-                    <div id="audienceGroup">
-                        <label>Аудитория</label>
-                        <input type="text" id="audienceInput" value="Общая" placeholder="Кто проходит?">
-                    </div>
-                    
-                    <!-- ОПЦИИ ДЛЯ QUIZ (Скрыты по дефолту) -->
-                    <div id="difficultyGroup" style="display:none;">
-                        <label>Вариантов ответа</label>
-                        <select id="difficultyInput">
-                            <option value="2">2 (Да/Нет)</option>
-                            <option value="3">3 (Легко)</option>
-                            <option value="4" selected>4 (Стандарт)</option>
-                        </select>
-                    </div>
+                <form onsubmit="app.start(event)">
+                    <label>Тема</label>
+                    <input type="text" id="themeInput" placeholder="Например: Какой ты хлебушек?" required>
 
-                    <div>
-                        <label>Вопросов</label>
+                    <label>Уточнения <span style="font-weight:normal; opacity:0.7; font-size:12px;">(опционально)</span></label>
+                    <textarea id="notesInput" rows="2" style="width:100%; padding:12px; margin-top:8px; border:1px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text); font-family:inherit; resize:vertical;" placeholder="Сделай смешным, для программистов..."></textarea>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div id="audienceGroup">
+                            <label>Аудитория</label>
+                            <input type="text" id="audienceInput" value="" placeholder="Подростки?">
+                        </div>
+                        <div id="difficultyGroup" style="display:none;">
+                            <label>Вариантов ответа</label>
+                            <select id="difficultyInput">
+                                <option value="2">2 (Да/Нет)</option>
+                                <option value="3">3 (Легко)</option>
+                                <option value="4" selected>4 (Стандарт)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Вопросов</label>
                         <select id="qCountInput">
                             <option value="5">5</option>
                             <option value="10" selected>10</option>
@@ -109,125 +73,140 @@
                             <option value="30">30</option>
                             <option value="50">50</option>
                             <option value="69">Тумач.</option>
-                        </select>
+                            </select>
+                        </div>
+                    </div>
+
+                    <label>API Ключ</label>
+                    <input type="password" id="apiKeyInput" placeholder="sk-or-... / AIza..." required>
+
+                    <button type="submit" class="btn primary-btn" style="margin-top: 25px;">
+                        🚀 Сгенерировать
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 2. LIBRARY VIEW -->
+        <div id="libraryView" class="view">
+            <div style="margin-bottom:20px;">
+                <button onclick="app.closeLibrary()" class="btn-text">← Назад</button>
+            </div>
+            <h2>Ваши тесты</h2>
+            <div id="libraryContent"></div> <!-- ВАЖНО: ID libraryContent -->
+        </div>
+
+        <!-- 3. DUEL VIEW (Экран вызова) -->
+        <div id="duelView" class="container" style="display: none; text-align: center; padding-top: 50px;">
+            <div style="font-size: 60px;">⚔️</div>
+            <h1 style="color: var(--primary); margin-bottom: 10px;">ВЫЗОВ ПРИНЯТ?</h1>
+            <p style="font-size: 18px; color: var(--text-muted); margin-bottom: 30px;">
+                Пользователь <strong id="duelHostName" style="color: #fff;">...</strong> набрал 
+                <strong id="duelHostScore" style="color: var(--accent);">...</strong> баллов.
+                <br>Сможешь его победить?
+            </p>
+            
+            <div class="card" style="margin-bottom: 30px; text-align: left;">
+                <h3 id="duelThemeTitle" style="margin-top: 0;">Тема...</h3>
+                <p>Вопросов: <span id="duelQCount">...</span></p>
+            </div>
+
+            <button class="btn" onclick="app.startDuelTest()" style="font-size: 20px; padding: 15px 40px;">
+                🚀 ПРИНЯТЬ БОЙ
+            </button>
+        </div>
+
+        <!-- 4. TEST VIEW -->
+        <div id="testView" class="view">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 15px;">
+                <button id="backBtn" class="btn-back" onclick="app.prevQuestion()">← Назад</button>
+                <div style="color: var(--text-muted); font-size: 13px; font-weight: 600;">
+                    ВОПРОС <span id="qNum">1</span>
+                </div>
+            </div>
+
+            <div class="progress-div"><div id="progressBar" class="bar"></div></div>
+
+            <div class="card">
+                <h3 id="qText" style="font-size: 22px; margin-bottom: 30px; line-height: 1.4;">...</h3>
+
+                <!-- PSY (Likert 1-5) -->
+                <div id="psyContainer" class="likert-grid">
+                    <div class="likert-opt" onclick="app.answer(1)">
+                        <span>1 🤬</span> <span>Нет</span>
+                    </div>
+                    <div class="likert-opt" onclick="app.answer(2)">
+                        <span>2 👎</span>
+                    </div>
+                    <div class="likert-opt" onclick="app.answer(3)">
+                        <span>3 😐</span>
+                    </div>
+                    <div class="likert-opt" onclick="app.answer(4)">
+                        <span>4 👍</span>
+                    </div>
+                    <div class="likert-opt" onclick="app.answer(5)">
+                        <span>5 😍</span> <span>Да</span>
                     </div>
                 </div>
 
-                <label>API Ключ</label>
-                <input type="password" id="apiKeyInput" placeholder="sk-or-... или AIza..." required>
-                
-                <button type="button" class="btn primary-btn" style="margin-top: 25px;" onclick="app.start()">🚀 Сгенерировать</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 2. VIEW: LIBRARY -->
-    <div id="libraryView" class="view">
-        <div id="libraryContent"></div>
-    </div>
-
-    <!-- 3. VIEW: LOADING -->
-    <div id="loadingView" class="view" style="text-align: center; padding-top: 50px;">
-        <div class="loader"></div>
-        <h3 id="loadTitle">Запуск...</h3>
-        <p id="loadDesc" style="color: var(--text-muted);">Инициализация моделей</p>
-    </div>
-
-    <!-- 4. VIEW: TEST -->
-    <div id="testView" class="view">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 15px;">
-            <button id="backBtn" class="btn-back" onclick="app.prevQuestion()">← Назад</button>
-            <div style="color: var(--text-muted); font-size: 13px; font-weight: 600;">
-                ВОПРОС <span id="qNum">1</span>
+                <!-- QUIZ (Grid) -->
+                <div id="quizContainer" class="quiz-grid" style="display:none;"></div>
             </div>
-        </div>
-
-        <div class="progress"><div id="progressBar" class="bar"></div></div>
-        
-        <div class="card">
-            <h3 id="qText" style="font-size: 22px; margin-bottom: 30px; line-height: 1.4;">...</h3>
             
-            <!-- Контейнер для PSY (1-5) -->
-            <div id="psyContainer" class="likert-grid">
-                <div class="likert-opt" onclick="app.answer(1)">1</div>
-                <div class="likert-opt" onclick="app.answer(2)">2</div>
-                <div class="likert-opt" onclick="app.answer(3)">3</div>
-                <div class="likert-opt" onclick="app.answer(4)">4</div>
-                <div class="likert-opt" onclick="app.answer(5)">5</div>
-                <div style="grid-column:1/-1; display:flex; justify-content:space-between; font-size:13px; color:var(--text-muted); margin-top:5px;">
-                    <span>❌ Нет</span><span>✅ Да</span>
-                </div>
-            </div>
+            <!-- Кнопку "Далее" убрали совсем, так как теперь везде авто-переход -->
+        </div>
 
-            <!-- Контейнер для QUIZ (Кнопки) -->
-            <div id="quizContainer" class="quiz-grid" style="display:none;">
-                <!-- JS сгенерирует кнопки здесь -->
-            </div>
-
-            <!-- Кнопка "Далее" для QUIZ -->
-            <div id="nextBtnContainer" class="next-btn-container" style="display:none;">
-                <button class="btn-next" onclick="app.nextQuestion()">Следующий вопрос →</button>
+        <!-- 5. RESULTS VIEW -->
+        <div id="resultsView" class="view">
+            <div class="card" id="resContent"></div>
+            
+            <div style="text-align:center; margin-top:20px;">
+                <button class="btn-text" onclick="location.reload()">↺ Создать новый</button>
             </div>
         </div>
+
     </div>
 
-    <!-- 5. VIEW: RESULTS -->
-    <div id="resultsView" class="view">
-        <div class="card" id="resContent"></div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <button class="btn" onclick="location.reload()">↺ Создать новый</button>
-            <button class="btn btn-secondary" id="saveTestBtn" onclick="app.saveCurrentTest()">💾 Сохранить в библиотеку</button>
-        </div>
-    </div>
-</div>
+    <!-- СКРИПТЫ (Порядок важен) -->
+    <script src="app-settings.js"></script>
+    <script src="storage.js"></script>
+    <!-- Подключаем LZString перед app.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    <script src="app.js"></script>
 
-<!-- ПОДКЛЮЧЕНИЕ СКРИПТОВ -->
-<script src="app-settings.js"></script> <!-- 1. Конфиг -->
-<script src="storage.js"></script>      <!-- 2. Хранилище -->
-<script src="app.js"></script>          <!-- 3. Логика приложения (api + app) -->
-
-<!-- ЛОГИКА ТЕМЫ (UI Only) -->
-<script>
-    function toggleThemeMenu() {
-        const menu = document.getElementById('themeMenu');
-        menu.classList.toggle('active');
-        if (menu.classList.contains('active')) {
-            setTimeout(() => document.addEventListener('click', closeMenuOutside), 10);
+    <!-- UI Scripts -->
+    <script>
+        function toggleThemeMenu() {
+            const menu = document.getElementById('themeMenu');
+            menu.classList.toggle('active');
+            if (menu.classList.contains('active')) {
+                setTimeout(() => document.addEventListener('click', closeMenuOutside, {once:true}), 10);
+            }
         }
-    }
-
-    function closeMenuOutside(e) {
-        if (!e.target.closest('.theme-menu') && !e.target.closest('.theme-toggle-btn')) {
+        function closeMenuOutside(e) {
+            if (!e.target.closest('.theme-menu') && !e.target.closest('.theme-toggle-btn')) {
+                document.getElementById('themeMenu').classList.remove('active');
+            }
+        }
+        function setTheme(themeName) {
+            if (themeName === 'light') document.body.removeAttribute('data-theme');
+            else document.body.setAttribute('data-theme', themeName);
+            localStorage.setItem('user-theme', themeName);
             document.getElementById('themeMenu').classList.remove('active');
-            document.removeEventListener('click', closeMenuOutside);
         }
-    }
-
-    function setTheme(themeName) {
-        if (themeName === 'light') {
-            document.body.removeAttribute('data-theme');
-        } else {
-            document.body.setAttribute('data-theme', themeName);
+        function initTheme() {
+            const saved = localStorage.getItem('user-theme');
+            if (saved) setTheme(saved);
+            else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
         }
-        localStorage.setItem('user_theme', themeName);
-        document.getElementById('themeMenu').classList.remove('active');
-    }
+        initTheme();
+    </script>
 
-    // Инициализация при загрузке
-    (function initTheme() {
-        const saved = localStorage.getItem('user_theme');
-        if (saved) setTheme(saved);
-        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            setTheme('dark');
-        }
-    })();
-</script>
+    <!-- ОВЕРЛЕЙ ЗАГРУЗКИ (Должен быть в конце body) -->
+    <div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; color: white;">
+        <div class="loader" style="font-size: 50px; margin-bottom: 20px;">🐒</div>
+        <h2 id="loadingText">Думаем...</h2>
+    </div>
 
-<div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; flex-direction:column; align-items:center; justify-content:center; color:white;">
-  <div class="loader" style="font-size:50px; margin-bottom:20px;">🧠</div>
-  <h2 id="loadingText">Думаем...</h2>
-</div>
-        
-</div>
 </body>
 </html>
