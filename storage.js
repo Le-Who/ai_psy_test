@@ -27,7 +27,7 @@ const Storage = {
      * Сохранить текущий тест (с авто-переименованием дубликатов)
      * Возвращает итоговое имя теста
      */
-    save(blueprint, questions, themeName) {
+    save(blueprint, questions, themeName, shortUrl) {
         const library = this.getAll();
         
         // Логика авто-переименования: "Тест" -> "Тест (2)" -> "Тест (3)"
@@ -46,7 +46,8 @@ const Storage = {
             }),
             theme: finalName,
             blueprint: blueprint,
-            questions: questions
+            questions: questions,
+            shortUrl: shortUrl || null
         };
 
         // Добавляем в начало списка
@@ -86,6 +87,14 @@ const Storage = {
             
             const count = test.questions ? test.questions.length : 0;
             
+            const shortUrlBlock = test.shortUrl ? `
+                <div style="margin-top:6px; font-size: 12px; color: var(--text-muted);">
+                    🔗 Короткая ссылка:&nbsp;
+                    <button class="btn-text" style="padding:0; font-size:12px;" onclick="prompt('Ссылка на тест:', '${test.shortUrl}')">
+                        открыть / скопировать
+                    </button>
+                </div>` : '';
+
             return `
             <div class="card" style="padding: 20px; display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
                 <div style="font-size: 24px; flex-shrink: 0;">${icon}</div>
@@ -95,6 +104,7 @@ const Storage = {
                     <div style="font-size: 12px; color: var(--text-muted);">
                         ${test.date} • ${count} вопросов
                     </div>
+                    ${shortUrlBlock}
                 </div>
 
                 <div style="display:flex; gap:10px; align-items: center; flex-shrink: 0;">
