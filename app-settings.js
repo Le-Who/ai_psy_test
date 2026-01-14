@@ -10,8 +10,8 @@ const CONFIG = {
             endpoint: 'https://openrouter.ai/api/v1/chat/completions',
             models: {
                 // Бесплатные модели Xiaomi/Liquid/DeepSeek
-                architect: 'xiaomi/mimo-v2-flash:free', 
-                generator: 'xiaomi/mimo-v2-flash:free' 
+                architect: 'x-ai/grok-4.1-fast', 
+                generator: 'x-ai/grok-4.1-fast' 
             },
             headers: (key) => ({
                 'Authorization': `Bearer ${key}`,
