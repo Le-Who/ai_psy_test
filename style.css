@@ -338,3 +338,22 @@ label {
     border: 1px solid #fecaca !important;
     backdrop-filter: blur(5px);
 }
+
+/* --- 9. DARK THEME SELECT DROPDOWN FIX --- */
+/* Fix for unreadable native dropdown list in dark theme */
+[data-theme="dark"] select {
+    color-scheme: dark; /* Force dark UI for native controls */
+}
+
+/* Dropdown list items */
+[data-theme="dark"] select option,
+[data-theme="dark"] select optgroup {
+    background: rgba(15, 23, 42, 0.95); /* matches --glass-bg tone, but opaque for readability */
+    color: var(--text);
+}
+
+/* Selected option styling (supported in many browsers) */
+[data-theme="dark"] select option:checked {
+    background-color: var(--primary);
+    color: #fff;
+}
