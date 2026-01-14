@@ -38,6 +38,56 @@ const app = {
         window.onpopstate = () => { history.replaceState(null, document.title, window.location.pathname); location.reload(); };
     },
 
+    // Нормализация mapping для психо-тестов в соответствии с архитектурными правилами
+    normalizePsyQuestions(questions) {
+        const ALLOWED_WEIGHTS = [-2.0, -1.0, -0.5, 0.5, 1.0, 2.0];
+        const snapWeight = (w) => {
+            const num = Number(w);
+            if (!Number.isFinite(num)) return 1.0;
+            let best = ALLOWED_WEIGHTS[0];
+            let bestDiff = Math.abs(num - best);
+            for (let i = 1; i < ALLOWED_WEIGHTS.length; i++) {
+                const d = Math.abs(num - ALLOWED_WEIGHTS[i]);
+                if (d < bestDiff) {
+                    bestDiff = d;
+                    best = ALLOWED_WEIGHTS[i];
+                }
+            }
+            return best;
+        };
+
+        if (!Array.isArray(questions)) return questions;
+        return questions.map((q) => {
+            if (!q || !Array.isArray(q.mapping)) return q;
+
+            let mapping = q.mapping
+                .filter(m => m && typeof m.outcomeId === 'string')
+                .map(m => {
+                    const weight = snapWeight(m.weight);
+                    return { ...m, weight };
+                });
+
+            if (mapping.length === 0) return q;
+
+            if (mapping.length > 2) {
+                mapping.sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
+                mapping = mapping.slice(0, 2);
+            }
+
+            // Авто-вывод polarity, если не задана моделью
+            if (!q.polarity) {
+                const hasPos = mapping.some(m => m.weight > 0);
+                const hasNeg = mapping.some(m => m.weight < 0);
+                let polarity = 'direct';
+                if (hasPos && hasNeg) polarity = 'mixed';
+                else if (hasNeg && !hasPos) polarity = 'reverse';
+                q.polarity = polarity;
+            }
+
+            return { ...q, mapping };
+        });
+    },
+
     // --- UI HELPER: TOAST ---
     showToast(message) {
         const x = document.getElementById("toast");
@@ -176,6 +226,12 @@ const app = {
                 if (res.meta) this.state.blueprint.meta = res.meta;
                 if (res.scaleProfile) this.state.blueprint.scaleProfile = res.scaleProfile;
                 if (Array.isArray(res.outcomes) && res.outcomes.length) this.state.blueprint.outcomes = res.outcomes;
+            }
+
+            // Нормализация mapping для психо-тестов: максимум 2 outcomes на вопрос,
+            // приведение весов к допустимым значениям (Soft Weights).
+            if (!isQuiz && Array.isArray(this.state.questions)) {
+                this.state.questions = this.normalizePsyQuestions(this.state.questions);
             }
             
             this.setLoading(false);
