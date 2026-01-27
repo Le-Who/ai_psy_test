@@ -1,7 +1,7 @@
 // AI Universal Test Generator - Core Logic v6.0 Final
 // UI/UX Polish, Features: Glassmorphism, Clipboard API, Confetti, Toast Notifications
 
-const TINYTOKEN = "lBjFvZGQQmPD56gcBpQBgdyMlezZCxwNShVIlh9wA3W4HFtDOI0418CnoXBx..."; // укорочено для примера
+const TINYTOKEN = "lBjFvZGQQmPD56gcBpQBgdyMlezZCxwNShVIlh9wA3W4HFtDOI0418CnoXBx"; // укорочено для примера
 
 const api = {
   detectProvider(key) {
