@@ -1,7 +1,7 @@
 // AI Universal Test Generator - Core Logic v6.0 Final
 // UI/UX Polish, Features: Glassmorphism, Clipboard API, Confetti, Toast Notifications
 
-const TINYTOKEN = "lBjFvZGQQmPD56gcBpQBgdyMlezZCxwNShVIlh9wA3W4HFtDOI0418CnoXBx"; // укорочено для примера
+const TINYTOKEN = "lBjFvZGQQmPD56gcBpQBgdyMlezZCxwNShVIlh9wA3W4HFtDOI0418CnoXBx";
 
 const api = {
   detectProvider(key) {
@@ -975,152 +975,107 @@ NOTES: ${notes || "нет"}`;
   // SHARE LINK / SAVE
   // =========================
 
-  async createShareLink() {
-    if (!TINYTOKEN) return alert("TinyURL Token не задан!");
+    async createShareLink() {
+        if(!TINYTOKEN) return alert("Нужен TinyURL Token!");
+        
+        const btn = document.getElementById('shareBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "⏳ Создаем ссылку...";
+        btn.disabled = true;
 
-    const btn = document.getElementById("shareBtn");
-    const originalText = btn.innerHTML;
-    btn.innerHTML = "Генерация ссылки...";
-    btn.disabled = true;
+        try {
+            const isQuiz = (this.state.blueprint.testType === 'quiz'); 
+            const score = this.state.quizScore;
+            const name = prompt("Твое имя (для отображения в дуэли):", "Аноним") || "Аноним";
 
-    try {
-      const isQuiz = this.state.blueprint.testType === "quiz";
-      const score = this.state.quizScore;
-      const name = prompt("Как тебя подписать в дуэли?", "Игрок");
+            const payload = { 
+                h: name, 
+                s: (isQuiz ? score : 0), 
+                r: (isQuiz ? null : this.state.lastResultName),
+                t: this.state.blueprint, 
+                q: this.state.questions 
+            };
+            
+            if(!payload.t.theme) payload.t.theme = document.getElementById('themeInput').value || "Тест";
 
-      const payload = {
-        h: name || "Игрок",
-        s: isQuiz ? score : 0,
-        r: isQuiz ? null : this.state.lastResultName,
-        t: this.state.blueprint,
-        q: this.state.questions
-      };
+            const jsonString = JSON.stringify(payload);
+            const compressed = LZString.compressToEncodedURIComponent(jsonString);
+            const longUrl = `${window.location.origin}${window.location.pathname}#d=${compressed}`;
 
-      if (!payload.t.theme) {
-        payload.t.theme =
-          document.getElementById("themeInput").value || "";
-      }
+            const response = await fetch('https://api.tinyurl.com/create', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${TINYTOKEN}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: longUrl, domain: "tiny.one" })
+            });
 
-      const jsonString = JSON.stringify(payload);
-      const compressed =
-        LZString.compressToEncodedURIComponent(jsonString);
-      const longUrl =
-        window.location.origin +
-        window.location.pathname +
-        "#d:" +
-        compressed;
+            if (!response.ok) throw new Error('API Error');
+            const data = await response.json();
+            const tinyUrl = data.data.tiny_url;
+            
+            // --- UX IMPROVEMENT: CLIPBOARD + TOAST ---
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(tinyUrl);
+                this.showToast("Ссылка скопирована! Отправь другу 🚀");
+            } else {
+                prompt("Скопируй ссылку:", tinyUrl);
+            }
 
-      const response = await fetch(
-        "https://api.tinyurl.com/create",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${TINYTOKEN}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            url: longUrl,
-            domain: "tiny.one"
-          })
+        } catch (e) {
+            console.error(e);
+            this.showToast("Ошибка создания ссылки 😢");
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         }
-      );
+    },
+    
+    async saveTest() {
+        const theme = this.state.blueprint.theme || document.getElementById('themeInput').value || "Тест";
+        let shortUrl = null;
 
-      if (!response.ok) throw new Error("API Error");
-      const data = await response.json();
-      const tinyUrl =
-        data &&
-        data.data &&
-        (data.data.tinyurl ||
-          data.data.data?.tinyurl ||
-          null);
+        try {
+            if (typeof LZString !== 'undefined' && TINYTOKEN) {
+                const isQuiz = (this.state.blueprint.testType === 'quiz');
+                const score = this.state.quizScore;
 
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(tinyUrl || longUrl);
-        this.showToast("Ссылка скопирована в буфер обмена!");
-      } else {
-        prompt("Скопируй ссылку вручную:", tinyUrl || longUrl);
-      }
-    } catch (e) {
-      console.error(e);
-      this.showToast("Ошибка генерации ссылки");
-    } finally {
-      btn.innerHTML = originalText;
-      btn.disabled = false;
-    }
-  },
+                const payload = { 
+                    h: "Аноним", 
+                    s: (isQuiz ? score : 0), 
+                    r: (isQuiz ? null : this.state.lastResultName || null),
+                    t: this.state.blueprint, 
+                    q: this.state.questions 
+                };
 
-  async saveTest() {
-    const theme =
-      this.state.blueprint.theme ||
-      document.getElementById("themeInput").value ||
-      "";
+                if (!payload.t.theme) payload.t.theme = theme;
 
-    let shortUrl = null;
-    try {
-      if (typeof LZString !== "undefined" && TINYTOKEN) {
-        const isQuiz = this.state.blueprint.testType === "quiz";
-        const score = this.state.quizScore;
-        const payload = {
-          h: "",
-          s: isQuiz ? score : 0,
-          r: isQuiz ? null : this.state.lastResultName || null,
-          t: this.state.blueprint,
-          q: this.state.questions
-        };
+                const jsonString = JSON.stringify(payload);
+                const compressed = LZString.compressToEncodedURIComponent(jsonString);
+                const longUrl = `${window.location.origin}${window.location.pathname}#d=${compressed}`;
 
-        if (!payload.t.theme) payload.t.theme = theme;
+                const response = await fetch('https://api.tinyurl.com/create', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${TINYTOKEN}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: longUrl, domain: "tiny.one" })
+                });
 
-        const jsonString = JSON.stringify(payload);
-        const compressed =
-          LZString.compressToEncodedURIComponent(jsonString);
-        const longUrl =
-          window.location.origin +
-          window.location.pathname +
-          "#d:" +
-          compressed;
-
-        const response = await fetch(
-          "https://api.tinyurl.com/create",
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${TINYTOKEN}`,
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              url: longUrl,
-              domain: "tiny.one"
-            })
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          shortUrl =
-            data &&
-            data.data &&
-            (data.data.tinyurl ||
-              data.data.data?.tinyurl ||
-              null);
+                if (response.ok) {
+                    const data = await response.json();
+                    shortUrl = data && data.data && data.data.tiny_url ? data.data.tiny_url : null;
+                }
+            }
+        } catch (e) {
+            console.warn("Short link generation failed (saveTest):", e);
         }
-      }
-    } catch (e) {
-      console.warn("Short link generation failed in saveTest", e);
-    }
 
-    Storage.save(
-      this.state.blueprint,
-      this.state.questions,
-      theme,
-      shortUrl
-    );
-    this.showToast("Тест сохранён!");
-
-    const btn = document.getElementById("saveTestBtn");
-    if (btn) {
-      btn.innerText = "Сохранено";
-      btn.disabled = true;
-    }
-  },
+        Storage.save(this.state.blueprint, this.state.questions, theme, shortUrl);
+        this.showToast("Тест сохранен в библиотеку! 💾");
+        
+        const btn = document.getElementById('saveTestBtn');
+        if (btn) {
+            btn.innerText = "✅ Сохранено";
+            btn.disabled = true;
+        }
+    },
 
   loadSavedTest(id) {
     const test = Storage.getById(id);
