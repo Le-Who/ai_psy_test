@@ -6,13 +6,21 @@
 
 const Storage = {
     KEY: 'ai_tests_library_v2',
+    _cache: null, // Optimization: In-memory cache to reduce JSON.parse calls
 
     /**
      * Получить весь список тестов
      */
     getAll() {
-        const data = localStorage.getItem(this.KEY);
-        return data ? JSON.parse(data) : [];
+        if (this._cache) return this._cache;
+        try {
+            const data = localStorage.getItem(this.KEY);
+            this._cache = data ? JSON.parse(data) : [];
+        } catch (e) {
+            console.error("Storage parse error", e);
+            this._cache = [];
+        }
+        return this._cache;
     },
 
     /**
@@ -28,7 +36,7 @@ const Storage = {
      * Возвращает итоговое имя теста
      */
     save(blueprint, questions, themeName, shortUrl) {
-        const library = this.getAll();
+        const library = this.getAll(); // Returns cache reference if loaded
         
         // Логика авто-переименования: "Тест" -> "Тест (2)" -> "Тест (3)"
         let finalName = themeName;
@@ -51,6 +59,7 @@ const Storage = {
         };
 
         // Добавляем в начало списка
+        // Note: library is a reference to this._cache, so we update cache in-place
         library.unshift(newTest);
         localStorage.setItem(this.KEY, JSON.stringify(library));
         
@@ -63,6 +72,7 @@ const Storage = {
     delete(id) {
         const list = this.getAll();
         const newList = list.filter(t => t.id !== id);
+        this._cache = newList; // Update cache
         localStorage.setItem(this.KEY, JSON.stringify(newList));
     },
 
@@ -124,3 +134,12 @@ const Storage = {
         }).join('');
     }
 };
+
+// Invalidate cache when localStorage changes in another tab
+if (typeof window !== 'undefined') {
+    window.addEventListener('storage', (e) => {
+        if (e.key === Storage.KEY) {
+            Storage._cache = null;
+        }
+    });
+}
