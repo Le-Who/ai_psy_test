@@ -101,6 +101,15 @@ const api = {
 // --- APP LOGIC ---
 const app = {
     state: { step: 0, answers: [], questions: [], blueprint: null, apiKey: '' },
+    ui: {},
+
+    initUI() {
+        this.ui.qNum = document.getElementById('qNum');
+        this.ui.qText = document.getElementById('qText');
+        this.ui.progressBar = document.getElementById('progressBar');
+        this.ui.backBtn = document.getElementById('backBtn');
+        this.ui.likertOpts = document.querySelectorAll('.likert-opt');
+    },
 
     async start(e) {
         if(e) e.preventDefault();
@@ -178,35 +187,34 @@ const app = {
         const q = this.state.questions[this.state.step];
         const total = this.state.questions.length;
         
-        document.getElementById('qNum').innerText = `${this.state.step + 1} / ${total}`;
-        document.getElementById('qText').innerText = q.text;
+        this.ui.qNum.innerText = `${this.state.step + 1} / ${total}`;
+        this.ui.qText.innerText = q.text;
         
         const pct = (this.state.step / total) * 100;
-        document.getElementById('progressBar').style.width = pct + '%';
+        this.ui.progressBar.style.width = pct + '%';
         
         // Очистка выделения
-        document.querySelectorAll('.likert-opt').forEach(d => d.classList.remove('selected'));
+        this.ui.likertOpts.forEach(d => d.classList.remove('selected'));
         
         // Если уже был ответ на этот шаг (при возврате назад) - подсветить его
         const prevAnswer = this.state.answers[this.state.step];
         if (prevAnswer) {
-            document.querySelectorAll('.likert-opt')[prevAnswer-1].classList.add('selected');
+            this.ui.likertOpts[prevAnswer-1].classList.add('selected');
         }
 
         // Логика кнопки "Назад"
-        const backBtn = document.getElementById('backBtn');
         if (this.state.step > 0) {
-            backBtn.style.visibility = 'visible';
-            backBtn.style.opacity = '1';
+            this.ui.backBtn.style.visibility = 'visible';
+            this.ui.backBtn.style.opacity = '1';
         } else {
-            backBtn.style.visibility = 'hidden';
-            backBtn.style.opacity = '0';
+            this.ui.backBtn.style.visibility = 'hidden';
+            this.ui.backBtn.style.opacity = '0';
         }
     },
 
     answer(val) {
         this.state.answers[this.state.step] = val;
-        document.querySelectorAll('.likert-opt')[val-1].classList.add('selected');
+        this.ui.likertOpts[val-1].classList.add('selected');
         
         setTimeout(() => {
             this.state.step++;
@@ -357,6 +365,7 @@ const app = {
 
 // Init
 document.addEventListener('DOMContentLoaded', () => {
+    app.initUI();
     const form = document.getElementById('setupForm');
     if(form) form.addEventListener('submit', (e) => app.start(e));
 });
