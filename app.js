@@ -283,13 +283,16 @@ const app = {
     const title = isQuiz ? "Викторина-домашка" : "Дуэль-тест";
 
     let desc;
+    const safeHostName = Utils.escapeHtml(this.state.duelHostName);
+    const safeResultName = Utils.escapeHtml(this.state.duelHostResultName);
+
     if (isQuiz) {
-      desc = `<strong style="color:#fff">${this.state.duelHostName}</strong> вызвал(а) тебя на викторину!`;
+      desc = `<strong style="color:#fff">${safeHostName}</strong> вызвал(а) тебя на викторину!`;
     } else {
-      const resultText = this.state.duelHostResultName
-        ? `<strong style="color:var(--accent)">${this.state.duelHostResultName}</strong>`
+      const resultText = safeResultName
+        ? `<strong style="color:var(--accent)">${safeResultName}</strong>`
         : "";
-      desc = `<strong style="color:#fff">${this.state.duelHostName}</strong> уже прошёл(ла) этот тест. ${resultText ? "<br>" + resultText : ""}`;
+      desc = `<strong style="color:#fff">${safeHostName}</strong> уже прошёл(ла) этот тест. ${resultText ? "<br>" + resultText : ""}`;
     }
 
     const dvH1 = dv.querySelector("h1");
