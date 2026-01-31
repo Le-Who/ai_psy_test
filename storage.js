@@ -6,6 +6,7 @@
 
 const Storage = {
     KEY: 'ai_test_gen_library_v1',
+    _cache: null,
 
     // === DATA LOGIC ===
 
@@ -13,8 +14,10 @@ const Storage = {
      * Получить все сохраненные тесты
      */
     getAll() {
+        if (this._cache) return this._cache;
         const raw = localStorage.getItem(this.KEY);
-        return raw ? JSON.parse(raw) : [];
+        this._cache = raw ? JSON.parse(raw) : [];
+        return this._cache;
     },
 
     /**
@@ -46,6 +49,7 @@ const Storage = {
     delete(id) {
         let library = this.getAll();
         library = library.filter(t => t.id !== id);
+        this._cache = library;
         localStorage.setItem(this.KEY, JSON.stringify(library));
     },
 
@@ -98,3 +102,10 @@ const Storage = {
         `;
     }
 };
+
+// Invalidate cache if data changes in another tab
+window.addEventListener('storage', (e) => {
+    if (e.key === Storage.KEY) {
+        Storage._cache = null;
+    }
+});
