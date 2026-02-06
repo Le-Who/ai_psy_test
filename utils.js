@@ -10,11 +10,14 @@ const Utils = {
      */
     escapeHtml: (unsafe) => {
         if (typeof unsafe !== 'string') return unsafe;
-        return unsafe
-             .replace(/&/g, "&amp;")
-             .replace(/</g, "&lt;")
-             .replace(/>/g, "&gt;")
-             .replace(/"/g, "&quot;")
-             .replace(/'/g, "&#039;");
+        return unsafe.replace(/[&<>"']/g, m => {
+            switch (m) {
+                case '&': return '&amp;';
+                case '<': return '&lt;';
+                case '>': return '&gt;';
+                case '"': return '&quot;';
+                case "'": return '&#039;';
+            }
+        });
     }
 };
