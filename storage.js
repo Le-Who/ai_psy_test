@@ -9,6 +9,20 @@ const Storage = {
     _cache: null,
     _htmlItems: null, // Array of HTML strings for each test card
     _renderedHtmlCache: null, // Cache for the full rendered library string
+    _themesCache: null, // Cache for unique theme names (Set)
+
+    /**
+     * Helper: Get or build themes Set for collision check
+     */
+    _getThemes() {
+        if (this._themesCache) return this._themesCache;
+        const list = this.getAll();
+        this._themesCache = new Set();
+        for (const t of list) {
+            this._themesCache.add(t.theme);
+        }
+        return this._themesCache;
+    },
 
     /**
      * Получить весь список тестов
@@ -85,12 +99,9 @@ const Storage = {
         let finalName = themeName;
         let counter = 2;
 
-        // OPTIMIZATION: Use Set for O(1) lookup instead of O(N) scan in loop
-        // Avoiding library.map() to prevent O(N) array allocation
-        const existingThemes = new Set();
-        for (const t of library) {
-            existingThemes.add(t.theme);
-        }
+        // OPTIMIZATION: Use cached Set for O(1) lookup instead of O(N) rebuild every save
+        const existingThemes = this._getThemes();
+
         while (existingThemes.has(finalName)) {
             finalName = `${themeName} (${counter})`;
             counter++;
@@ -110,6 +121,11 @@ const Storage = {
         // Добавляем в начало списка
         library.unshift(newTest);
         localStorage.setItem(this.KEY, JSON.stringify(library));
+
+        // Update themes cache
+        if (this._themesCache) {
+            this._themesCache.add(finalName);
+        }
 
         // OPTIMIZATION: Update htmlItems cache incrementally
         if (this._htmlItems) {
@@ -136,9 +152,17 @@ const Storage = {
         const index = list.findIndex(t => t.id === id);
 
         if (index > -1) {
+            // Retrieve theme before deletion for cache update
+            const deletedTheme = list[index].theme;
+
             // Remove from data cache
             list.splice(index, 1);
             localStorage.setItem(this.KEY, JSON.stringify(list));
+
+            // Update themes cache
+            if (this._themesCache) {
+                this._themesCache.delete(deletedTheme);
+            }
 
             // OPTIMIZATION: Remove from htmlItems cache incrementally
             if (this._htmlItems) {
@@ -184,6 +208,7 @@ if (typeof window !== 'undefined') {
             Storage._cache = null;
             Storage._htmlItems = null;
             Storage._renderedHtmlCache = null;
+            Storage._themesCache = null;
         }
     });
 }
