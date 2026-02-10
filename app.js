@@ -421,11 +421,19 @@ NOTES: ${notes || "нет"}`;
       if (psyDiv) psyDiv.style.display = "none";
       if (quizDiv) {
         quizDiv.style.display = "flex";
-        let html = "";
+        // OPTIMIZATION: Use DocumentFragment to batch DOM insertions
+        // Reduces browser re-parsing overhead compared to innerHTML string concatenation
+        quizDiv.innerHTML = "";
+        const fragment = document.createDocumentFragment();
         q.options.forEach((opt, idx) => {
-          html += `<button class="quiz-opt" onclick="app.handleQuizAnswer(${idx}, this)">${Utils.escapeHtml(opt)}</button>`;
+          const btn = document.createElement("button");
+          btn.className = "quiz-opt";
+          // textContent is faster and safer than escapeHtml() + innerHTML
+          btn.textContent = opt;
+          btn.onclick = () => app.handleQuizAnswer(idx, btn);
+          fragment.appendChild(btn);
         });
-        quizDiv.innerHTML = html;
+        quizDiv.appendChild(fragment);
       }
     } else {
       if (psyDiv) psyDiv.style.display = "grid";
