@@ -41,6 +41,7 @@ const app = {
     this.ui.backBtn = document.getElementById("backBtn");
     this.ui.psyContainer = document.getElementById("psyContainer");
     this.ui.quizContainer = document.getElementById("quizContainer");
+    this.ui.keyboardHint = document.getElementById("keyboardHint");
 
     // Static Psy Buttons
     this.ui.psyButtons = this.ui.psyContainer.querySelectorAll(".likert-opt");
@@ -48,6 +49,8 @@ const app = {
 
   init() {
     this.initUI();
+
+    document.addEventListener("keydown", (e) => this.handleGlobalKeydown(e));
 
     const savedKey = localStorage.getItem("user_api_key");
     if (savedKey) {
@@ -88,6 +91,23 @@ const app = {
       ?.addEventListener("click", () => this.closeLibrary());
 
     this.setView("setup");
+  },
+
+  handleGlobalKeydown(e) {
+    // Only works if test view is active and we are in psy mode
+    if (!this.ui.testView || this.ui.testView.style.display !== "block") return;
+    if (this.state.mode !== "psy") return;
+
+    // Ignore if typing in an input
+    if (document.activeElement &&
+       (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA")) {
+      return;
+    }
+
+    const key = parseInt(e.key, 10);
+    if (!isNaN(key) && key >= 1 && key <= 5) {
+      this.handlePsyAnswer(key);
+    }
   },
 
   // =========================
@@ -416,8 +436,10 @@ NOTES: ${notes || "нет"}`;
 
     const psyDiv = this.ui.psyContainer;
     const quizDiv = this.ui.quizContainer;
+    const hintDiv = this.ui.keyboardHint;
 
     if (isQuizMode) {
+      if (hintDiv) hintDiv.style.display = "none";
       if (psyDiv) psyDiv.style.display = "none";
       if (quizDiv) {
         quizDiv.style.display = "flex";
@@ -428,6 +450,7 @@ NOTES: ${notes || "нет"}`;
         quizDiv.innerHTML = html;
       }
     } else {
+      if (hintDiv) hintDiv.style.display = "block";
       if (psyDiv) psyDiv.style.display = "grid";
       if (quizDiv) quizDiv.style.display = "none";
 

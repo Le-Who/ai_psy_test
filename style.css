@@ -434,3 +434,16 @@ label {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
+/* --- 11. KEYBOARD HINT (Micro-UX) --- */
+.keyboard-hint {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 15px;
+    opacity: 0.8;
+    font-weight: 500;
+}
+@media (hover: none) {
+    .keyboard-hint { display: none !important; }
+}
