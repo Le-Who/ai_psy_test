@@ -440,7 +440,8 @@ NOTES: ${notes || "нет"}`;
       this.setLoading(false);
       const box = document.getElementById("errorBox");
       box.style.display = "block";
-      box.innerHTML = err.message || "Ошибка генерации";
+      // SECURITY: Prevent XSS by using textContent for untrusted error messages
+      box.textContent = err.message || "Ошибка генерации";
       this.setView("setup");
     }
   },
