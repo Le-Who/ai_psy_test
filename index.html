@@ -21,10 +21,10 @@
             </div>
             
             <button class="theme-toggle-btn" onclick="toggleThemeMenu()" title="Темы" aria-label="Переключить тему" aria-expanded="false">🎨</button>
-            <div class="theme-menu" id="themeMenu">
-                <button class="theme-opt" onclick="setTheme('light')"><div class="theme-circle" style="background: #fff; border: 1px solid #ddd;"></div> Светленькая</button>
-                <button class="theme-opt" onclick="setTheme('dark')"><div class="theme-circle" style="background: #1e293b;"></div> Темненькая</button>
-                <button class="theme-opt" onclick="setTheme('gray')"><div class="theme-circle" style="background: #e5e5e5; border: 1px solid #999;"></div> Серенькая</button>
+            <div class="theme-menu" id="themeMenu" role="menu">
+                <button class="theme-opt" data-theme="light" role="menuitemradio" aria-checked="false" onclick="setTheme('light')"><div class="theme-circle" style="background: #fff; border: 1px solid #ddd;"></div> Светленькая</button>
+                <button class="theme-opt" data-theme="dark" role="menuitemradio" aria-checked="false" onclick="setTheme('dark')"><div class="theme-circle" style="background: #1e293b;"></div> Темненькая</button>
+                <button class="theme-opt" data-theme="gray" role="menuitemradio" aria-checked="false" onclick="setTheme('gray')"><div class="theme-circle" style="background: #e5e5e5; border: 1px solid #999;"></div> Серенькая</button>
             </div>
         </div>
 
@@ -242,22 +242,37 @@
             cleanupMenuListeners();
         }
 
+        function updateThemeUI(activeTheme) {
+            const buttons = document.querySelectorAll('.theme-opt');
+            buttons.forEach(btn => {
+                const theme = btn.dataset.theme;
+                const isActive = theme === activeTheme;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-checked', isActive);
+            });
+        }
+
         function setTheme(themeName) {
             if (themeName === 'light') document.body.removeAttribute('data-theme');
             else document.body.setAttribute('data-theme', themeName);
             localStorage.setItem('user-theme', themeName);
+            updateThemeUI(themeName);
             closeThemeMenu();
         }
 
         function initTheme() {
+            let activeTheme = 'light';
             const saved = localStorage.getItem('user-theme');
             if (saved) {
+                activeTheme = saved;
                 if (saved !== 'light') document.body.setAttribute('data-theme', saved);
                 else document.body.removeAttribute('data-theme');
             }
             else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                 activeTheme = 'dark';
                  document.body.setAttribute('data-theme', 'dark');
             }
+            updateThemeUI(activeTheme);
         }
         initTheme();
     </script>
