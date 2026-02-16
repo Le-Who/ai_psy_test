@@ -13,3 +13,7 @@
 ## 2025-05-23 - [Dynamic Button States]
 **Learning:** When a button's visual text changes to convey a new state (like "Delete" -> "Confirm?"), the `aria-label` MUST update simultaneously. Screen reader users miss the context switch if the label remains static.
 **Action:** Use `dataset` to store the original label, update `aria-label` during the confirmation state, and restore it on timeout or cancellation.
+
+## 2025-05-24 - [Empty States & Guidance]
+**Learning:** A blank "empty state" is a missed opportunity for onboarding. Instead of just stating "Library is empty", providing a direct Call-to-Action (button) and a friendly message reduces friction for new users.
+**Action:** Always include a primary action button in empty states to guide the user to the next logical step.

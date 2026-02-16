@@ -182,9 +182,15 @@ const Storage = {
     renderLibraryHTML() {
         const list = this.getAll();
         if (list.length === 0) {
-            return `<div style="text-align:center; padding:40px; color:var(--text-muted);">
-                <div style="font-size:40px; margin-bottom:10px;">📭</div>
-                Библиотека пуста.<br>Создайте свой первый тест!
+            return `<div style="text-align:center; padding: 40px; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                <div style="font-size: 48px; margin-bottom: 5px; animation: bounce 2s infinite;">📭</div>
+                <div>
+                    <h3 style="margin: 0 0 5px; color: var(--text);">Библиотека пуста</h3>
+                    <p style="margin: 0; font-size: 14px;">Здесь будут храниться ваши шедевры</p>
+                </div>
+                <button class="btn" style="width: auto; padding: 10px 24px; margin-top: 10px;" onclick="app.closeLibrary()">
+                    ✨ Создать первый тест
+                </button>
             </div>`;
         }
 
