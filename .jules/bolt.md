@@ -18,3 +18,7 @@
 ## 2024-05-25 - [Persistent Set Cache for Collision Checks]
 **Learning:** Even with O(1) lookups via `Set`, rebuilding the `Set` from a large array on every `save()` operation remains O(N) and blocks the main thread during bulk operations or frequent saves.
 **Action:** Maintain a persistent `_themesCache` (Set) in the `Storage` class and update it incrementally (add/delete) to keep `save()` complexity closer to O(1).
+
+## 2024-05-26 - [DOM Removal Optimization]
+**Learning:** `app.deleteTest` triggered a full library re-render (O(N)) via `innerHTML` replacement for every deletion, causing layout thrashing and ~89ms delays for 1000 items.
+**Action:** Use `element.remove()` for direct DOM manipulation (O(1)) when deleting individual items, falling back to re-render only for empty states.
