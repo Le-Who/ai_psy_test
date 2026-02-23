@@ -1,7 +1,6 @@
 // AI Universal Test Generator - Core Logic v6.0 Final
 // UI/UX Polish, Features: Glassmorphism, Clipboard API, Confetti, Toast Notifications
 
-// TINYTOKEN moved to app-settings.js
 // api object moved to api.js
 
 const app = {
@@ -999,38 +998,64 @@ NOTES: ${notes || "нет"}`;
   // SHARE LINK / SAVE
   // =========================
 
-    async createShareLink(btnEl = null) {
-        if(!TINYTOKEN) return alert("Нужен TinyURL Token!");
-        
-        const btn = btnEl || document.getElementById('shareBtn') || document.getElementById('inProgressShareBtn');
-        const originalText = btn ? btn.innerHTML : null;
-        if (btn) {
-            btn.innerHTML = "⏳ Создаем ссылку...";
-            btn.disabled = true;
-        }
+  getTinyToken(promptUser) {
+    let token = localStorage.getItem("tinyurl_token");
+    if (!token && promptUser) {
+      const input = prompt(
+        "Введите TinyURL API Token (с tinyurl.com/app/settings/tokens):"
+      );
+      if (input) {
+        token = input.trim();
+        localStorage.setItem("tinyurl_token", token);
+      }
+    }
+    return token;
+  },
 
-        try {
-            const isQuiz = (this.state.blueprint.testType === 'quiz'); 
-            const score = this.state.quizScore;
-            const name = prompt("Твое имя (для отображения в дуэли):", "Аноним") || "Аноним";
+  async createShareLink(btnEl = null) {
+    const token = this.getTinyToken(true);
+    if (!token) return alert("Нужен TinyURL Token!");
 
-            const payload = { 
-                h: name, 
-                s: (isQuiz ? score : 0), 
-                r: (isQuiz ? null : this.state.lastResultName),
-                t: this.state.blueprint, 
-                q: this.state.questions 
-            };
-            
-            if(!payload.t.theme) payload.t.theme = document.getElementById('themeInput').value || "Тест";
+    const btn =
+      btnEl ||
+      document.getElementById("shareBtn") ||
+      document.getElementById("inProgressShareBtn");
+    const originalText = btn ? btn.innerHTML : null;
+    if (btn) {
+      btn.innerHTML = "⏳ Создаем ссылку...";
+      btn.disabled = true;
+    }
 
-            const longUrl = `${window.location.origin}${window.location.pathname}${this.buildDuelHashFromPayload(payload)}`;
+    try {
+      const isQuiz = this.state.blueprint.testType === "quiz";
+      const score = this.state.quizScore;
+      const name =
+        prompt("Твое имя (для отображения в дуэли):", "Аноним") || "Аноним";
 
-            const response = await fetch('https://api.tinyurl.com/create', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${TINYTOKEN}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: longUrl, domain: "tiny.one" })
-            });
+      const payload = {
+        h: name,
+        s: isQuiz ? score : 0,
+        r: isQuiz ? null : this.state.lastResultName,
+        t: this.state.blueprint,
+        q: this.state.questions
+      };
+
+      if (!payload.t.theme)
+        payload.t.theme =
+          document.getElementById("themeInput").value || "Тест";
+
+      const longUrl = `${window.location.origin}${
+        window.location.pathname
+      }${this.buildDuelHashFromPayload(payload)}`;
+
+      const response = await fetch("https://api.tinyurl.com/create", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ url: longUrl, domain: "tiny.one" })
+      });
 
             if (!response.ok) throw new Error('API Error');
             const data = await response.json();
@@ -1055,35 +1080,44 @@ NOTES: ${notes || "нет"}`;
         }
     },
     
-    async saveTest(btnEl = null) {
-        const theme = this.state.blueprint.theme || document.getElementById('themeInput').value || "Тест";
-        let shortUrl = null;
+  async saveTest(btnEl = null) {
+    const theme =
+      this.state.blueprint.theme ||
+      document.getElementById("themeInput").value ||
+      "Тест";
+    let shortUrl = null;
+    const token = this.getTinyToken(false);
 
-        try {
-            if (typeof LZString !== 'undefined' && TINYTOKEN) {
-                const isQuiz = (this.state.blueprint.testType === 'quiz');
-                const score = this.state.quizScore;
+    try {
+      if (typeof LZString !== "undefined" && token) {
+        const isQuiz = this.state.blueprint.testType === "quiz";
+        const score = this.state.quizScore;
 
-                const payload = { 
-                    h: "Аноним", 
-                    s: (isQuiz ? score : 0), 
-                    r: (isQuiz ? null : this.state.lastResultName || null),
-                    t: this.state.blueprint, 
-                    q: this.state.questions 
-                };
+        const payload = {
+          h: "Аноним",
+          s: isQuiz ? score : 0,
+          r: isQuiz ? null : this.state.lastResultName || null,
+          t: this.state.blueprint,
+          q: this.state.questions
+        };
 
-                if (!payload.t.theme) payload.t.theme = theme;
+        if (!payload.t.theme) payload.t.theme = theme;
 
-                const longUrl = `${window.location.origin}${window.location.pathname}${this.buildDuelHashFromPayload(payload)}`;
+        const longUrl = `${window.location.origin}${
+          window.location.pathname
+        }${this.buildDuelHashFromPayload(payload)}`;
 
-                const response = await fetch('https://api.tinyurl.com/create', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${TINYTOKEN}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: longUrl, domain: "tiny.one" })
-                });
+        const response = await fetch("https://api.tinyurl.com/create", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ url: longUrl, domain: "tiny.one" })
+        });
 
-                if (response.ok) {
-                    const data = await response.json();
+        if (response.ok) {
+          const data = await response.json();
                     shortUrl = data && data.data && data.data.tiny_url ? data.data.tiny_url : null;
                 }
             }
