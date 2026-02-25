@@ -18,3 +18,7 @@
 ## 2024-05-25 - [Persistent Set Cache for Collision Checks]
 **Learning:** Even with O(1) lookups via `Set`, rebuilding the `Set` from a large array on every `save()` operation remains O(N) and blocks the main thread during bulk operations or frequent saves.
 **Action:** Maintain a persistent `_themesCache` (Set) in the `Storage` class and update it incrementally (add/delete) to keep `save()` complexity closer to O(1).
+
+## 2024-05-26 - [DOM Manipulation vs Full Re-render]
+**Learning:** In a vanilla JS app using string concatenation for rendering lists (`Storage.renderLibraryHTML`), deleting a single item by re-rendering the whole list is O(N) and causes unnecessary DOM thrashing.
+**Action:** For destructive actions on list items, remove the specific DOM element directly (`element.remove()`) and update the data store silently, only re-rendering if the list becomes empty.
