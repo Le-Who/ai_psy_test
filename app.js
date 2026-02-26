@@ -162,6 +162,20 @@ const app = {
     }, 3000);
   },
 
+  async copyToClipboard(text, successMessage) {
+    if (!text) return;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        this.showToast(successMessage || "Скопировано! 📋");
+      } else {
+        throw new Error("Clipboard API unavailable");
+      }
+    } catch (err) {
+      prompt("Скопируй ссылку:", text);
+    }
+  },
+
   // =========================
   // DUEL SHARE / HASH
   // =========================
@@ -1036,13 +1050,7 @@ NOTES: ${notes || "нет"}`;
             const data = await response.json();
             const tinyUrl = data.data.tiny_url;
             
-            // --- UX IMPROVEMENT: CLIPBOARD + TOAST ---
-            if (navigator.clipboard && window.isSecureContext) {
-                await navigator.clipboard.writeText(tinyUrl);
-                this.showToast("Ссылка скопирована! Отправь другу 🚀");
-            } else {
-                prompt("Скопируй ссылку:", tinyUrl);
-            }
+            await this.copyToClipboard(tinyUrl, "Ссылка скопирована! Отправь другу 🚀");
 
         } catch (e) {
             console.error(e);
