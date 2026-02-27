@@ -544,16 +544,15 @@ NOTES: ${notes || "нет"}`;
       btn.classList.add("wrong");
     }
 
+    // ⚡ Bolt: Cache DOM query result to avoid redundant NodeList lookups
     const allBtns = document.querySelectorAll(".quiz-opt");
     if (allBtns[q.correctIndex]) {
       allBtns[q.correctIndex].classList.add("correct");
     }
-    document
-      .querySelectorAll(".quiz-opt")
-      .forEach((b) => {
-        b.classList.add("disabled");
-        b.disabled = true;
-      });
+    allBtns.forEach((b) => {
+      b.classList.add("disabled");
+      b.disabled = true;
+    });
 
     setTimeout(() => this.nextQuestion(), 1200);
   },
@@ -1152,7 +1151,21 @@ NOTES: ${notes || "нет"}`;
 
     // Confirmed delete
     Storage.delete(id);
-    this.openLibrary();
+    // ⚡ Bolt: Optimize by directly removing the DOM element in O(1) instead of triggering a full O(N) re-render of the library.
+    let removedDom = false;
+    if (btn) {
+      const card = btn.closest('.card');
+      if (card) {
+        card.remove();
+        removedDom = true;
+      }
+    }
+
+    // Fallback to full render if we couldn't remove the DOM element directly,
+    // or if the library is empty and we need to show the empty state.
+    if (!removedDom || Storage.getAll().length === 0) {
+      this.openLibrary();
+    }
     this.showToast("Тест удален 🗑");
   },
 
