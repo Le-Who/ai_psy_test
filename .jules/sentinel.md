@@ -1,0 +1,4 @@
+## 2024-05-24 - [CRITICAL] Hardcoded API Key Exposure
+**Vulnerability:** A hardcoded TinyURL API key (`TINYTOKEN`) was present at the bottom of the `app-settings.js` file, which is served directly to the client as a static asset. This exposes the credential to any user visiting the site, potentially leading to unauthorized usage or quota exhaustion of the external service.
+**Learning:** In purely client-side applications (like this no-build SPA) without a secure backend to proxy API requests, secrets cannot be safely embedded in source code. Any variable defined in a `.js` file loaded via a `<script>` tag is publicly accessible.
+**Prevention:** External API tokens must be retrieved dynamically from user input or `localStorage`, and never hardcoded in source files. The application should prompt the user for their own credentials when interacting with third-party services that require authentication.
