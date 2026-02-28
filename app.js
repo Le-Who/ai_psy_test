@@ -544,16 +544,15 @@ NOTES: ${notes || "нет"}`;
       btn.classList.add("wrong");
     }
 
+    // OPTIMIZATION: Cache querySelectorAll result to avoid redundant DOM lookups
     const allBtns = document.querySelectorAll(".quiz-opt");
     if (allBtns[q.correctIndex]) {
       allBtns[q.correctIndex].classList.add("correct");
     }
-    document
-      .querySelectorAll(".quiz-opt")
-      .forEach((b) => {
-        b.classList.add("disabled");
-        b.disabled = true;
-      });
+    allBtns.forEach((b) => {
+      b.classList.add("disabled");
+      b.disabled = true;
+    });
 
     setTimeout(() => this.nextQuestion(), 1200);
   },
@@ -1152,7 +1151,22 @@ NOTES: ${notes || "нет"}`;
 
     // Confirmed delete
     Storage.delete(id);
-    this.openLibrary();
+
+    // OPTIMIZATION: O(1) DOM removal instead of full re-render
+    // Added safety check to ensure btn exists and is a valid DOM node
+    if (btn && typeof btn.closest === 'function') {
+      const card = btn.closest('.card');
+      const libraryCount = Storage.getAll().length;
+
+      if (card && libraryCount > 0) {
+        card.remove();
+      } else {
+        this.openLibrary(); // Fallback for empty state or missing card
+      }
+    } else {
+      this.openLibrary(); // Fallback if btn is undefined
+    }
+
     this.showToast("Тест удален 🗑");
   },
 
