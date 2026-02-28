@@ -1,0 +1,4 @@
+## 2024-05-20 - Remove hardcoded TinyURL API Token
+**Vulnerability:** A hardcoded `TINYTOKEN` API key was found in `app-settings.js`. This is a critical security vulnerability as it exposes the secret to anyone with access to the codebase or the compiled application.
+**Learning:** External API keys must not be hardcoded in the client-side code. They should be dynamically retrieved from `localStorage` or user input, or ideally, requests should be proxied through a secure backend. In this specific project context (a no-build Single Page Application), dynamically retrieving the token from `localStorage` or prompting the user is the most appropriate mitigation.
+**Prevention:** Implement checks in the CI/CD pipeline or use tools like `trufflehog` or `git-secrets` to scan for hardcoded secrets before they are committed to the repository.
