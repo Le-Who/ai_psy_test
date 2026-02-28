@@ -18,3 +18,11 @@
 ## 2024-05-25 - [Persistent Set Cache for Collision Checks]
 **Learning:** Even with O(1) lookups via `Set`, rebuilding the `Set` from a large array on every `save()` operation remains O(N) and blocks the main thread during bulk operations or frequent saves.
 **Action:** Maintain a persistent `_themesCache` (Set) in the `Storage` class and update it incrementally (add/delete) to keep `save()` complexity closer to O(1).
+
+## 2024-11-20 - [Redundant DOM Lookups in Iterations]
+**Learning:** Functions like `handleQuizAnswer` call `document.querySelectorAll` multiple times for the same static NodeList, wasting CPU cycles on unnecessary DOM queries.
+**Action:** Always cache the result of `document.querySelectorAll` if the node list is accessed multiple times within the same function execution context.
+
+## 2024-11-20 - [O(n) Full Library Re-renders on Deletion]
+**Learning:** `app.deleteTest` triggered `this.openLibrary()` on every deletion, causing a full O(n) string concatenation and re-render of the entire library list, even when only one item was removed.
+**Action:** Implement O(1) targeted DOM removal (`btn.closest('.card').remove()`) when deleting items to avoid full re-renders, but always include safety checks (e.g. `typeof btn.closest === 'function'`) and a fallback to `this.openLibrary()` for empty states or programmatic calls missing the DOM event context.
