@@ -1,4 +1,0 @@
-## 2024-05-24 - [Hardcoded Secret Removal]
-**Vulnerability:** A hardcoded API key (`TINYTOKEN`) for the TinyURL service was stored in plaintext directly inside `app-settings.js`, exposing it to any user or client loading the site.
-**Learning:** Hardcoding secrets on the frontend implies inherent leakage since JS bundles are publicly accessible. A secret must never exist statically in the source files. While some services enforce origins, a stolen token can often be abused. A no-build Single Page Application requires the client to supply their own credentials or fetch them dynamically from a secure backend.
-**Prevention:** Remove all hardcoded credentials from the repository. When relying on third-party APIs from the client without a backend, transition to a "bring your own key" (BYOK) model, prompting the user for their token and storing it securely in the browser's `localStorage`. Ensure the token is passed dynamically at runtime.
