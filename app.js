@@ -544,16 +544,15 @@ NOTES: ${notes || "нет"}`;
       btn.classList.add("wrong");
     }
 
+    // OPTIMIZATION: Cache static NodeList to avoid redundant DOM lookups
     const allBtns = document.querySelectorAll(".quiz-opt");
     if (allBtns[q.correctIndex]) {
       allBtns[q.correctIndex].classList.add("correct");
     }
-    document
-      .querySelectorAll(".quiz-opt")
-      .forEach((b) => {
-        b.classList.add("disabled");
-        b.disabled = true;
-      });
+    allBtns.forEach((b) => {
+      b.classList.add("disabled");
+      b.disabled = true;
+    });
 
     setTimeout(() => this.nextQuestion(), 1200);
   },
