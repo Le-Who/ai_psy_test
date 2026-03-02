@@ -18,3 +18,7 @@
 ## 2024-05-25 - [Persistent Set Cache for Collision Checks]
 **Learning:** Even with O(1) lookups via `Set`, rebuilding the `Set` from a large array on every `save()` operation remains O(N) and blocks the main thread during bulk operations or frequent saves.
 **Action:** Maintain a persistent `_themesCache` (Set) in the `Storage` class and update it incrementally (add/delete) to keep `save()` complexity closer to O(1).
+
+## $(date +%Y-%m-%d) - Optimization Rejection: Readability vs Defensive Coding
+**Learning:** During the O(1) DOM removal optimization in `app.deleteTest`, the code review process strongly rejected defensive verbose type checks (`typeof btn === 'undefined' || btn === null`) when a simple truthiness check (`!btn`) was already in place. Although the goal was to avoid `ReferenceError`, the strict type checking was deemed unnecessary parameter juggling that sacrificed code readability (a violation of the "Never sacrifice readability for micro-optimizations" rule). The O(1) optimization itself is valid and safe in this specific view because there are no external UI states (counters/pagination) to fall out of sync.
+**Action:** When implementing optimizations, retain the existing codebase's style for parameter checks (e.g., using simple truthiness `!btn`). Avoid introducing unnecessarily verbose defensive code (`typeof x === 'undefined'`) unless strictly necessary for undeclared globals, and do not submit temporary test directories (`tests/`), log files (`server.log`), or local test states (`test-results/`) in the final PR.
