@@ -1,3 +1,7 @@
+## 2026-02-02 - [Form Accessibility and Usability]
+**Learning:** In forms, omitting the `for` attribute on `<label>` elements prevents screen readers from associating the label with its input and breaks the native click-to-focus behavior.
+**Action:** Always include a `for` attribute on `<label>` elements that exactly matches the `id` of the target input, ensuring optimal accessibility and a larger click target for users.
+
 ## 2026-02-01 - [Form Validation & Feedback]
 **Learning:** Standard HTML5 `required` attribute allows whitespace, which can lead to empty submissions. Replacing intrusive `alert()` calls with Toasts and focus management creates a much smoother flow.
 **Action:** Always combine `required` attributes with explicit JS validation (`.trim()`) for text inputs, and use visual indicators (asterisks) to make expectations clear upfront.
