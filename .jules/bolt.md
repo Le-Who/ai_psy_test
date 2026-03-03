@@ -18,3 +18,7 @@
 ## 2024-05-25 - [Persistent Set Cache for Collision Checks]
 **Learning:** Even with O(1) lookups via `Set`, rebuilding the `Set` from a large array on every `save()` operation remains O(N) and blocks the main thread during bulk operations or frequent saves.
 **Action:** Maintain a persistent `_themesCache` (Set) in the `Storage` class and update it incrementally (add/delete) to keep `save()` complexity closer to O(1).
+
+## 2026-03-03 - [Targeted Deletion Optimization]
+**Learning:** Calling `app.openLibrary()` inside `deleteTest` forces an O(N) full DOM re-render of the entire library list just to remove a single item, causing massive UI freezes on large lists (e.g., ~3.2s for 50 deletes).
+**Action:** When removing an item from a list, update the underlying data model (`Storage.delete`) and then perform targeted O(1) DOM manipulation (`btn.closest('.card').remove()`) instead of triggering a full re-render. Always include a fallback for empty states.
