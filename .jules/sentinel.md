@@ -1,0 +1,4 @@
+## 2024-03-03 - [Eliminate Hardcoded TinyURL API Token]
+**Vulnerability:** A hardcoded `TINYTOKEN` API key was discovered in the `app-settings.js` configuration file. Hardcoded secrets are a critical security vulnerability as they can be extracted by any user accessing the application.
+**Learning:** The application's no-build SPA architecture requires third-party API credentials to be managed securely without a backend server.
+**Prevention:** Use a Bring Your Own Key (BYOK) architecture. Instead of hardcoding secrets in source files, dynamically retrieve them using `localStorage` and prompt the user for their token when it's missing.

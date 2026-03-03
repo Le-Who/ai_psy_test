@@ -999,7 +999,19 @@ NOTES: ${notes || "нет"}`;
   // SHARE LINK / SAVE
   // =========================
 
+    getTinyToken(promptUser) {
+        let token = localStorage.getItem('tinyurl_token');
+        if (!token && promptUser) {
+            token = prompt("Введите ваш TinyURL API Token для создания коротких ссылок:");
+            if (token) {
+                localStorage.setItem('tinyurl_token', token.trim());
+            }
+        }
+        return token;
+    },
+
     async createShareLink(btnEl = null) {
+        const TINYTOKEN = this.getTinyToken(true);
         if(!TINYTOKEN) return alert("Нужен TinyURL Token!");
         
         const btn = btnEl || document.getElementById('shareBtn') || document.getElementById('inProgressShareBtn');
@@ -1060,6 +1072,7 @@ NOTES: ${notes || "нет"}`;
         let shortUrl = null;
 
         try {
+            const TINYTOKEN = this.getTinyToken(false);
             if (typeof LZString !== 'undefined' && TINYTOKEN) {
                 const isQuiz = (this.state.blueprint.testType === 'quiz');
                 const score = this.state.quizScore;
