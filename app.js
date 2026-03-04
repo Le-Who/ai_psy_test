@@ -149,6 +149,22 @@ const app = {
   },
 
   // =========================
+  // TOKENS
+  // =========================
+
+  getTinyToken(promptUser = false) {
+    let token = localStorage.getItem("tinyurl_token");
+    if (!token && promptUser) {
+      token = prompt("Для создания коротких ссылок требуется TinyURL API Token.\nВведите ваш токен:", "");
+      if (token) {
+        token = token.trim();
+        localStorage.setItem("tinyurl_token", token);
+      }
+    }
+    return token;
+  },
+
+  // =========================
   // TOAST
   // =========================
 
@@ -1000,7 +1016,8 @@ NOTES: ${notes || "нет"}`;
   // =========================
 
     async createShareLink(btnEl = null) {
-        if(!TINYTOKEN) return alert("Нужен TinyURL Token!");
+        const token = this.getTinyToken(true);
+        if(!token) return alert("Нужен TinyURL Token!");
         
         const btn = btnEl || document.getElementById('shareBtn') || document.getElementById('inProgressShareBtn');
         const originalText = btn ? btn.innerHTML : null;
@@ -1028,7 +1045,7 @@ NOTES: ${notes || "нет"}`;
 
             const response = await fetch('https://api.tinyurl.com/create', {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${TINYTOKEN}`, 'Content-Type': 'application/json' },
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: longUrl, domain: "tiny.one" })
             });
 
@@ -1060,7 +1077,8 @@ NOTES: ${notes || "нет"}`;
         let shortUrl = null;
 
         try {
-            if (typeof LZString !== 'undefined' && TINYTOKEN) {
+            const token = this.getTinyToken(false);
+            if (typeof LZString !== 'undefined' && token) {
                 const isQuiz = (this.state.blueprint.testType === 'quiz');
                 const score = this.state.quizScore;
 
@@ -1078,7 +1096,7 @@ NOTES: ${notes || "нет"}`;
 
                 const response = await fetch('https://api.tinyurl.com/create', {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${TINYTOKEN}`, 'Content-Type': 'application/json' },
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ url: longUrl, domain: "tiny.one" })
                 });
 
