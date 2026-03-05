@@ -1121,6 +1121,9 @@ NOTES: ${notes || "нет"}`;
   },
 
   deleteTest(id, btn) {
+    // OPTIMIZATION: O(1) DOM removal for deleted library items
+    const card = btn ? btn.closest('.card') : null;
+
     // Fallback for calls without button (if any)
     if (!btn) {
       if (confirm("Удалить сохранённый тест?")) {
@@ -1157,7 +1160,14 @@ NOTES: ${notes || "нет"}`;
 
     // Confirmed delete
     AppStorage.delete(id);
-    this.openLibrary();
+
+    // OPTIMIZATION: Remove DOM element directly instead of full re-render
+    if (card && AppStorage.getAll().length > 0) {
+      card.remove();
+    } else {
+      this.openLibrary(); // Fallback if card not found or library empty
+    }
+
     this.showToast("Тест удален 🗑");
   },
 
