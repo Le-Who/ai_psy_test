@@ -13,3 +13,7 @@
 ## 2025-05-23 - [Dynamic Button States]
 **Learning:** When a button's visual text changes to convey a new state (like "Delete" -> "Confirm?"), the `aria-label` MUST update simultaneously. Screen reader users miss the context switch if the label remains static.
 **Action:** Use `dataset` to store the original label, update `aria-label` during the confirmation state, and restore it on timeout or cancellation.
+
+## $(date +%Y-%m-%d) - Adding 'for' attributes to labels
+**Learning:** Even though labels wrapping inputs is valid HTML for some simple cases, explicit `for` attributes on `<label>` elements linked to the input's `id` provide much more robust accessibility (a11y) support, especially for screen readers and expanding the click target for users. In this specific app's setup form, missing `for` attributes meant users couldn't click the label text to focus the inputs (like "Тема", "Аудитория", "API Ключ").
+**Action:** Always verify that every `<label>` has a `for` attribute matching its target input's `id`, ensuring the click-to-focus behavior works and a11y tools correctly associate them.
