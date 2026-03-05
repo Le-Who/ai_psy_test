@@ -148,6 +148,21 @@ const app = {
   },
 
   // =========================
+  // TOKENS
+  // =========================
+
+  getTinyToken(promptUser = false) {
+    let token = localStorage.getItem("tinyurl_token");
+    if (!token && promptUser) {
+        token = prompt("Введите свой API токен для TinyURL (domain: tiny.one):");
+        if (token) {
+            localStorage.setItem("tinyurl_token", token.trim());
+        }
+    }
+    return token ? token.trim() : null;
+  },
+
+  // =========================
   // TOAST
   // =========================
 
@@ -980,7 +995,8 @@ NOTES: ${notes || "нет"}`;
   // =========================
 
   async createShareLink(btnEl = null) {
-    if (!TINYTOKEN) return alert("Нужен TinyURL Token!");
+    const tinyToken = this.getTinyToken(true);
+    if (!tinyToken) return alert("Нужен TinyURL Token!");
 
     const btn =
       btnEl ||
@@ -1017,7 +1033,7 @@ NOTES: ${notes || "нет"}`;
       const response = await fetch("https://api.tinyurl.com/create", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${TINYTOKEN}`,
+          Authorization: `Bearer ${tinyToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
@@ -1054,7 +1070,8 @@ NOTES: ${notes || "нет"}`;
     let shortUrl = null;
 
     try {
-      if (typeof LZString !== "undefined" && TINYTOKEN) {
+      const tinyToken = this.getTinyToken(false);
+      if (typeof LZString !== "undefined" && tinyToken) {
         const isQuiz = this.state.blueprint.testType === "quiz";
         const score = this.state.quizScore;
 
@@ -1073,7 +1090,7 @@ NOTES: ${notes || "нет"}`;
         const response = await fetch("https://api.tinyurl.com/create", {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${TINYTOKEN}`,
+            Authorization: `Bearer ${tinyToken}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
