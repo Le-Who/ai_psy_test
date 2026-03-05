@@ -992,7 +992,7 @@ export const app = {
 			// --- UX IMPROVEMENT: CLIPBOARD + TOAST ---
 			if (navigator.clipboard && window.isSecureContext) {
 				await navigator.clipboard.writeText(tinyUrl);
-				this.showToast("Ссылка скопирована! Отправь другу 🚀");
+				this.showToast("Link copied to clipboard. Share it!");
 			} else {
 				prompt("Скопируй ссылку:", tinyUrl);
 			}

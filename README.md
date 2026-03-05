@@ -1,6 +1,6 @@
-# Евдокия Тестикова (AI Universal Test Generator)
+# Aether Assessments (AI Universal Test Protocol)
 
-A client-side, single-page web application that uses AI to generate psychometric tests, trivia quizzes, and interactive "duel" challenges. Powered by Gemini/OpenRouter with a premium glassmorphism-styled frontend and full PWA support.
+A client-side, single-page web application that uses AI to generate psychometric tests, trivia quizzes, and interactive "duel" challenges. Powered by Gemini/OpenRouter with a premium, minimal "Obsidian Elegance" glassmorphism-styled frontend and full PWA support.
 
 ## 🚀 Features
 
@@ -14,7 +14,7 @@ A client-side, single-page web application that uses AI to generate psychometric
 - **Runtime Validation:** AI-generated outputs are validated against strict JSON schemas with automatic retry on hallucination.
 - **Code Splitting:** `lz-string` and `canvas-confetti` are dynamically imported only when needed.
 - **Local Storage Library:** All generated tests are saved for future replay.
-- **Custom UI System:** Responsive, themable (Light, Dark, Gray), with confetti celebrations and toast notifications.
+- **Custom UI System:** Responsive, themable (Obsidian Dark, Alabaster Light) with highly refined typography ("Cormorant Garamond" & "Outfit") and subtle ambient background glows.
 
 ## 🗂 Project Structure
 
