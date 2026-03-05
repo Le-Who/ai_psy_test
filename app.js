@@ -17,7 +17,7 @@ const app = {
     quizScore: 0,
     duelHostName: null,
     duelHostScore: null,
-    duelHostResultName: null
+    duelHostResultName: null,
   },
 
   ui: {},
@@ -53,10 +53,11 @@ const app = {
 
     const savedKey = localStorage.getItem("user_api_key");
     if (savedKey) {
-      const input = document.getElementById("apiKeyInput");
+      const input = /** @type {HTMLInputElement | null} */ (
+        document.getElementById("apiKeyInput")
+      );
       if (input) input.value = savedKey;
     }
-
     this.checkHash();
     this.runDuelHashRegressionCheck();
 
@@ -129,9 +130,7 @@ const app = {
       if (mapping.length === 0) return q;
 
       if (mapping.length > 2) {
-        mapping.sort(
-          (a, b) => Math.abs(b.weight) - Math.abs(a.weight)
-        );
+        mapping.sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
         mapping = mapping.slice(0, 2);
       }
 
@@ -157,7 +156,7 @@ const app = {
     if (!x) return;
     x.innerText = message;
     x.className = "show";
-    setTimeout(function () {
+    setTimeout(() => {
       x.className = x.className.replace("show", "");
     }, 3000);
   },
@@ -204,7 +203,7 @@ const app = {
         s: 1,
         r: null,
         t: { theme: "Regression", testType: "quiz" },
-        q: [{ text: "Q1" }]
+        q: [{ text: "Q1" }],
       };
 
       const canonicalHash = this.buildDuelHashFromPayload(payload);
@@ -228,7 +227,10 @@ const app = {
   },
 
   checkHash() {
-    if (window.location.hash.startsWith("#d=") || window.location.hash.startsWith("#d:")) {
+    if (
+      window.location.hash.startsWith("#d=") ||
+      window.location.hash.startsWith("#d:")
+    ) {
       try {
         const data = this.extractDuelPayloadFromHash(window.location.hash);
 
@@ -308,7 +310,7 @@ const app = {
   openLibrary() {
     this.setView("library");
     const el = document.getElementById("libraryContent");
-    if (el) el.innerHTML = Storage.renderLibraryHTML();
+    if (el) el.innerHTML = AppStorage.renderLibraryHTML();
   },
 
   closeLibrary() {
@@ -329,7 +331,8 @@ const app = {
     document.getElementById("difficultyGroup").style.display =
       mode === "quiz" ? "block" : "none";
 
-    document.getElementById("themeInput").placeholder =
+    /** @type {HTMLInputElement} */
+    (document.getElementById("themeInput")).placeholder =
       mode === "psy" ? "Тема психологического теста..." : "Тема викторины...";
   },
 
@@ -347,12 +350,18 @@ const app = {
     this.state.questions = [];
     this.state.duelHostName = null;
 
-    const apiKey = document
-      .getElementById("apiKeyInput")
-      .value.trim();
-    const theme = document.getElementById("themeInput").value.trim();
-    const notes = document.getElementById("notesInput").value;
-    const count = document.getElementById("qCountInput").value;
+    const apiKey = /** @type {HTMLInputElement} */ (
+      document.getElementById("apiKeyInput")
+    ).value.trim();
+    const theme = /** @type {HTMLInputElement} */ (
+      document.getElementById("themeInput")
+    ).value.trim();
+    const notes = /** @type {HTMLInputElement} */ (
+      document.getElementById("notesInput")
+    ).value;
+    const count = /** @type {HTMLInputElement} */ (
+      document.getElementById("qCountInput")
+    ).value;
 
     if (!theme) {
       this.showToast("Введите тему теста! 📝");
@@ -369,8 +378,12 @@ const app = {
 
     const isQuiz = this.state.mode === "quiz";
     const contextParam = isQuiz
-      ? document.getElementById("difficultyInput").value
-      : document.getElementById("audienceInput").value;
+      ? /** @type {HTMLInputElement} */ (
+          document.getElementById("difficultyInput")
+        ).value
+      : /** @type {HTMLInputElement} */ (
+          document.getElementById("audienceInput")
+        ).value;
 
     const taskSuffix = isQuiz ? "quiz" : "psy";
 
@@ -386,7 +399,7 @@ const app = {
         "architect_" + taskSuffix,
         archPrompt,
         isQuiz ? SCHEMAS.quiz_blueprint : SCHEMAS.psy_blueprint,
-        apiKey
+        apiKey,
       );
 
       this.state.blueprint.theme = theme;
@@ -394,7 +407,11 @@ const app = {
       this.setLoading(true, "Генерируем вопросы...");
 
       const optionsCount = isQuiz
-        ? Number(document.getElementById("difficultyInput").value || 0)
+        ? Number(
+            /** @type {HTMLInputElement} */ (
+              document.getElementById("difficultyInput")
+            ).value || 0,
+          )
         : 0;
 
       // ВАЖНО: передаём полный blueprint, а не только outcomes
@@ -409,7 +426,7 @@ NOTES: ${notes || "нет"}`;
         "generator_" + taskSuffix,
         genPrompt,
         isQuiz ? SCHEMAS.quiz_questions : SCHEMAS.psy_questions,
-        apiKey
+        apiKey,
       );
 
       const hasNestedQuestions =
@@ -427,9 +444,7 @@ NOTES: ${notes || "нет"}`;
       }
 
       if (!isQuiz && Array.isArray(this.state.questions)) {
-        this.state.questions = this.normalizePsyQuestions(
-          this.state.questions
-        );
+        this.state.questions = this.normalizePsyQuestions(this.state.questions);
       }
 
       this.setLoading(false);
@@ -456,23 +471,24 @@ NOTES: ${notes || "нет"}`;
     const total = this.state.questions.length;
     const isQuizMode =
       this.state.mode === "quiz" ||
-      (this.state.mode === "duel" &&
-        this.state.blueprint.testType === "quiz");
+      (this.state.mode === "duel" && this.state.blueprint.testType === "quiz");
 
     // OPTIMIZATION: Use cached UI elements
     if (this.ui.qNum)
-      this.ui.qNum.innerText = (this.state.step + 1).toString() + "/" + total.toString();
-    if (this.ui.qText)
-      this.ui.qText.innerText = q.text;
+      this.ui.qNum.innerText =
+        (this.state.step + 1).toString() + "/" + total.toString();
+    if (this.ui.qText) this.ui.qText.innerText = q.text;
 
     if (this.ui.progressBar)
-      this.ui.progressBar.style.width = ((this.state.step + 1) / total) * 100 + "%";
+      this.ui.progressBar.style.width =
+        ((this.state.step + 1) / total) * 100 + "%";
 
     this.updateInProgressActions();
 
     const backBtn = this.ui.backBtn;
     if (backBtn)
-      backBtn.style.visibility = !isQuizMode && this.state.step > 0 ? "visible" : "hidden";
+      backBtn.style.visibility =
+        !isQuizMode && this.state.step > 0 ? "visible" : "hidden";
 
     const psyDiv = this.ui.psyContainer;
     const quizDiv = this.ui.quizContainer;
@@ -548,12 +564,10 @@ NOTES: ${notes || "нет"}`;
     if (allBtns[q.correctIndex]) {
       allBtns[q.correctIndex].classList.add("correct");
     }
-    document
-      .querySelectorAll(".quiz-opt")
-      .forEach((b) => {
-        b.classList.add("disabled");
-        b.disabled = true;
-      });
+    document.querySelectorAll(".quiz-opt").forEach((/** @type {any} */ b) => {
+      b.classList.add("disabled");
+      b.disabled = true;
+    });
 
     setTimeout(() => this.nextQuestion(), 1200);
   },
@@ -582,9 +596,7 @@ NOTES: ${notes || "нет"}`;
         this.state.blueprint &&
         this.state.blueprint.testType === "quiz");
 
-    return isQuizMode
-      ? "Поделиться викториной"
-      : "Создать дуэль-ссылку";
+    return isQuizMode ? "Поделиться викториной" : "Создать дуэль-ссылку";
   },
 
   updateInProgressActions() {
@@ -608,11 +620,7 @@ NOTES: ${notes || "нет"}`;
       const a = ans !== undefined && ans !== null ? Number(ans) : 3;
       if (baseScoreMap && typeof baseScoreMap === "object") {
         const v = baseScoreMap[String(a)];
-        if (
-          typeof v === "number" &&
-          Number.isFinite(v)
-        )
-          return v;
+        if (typeof v === "number" && Number.isFinite(v)) return v;
       }
       return a - 1 * 2.5; // из старой логики
     };
@@ -626,14 +634,14 @@ NOTES: ${notes || "нет"}`;
             typeof b.min === "number"
               ? b.min
               : typeof b.from === "number"
-              ? b.from
-              : null;
+                ? b.from
+                : null;
           const max =
             typeof b.max === "number"
               ? b.max
               : typeof b.to === "number"
-              ? b.to
-              : null;
+                ? b.to
+                : null;
           if (min == null || max == null) continue;
           if (percent >= min && percent <= max)
             return b.label || b.name || b.title || null;
@@ -648,14 +656,14 @@ NOTES: ${notes || "нет"}`;
             typeof b.min === "number"
               ? b.min
               : typeof b.from === "number"
-              ? b.from
-              : null;
+                ? b.from
+                : null;
           const max =
             typeof b.max === "number"
               ? b.max
               : typeof b.to === "number"
-              ? b.to
-              : null;
+                ? b.to
+                : null;
           if (min == null || max == null) continue;
           if (percent >= min && percent <= max)
             return b.label || b.name || key || null;
@@ -671,23 +679,20 @@ NOTES: ${notes || "нет"}`;
 
     if (
       this.state.mode === "quiz" ||
-      (this.state.mode === "duel" &&
-        this.state.blueprint.testType === "quiz")
+      (this.state.mode === "duel" && this.state.blueprint.testType === "quiz")
     ) {
       const score = this.state.quizScore;
       const total = this.state.questions.length;
-      let result =
-        outcomes.find(
-          (o) => score >= o.minScore && score <= o.maxScore
-        ) || outcomes[0];
+      const result =
+        outcomes.find((o) => score >= o.minScore && score <= o.maxScore) ||
+        outcomes[0];
       winningResultName = result.name;
 
       let duelBlock = "";
       if (this.state.mode === "duel") {
         const hostScore = this.state.duelHostScore;
         const hostName = this.state.duelHostName;
-        let verdict,
-          color;
+        let verdict, color;
         if (score > hostScore) {
           verdict = "Ты выиграл дуэль!";
           color = "#4caf50";
@@ -745,15 +750,13 @@ NOTES: ${notes || "нет"}`;
           sumAbsWeight: 0,
           numItems: 0,
           numReverseItems: 0,
-          numTwoOutcomeItems: 0
+          numTwoOutcomeItems: 0,
         };
       });
 
       this.state.questions.forEach((q, idx) => {
         const ans =
-          this.state.answers[idx] !== undefined
-            ? this.state.answers[idx]
-            : 3;
+          this.state.answers[idx] !== undefined ? this.state.answers[idx] : 3;
         const baseScore = getBaseScore(ans, baseScoreMap);
         if (!q.mapping) return;
 
@@ -764,8 +767,7 @@ NOTES: ${notes || "нет"}`;
           const weight = m.weight || 1;
           const absW = Math.abs(weight);
           const polarity = weight >= 0 ? 1 : -1;
-          const finalScore =
-            polarity === 1 ? baseScore : 10 - baseScore;
+          const finalScore = polarity === 1 ? baseScore : 10 - baseScore;
 
           scores[m.outcomeId] += finalScore * absW;
           potential[m.outcomeId].minRaw += 0 * absW;
@@ -787,12 +789,7 @@ NOTES: ${notes || "нет"}`;
         if (denom > 0) {
           percentages[o.id] = Math.max(
             0,
-            Math.min(
-              100,
-              Math.round(
-                ((scores[o.id] - minRaw) / denom) * 100
-              )
-            )
+            Math.min(100, Math.round(((scores[o.id] - minRaw) / denom) * 100)),
           );
         } else {
           percentages[o.id] = 0;
@@ -803,11 +800,7 @@ NOTES: ${notes || "нет"}`;
       let qcText = null;
       if (scaleProfile && scaleProfile.qualityChecks) {
         try {
-          qcText = JSON.stringify(
-            scaleProfile.qualityChecks,
-            null,
-            2
-          );
+          qcText = JSON.stringify(scaleProfile.qualityChecks, null, 2);
         } catch (e) {
           qcText = String(scaleProfile.qualityChecks);
         }
@@ -823,15 +816,11 @@ NOTES: ${notes || "нет"}`;
         const st = structure[o.id];
         const revPct =
           st.numItems > 0
-            ? Math.round(
-                (st.numReverseItems / st.numItems) * 100
-              )
+            ? Math.round((st.numReverseItems / st.numItems) * 100)
             : 0;
         const twoOutPct =
           st.numItems > 0
-            ? Math.round(
-                (st.numTwoOutcomeItems / st.numItems) * 100
-              )
+            ? Math.round((st.numTwoOutcomeItems / st.numItems) * 100)
             : 0;
 
         diagnosticsHtml += `
@@ -840,17 +829,11 @@ NOTES: ${notes || "нет"}`;
               <div class="diag-title">${Utils.escapeHtml(o.name)}</div>
               <div class="diag-sub">
                 <span>${pct}%</span>
-                ${
-                  band
-                    ? `<span>${Utils.escapeHtml(band)}</span>`
-                    : ""
-                }
+                ${band ? `<span>${Utils.escapeHtml(band)}</span>` : ""}
               </div>
             </div>
             <div class="diag-meta">
-              <span class="diag-pill">∑|w| ${st.sumAbsWeight.toFixed(
-                2
-              )}</span>
+              <span class="diag-pill">∑|w| ${st.sumAbsWeight.toFixed(2)}</span>
               <span class="diag-pill">items ${st.numItems}</span>
               <span class="diag-pill">reverse ${st.numReverseItems} (${revPct}%)</span>
               <span class="diag-pill">2-outcome ${twoOutPct}%</span>
@@ -874,23 +857,20 @@ NOTES: ${notes || "нет"}`;
 
       if (this.state.blueprint.testType === "dimensional") {
         const sorted = [...outcomes].sort(
-          (a, b) => percentages[b.id] - percentages[a.id]
+          (a, b) => percentages[b.id] - percentages[a.id],
         );
         const win = sorted[0];
         winningResultName = win.name;
-        const band = pickBandLabel(
-          interpretationBands,
-          percentages[win.id]
-        );
+        const band = pickBandLabel(interpretationBands, percentages[win.id]);
 
         html += `
           <div style="text-align:center;padding-bottom:20px;">
             <div style="font-size:12px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Твой ведущий результат</div>
             <h2 style="font-size:32px;margin:0 0 10px;color:var(--primary)">${Utils.escapeHtml(win.name)}</h2>
             <p style="font-size:18px;line-height:1.6;">${Utils.escapeHtml(win.description || "")}</p>
-            <div style="margin-top:15px;font-size:28px;color:var(--accent);font-weight:bold;">${percentages[
-              win.id
-            ]}%</div>
+            <div style="margin-top:15px;font-size:28px;color:var(--accent);font-weight:bold;">${
+              percentages[win.id]
+            }%</div>
             ${
               band
                 ? `<div style="margin-top:8px;color:var(--text-muted);font-weight:600;">${Utils.escapeHtml(band)}</div>`
@@ -976,20 +956,20 @@ NOTES: ${notes || "нет"}`;
         particleCount: 150,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ["#6366f1", "#ec4899", "#06b6d4", "#ffd700"]
+        colors: ["#6366f1", "#ec4899", "#06b6d4", "#ffd700"],
       });
       setTimeout(() => {
         confetti({
           particleCount: 50,
           angle: 60,
           spread: 55,
-          origin: { x: 0 }
+          origin: { x: 0 },
         });
         confetti({
           particleCount: 50,
           angle: 120,
           spread: 55,
-          origin: { x: 1 }
+          origin: { x: 1 },
         });
       }, 400);
     }
@@ -999,115 +979,140 @@ NOTES: ${notes || "нет"}`;
   // SHARE LINK / SAVE
   // =========================
 
-    async createShareLink(btnEl = null) {
-        if(!TINYTOKEN) return alert("Нужен TinyURL Token!");
-        
-        const btn = btnEl || document.getElementById('shareBtn') || document.getElementById('inProgressShareBtn');
-        const originalText = btn ? btn.innerHTML : null;
-        if (btn) {
-            btn.innerHTML = "⏳ Создаем ссылку...";
-            btn.disabled = true;
+  async createShareLink(btnEl = null) {
+    if (!TINYTOKEN) return alert("Нужен TinyURL Token!");
+
+    const btn =
+      btnEl ||
+      document.getElementById("shareBtn") ||
+      document.getElementById("inProgressShareBtn");
+    const originalText = btn ? btn.innerHTML : null;
+    if (btn) {
+      btn.innerHTML = "⏳ Создаем ссылку...";
+      btn.disabled = true;
+    }
+
+    try {
+      const isQuiz = this.state.blueprint.testType === "quiz";
+      const score = this.state.quizScore;
+      const name =
+        prompt("Твое имя (для отображения в дуэли):", "Аноним") || "Аноним";
+
+      const payload = {
+        h: name,
+        s: isQuiz ? score : 0,
+        r: isQuiz ? null : this.state.lastResultName,
+        t: this.state.blueprint,
+        q: this.state.questions,
+      };
+
+      if (!payload.t.theme)
+        payload.t.theme =
+          /** @type {HTMLInputElement} */ (
+            document.getElementById("themeInput")
+          ).value || "Тест";
+
+      const longUrl = `${window.location.origin}${window.location.pathname}${this.buildDuelHashFromPayload(payload)}`;
+
+      const response = await fetch("https://api.tinyurl.com/create", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${TINYTOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
+      });
+
+      if (!response.ok) throw new Error("API Error");
+      const data = await response.json();
+      const tinyUrl = data.data.tiny_url;
+
+      // --- UX IMPROVEMENT: CLIPBOARD + TOAST ---
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(tinyUrl);
+        this.showToast("Ссылка скопирована! Отправь другу 🚀");
+      } else {
+        prompt("Скопируй ссылку:", tinyUrl);
+      }
+    } catch (e) {
+      console.error(e);
+      this.showToast("Ошибка создания ссылки 😢");
+    } finally {
+      if (btn) {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+  },
+
+  async saveTest(btnEl = null) {
+    const theme =
+      this.state.blueprint.theme ||
+      /** @type {HTMLInputElement} */ (document.getElementById("themeInput"))
+        .value ||
+      "Тест";
+    let shortUrl = null;
+
+    try {
+      if (typeof LZString !== "undefined" && TINYTOKEN) {
+        const isQuiz = this.state.blueprint.testType === "quiz";
+        const score = this.state.quizScore;
+
+        const payload = {
+          h: "Аноним",
+          s: isQuiz ? score : 0,
+          r: isQuiz ? null : this.state.lastResultName || null,
+          t: this.state.blueprint,
+          q: this.state.questions,
+        };
+
+        if (!payload.t.theme) payload.t.theme = theme;
+
+        const longUrl = `${window.location.origin}${window.location.pathname}${this.buildDuelHashFromPayload(payload)}`;
+
+        const response = await fetch("https://api.tinyurl.com/create", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${TINYTOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          shortUrl =
+            data && data.data && data.data.tiny_url ? data.data.tiny_url : null;
         }
+      }
+    } catch (e) {
+      console.warn("Short link generation failed (saveTest):", e);
+    }
 
-        try {
-            const isQuiz = (this.state.blueprint.testType === 'quiz'); 
-            const score = this.state.quizScore;
-            const name = prompt("Твое имя (для отображения в дуэли):", "Аноним") || "Аноним";
+    AppStorage.save(
+      this.state.blueprint,
+      this.state.questions,
+      theme,
+      shortUrl,
+    );
+    this.showToast("Тест сохранен в библиотеку! 💾");
 
-            const payload = { 
-                h: name, 
-                s: (isQuiz ? score : 0), 
-                r: (isQuiz ? null : this.state.lastResultName),
-                t: this.state.blueprint, 
-                q: this.state.questions 
-            };
-            
-            if(!payload.t.theme) payload.t.theme = document.getElementById('themeInput').value || "Тест";
-
-            const longUrl = `${window.location.origin}${window.location.pathname}${this.buildDuelHashFromPayload(payload)}`;
-
-            const response = await fetch('https://api.tinyurl.com/create', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${TINYTOKEN}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: longUrl, domain: "tiny.one" })
-            });
-
-            if (!response.ok) throw new Error('API Error');
-            const data = await response.json();
-            const tinyUrl = data.data.tiny_url;
-            
-            // --- UX IMPROVEMENT: CLIPBOARD + TOAST ---
-            if (navigator.clipboard && window.isSecureContext) {
-                await navigator.clipboard.writeText(tinyUrl);
-                this.showToast("Ссылка скопирована! Отправь другу 🚀");
-            } else {
-                prompt("Скопируй ссылку:", tinyUrl);
-            }
-
-        } catch (e) {
-            console.error(e);
-            this.showToast("Ошибка создания ссылки 😢");
-        } finally {
-            if (btn) {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-    },
-    
-    async saveTest(btnEl = null) {
-        const theme = this.state.blueprint.theme || document.getElementById('themeInput').value || "Тест";
-        let shortUrl = null;
-
-        try {
-            if (typeof LZString !== 'undefined' && TINYTOKEN) {
-                const isQuiz = (this.state.blueprint.testType === 'quiz');
-                const score = this.state.quizScore;
-
-                const payload = { 
-                    h: "Аноним", 
-                    s: (isQuiz ? score : 0), 
-                    r: (isQuiz ? null : this.state.lastResultName || null),
-                    t: this.state.blueprint, 
-                    q: this.state.questions 
-                };
-
-                if (!payload.t.theme) payload.t.theme = theme;
-
-                const longUrl = `${window.location.origin}${window.location.pathname}${this.buildDuelHashFromPayload(payload)}`;
-
-                const response = await fetch('https://api.tinyurl.com/create', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${TINYTOKEN}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: longUrl, domain: "tiny.one" })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    shortUrl = data && data.data && data.data.tiny_url ? data.data.tiny_url : null;
-                }
-            }
-        } catch (e) {
-            console.warn("Short link generation failed (saveTest):", e);
-        }
-
-        Storage.save(this.state.blueprint, this.state.questions, theme, shortUrl);
-        this.showToast("Тест сохранен в библиотеку! 💾");
-        
-        const btn = btnEl || document.getElementById('saveTestBtn') || document.getElementById('inProgressSaveBtn');
-        if (btn) {
-            btn.innerText = "✅ Сохранено";
-            btn.disabled = true;
-        }
-    },
+    const btn =
+      btnEl ||
+      document.getElementById("saveTestBtn") ||
+      document.getElementById("inProgressSaveBtn");
+    if (btn) {
+      btn.innerText = "✅ Сохранено";
+      btn.disabled = true;
+    }
+  },
 
   loadSavedTest(id) {
-    const test = Storage.getById(id);
+    const test = AppStorage.getById(id);
     if (!test) return;
     this.state.blueprint = test.blueprint;
     this.state.questions = test.questions;
-    this.state.mode =
-      test.blueprint.testType === "quiz" ? "quiz" : "psy";
+    this.state.mode = test.blueprint.testType === "quiz" ? "quiz" : "psy";
     this.state.step = 0;
     this.state.answers = [];
     this.state.quizScore = 0;
@@ -1119,7 +1124,7 @@ NOTES: ${notes || "нет"}`;
     // Fallback for calls without button (if any)
     if (!btn) {
       if (confirm("Удалить сохранённый тест?")) {
-        Storage.delete(id);
+        AppStorage.delete(id);
         this.openLibrary();
       }
       return;
@@ -1151,7 +1156,7 @@ NOTES: ${notes || "нет"}`;
     }
 
     // Confirmed delete
-    Storage.delete(id);
+    AppStorage.delete(id);
     this.openLibrary();
     this.showToast("Тест удален 🗑");
   },
@@ -1165,9 +1170,10 @@ NOTES: ${notes || "нет"}`;
       (v) => {
         const el = this.ui[v] || document.getElementById(v);
         if (el) el.style.display = "none";
-      }
+      },
     );
-    const target = this.ui[view + "View"] || document.getElementById(view + "View");
+    const target =
+      this.ui[view + "View"] || document.getElementById(view + "View");
     if (target) target.style.display = "block";
   },
 
@@ -1178,7 +1184,7 @@ NOTES: ${notes || "нет"}`;
       const t = document.getElementById("loadingText");
       if (t) t.innerText = text;
     }
-  }
+  },
 };
 
 document.addEventListener("DOMContentLoaded", () => app.init());

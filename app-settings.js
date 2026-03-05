@@ -1,35 +1,35 @@
 // AI Universal Test Generator - Settings v6.5 (Psy v3.0 Architecture)
 
 const CONFIG = {
-  providers: {
-    openrouter: {
-      endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-      models: {
-        architect: 'x-ai/grok-4.1-fast',
-        generator: 'x-ai/grok-4.1-fast'
-      },
-      headers: (key) => ({
-        'Authorization': `Bearer ${key}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': window.location.href,
-        'X-Title': 'AI Universal Test'
-      })
-    },
-    gemini: {
-      endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
-      models: {
-        architect: 'gemini-2.5-flash',
-        generator: 'gemini-2.5-flash'
-      },
-      generation: {
-        temperature: 0.7
-      },
-      limits: {
-        minQuestions: 5,
-        maxQuestions: 69
-      }
-    }
-  }
+	providers: {
+		openrouter: {
+			endpoint: "https://openrouter.ai/api/v1/chat/completions",
+			models: {
+				architect: "x-ai/grok-4.1-fast",
+				generator: "x-ai/grok-4.1-fast",
+			},
+			headers: (key) => ({
+				Authorization: `Bearer ${key}`,
+				"Content-Type": "application/json",
+				"HTTP-Referer": window.location.href,
+				"X-Title": "AI Universal Test",
+			}),
+		},
+		gemini: {
+			endpoint: "https://generativelanguage.googleapis.com/v1beta/models/",
+			models: {
+				architect: "gemini-2.5-flash",
+				generator: "gemini-2.5-flash",
+			},
+			generation: {
+				temperature: 0.7,
+			},
+			limits: {
+				minQuestions: 5,
+				maxQuestions: 69,
+			},
+		},
+	},
 };
 
 // ===============================
@@ -37,318 +37,315 @@ const CONFIG = {
 // ===============================
 
 const SCHEMAS = {
-  // 1. PSY
-  psy_blueprint: {
-    type: "object",
-    properties: {
-      testType: {
-        type: "string",
-        enum: ["dimensional", "categorical"]
-      },
+	// 1. PSY
+	psy_blueprint: {
+		type: "object",
+		properties: {
+			testType: {
+				type: "string",
+				enum: ["dimensional", "categorical"],
+			},
 
-      // NEW: конструкция теста
-      constructDefinition: {
-        type: "object",
-        properties: {
-          name: { type: "string" },
-          theoreticalBackground: { type: "string" },
-          targetPopulation: { type: "string" },
-          expectedOutcomeCount: { type: "integer" }
-        },
-        required: ["name"]
-      },
+			// NEW: конструкция теста
+			constructDefinition: {
+				type: "object",
+				properties: {
+					name: { type: "string" },
+					theoreticalBackground: { type: "string" },
+					targetPopulation: { type: "string" },
+					expectedOutcomeCount: { type: "integer" },
+				},
+				required: ["name"],
+			},
 
-      outcomes: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            id: { type: "string" },
-            name: { type: "string" },
-            description: { type: "string" },
+			outcomes: {
+				type: "array",
+				items: {
+					type: "object",
+					properties: {
+						id: { type: "string" },
+						name: { type: "string" },
+						description: { type: "string" },
 
-            // NEW: структурированные фасеты вместо facetHints
-            facets: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  id: { type: "string" },
-                  type: {
-                    type: "string",
-                    enum: ["behavior", "cognition", "emotion", "preference", "stress_response"]
-                  },
-                  label: { type: "string" },
-                  rationale: { type: "string" }
-                },
-                required: ["id", "type", "label"]
-              }
-            },
+						// NEW: структурированные фасеты вместо facetHints
+						facets: {
+							type: "array",
+							items: {
+								type: "object",
+								properties: {
+									id: { type: "string" },
+									type: {
+										type: "string",
+										enum: [
+											"behavior",
+											"cognition",
+											"emotion",
+											"preference",
+											"stress_response",
+										],
+									},
+									label: { type: "string" },
+									rationale: { type: "string" },
+								},
+								required: ["id", "type", "label"],
+							},
+						},
 
-            // NEW: дискриминаторы (ссылки на facet.id)
-            discriminators: {
-              type: "array",
-              items: { type: "string" }
-            },
+						// NEW: дискриминаторы (ссылки на facet.id)
+						discriminators: {
+							type: "array",
+							items: { type: "string" },
+						},
 
-            // NEW: требования к вопросам для outcome
-            questionRequirements: {
-              type: "object",
-              properties: {
-                totalQuestions: { type: "integer", minimum: 1 },
-                facetCoverage: { type: "string", enum: ["all", "primary"] },
-                reverseItems: { type: "integer", minimum: 0 },
-                dualOutcomeItems: { type: "integer", minimum: 0 },
-                complexityLevel: { type: "string", enum: ["easy", "moderate", "complex"] }
-              }
-            }
-          },
-          required: ["id", "name", "description"]
-        }
-      },
+						// NEW: требования к вопросам для outcome
+						questionRequirements: {
+							type: "object",
+							properties: {
+								totalQuestions: { type: "integer", minimum: 1 },
+								facetCoverage: { type: "string", enum: ["all", "primary"] },
+								reverseItems: { type: "integer", minimum: 0 },
+								dualOutcomeItems: { type: "integer", minimum: 0 },
+								complexityLevel: {
+									type: "string",
+									enum: ["easy", "moderate", "complex"],
+								},
+							},
+						},
+					},
+					required: ["id", "name", "description"],
+				},
+			},
 
-      // NEW: чекпоинты качества для генератора
-      qualityCheckpoints: {
-        type: "object",
-        properties: {
-          semanticSimilarityThreshold: { type: "number" },
-          facetRedundancyCheck: { type: "boolean" },
-          outcomeDiscriminationCheck: { type: "boolean" },
-          reverseItemQualityCheck: { type: "boolean" }
-        }
-      }
-    },
-    required: ["testType", "outcomes"]
-  },
+			// NEW: чекпоинты качества для генератора
+			qualityCheckpoints: {
+				type: "object",
+				properties: {
+					semanticSimilarityThreshold: { type: "number" },
+					facetRedundancyCheck: { type: "boolean" },
+					outcomeDiscriminationCheck: { type: "boolean" },
+					reverseItemQualityCheck: { type: "boolean" },
+				},
+			},
+		},
+		required: ["testType", "outcomes"],
+	},
 
-  psy_questions: {
-    type: "object",
-    properties: {
-      meta: {
-        type: "object",
-        properties: {
-          topic: { type: "string" },
-          language: { type: "string" },
-          voice: { type: "string" },
-          likertScale: {
-            anyOf: [
-              { type: "string" },
-              { type: "object" }
-            ]
-          },
-          scoringModel: {
-            anyOf: [
-              { type: "string" },
-              { type: "object" }
-            ]
-          },
-          generatedAtISO: { type: "string" }
-        }
-      },
+	psy_questions: {
+		type: "object",
+		properties: {
+			meta: {
+				type: "object",
+				properties: {
+					topic: { type: "string" },
+					language: { type: "string" },
+					voice: { type: "string" },
+					likertScale: {
+						anyOf: [{ type: "string" }, { type: "object" }],
+					},
+					scoringModel: {
+						anyOf: [{ type: "string" }, { type: "object" }],
+					},
+					generatedAtISO: { type: "string" },
+				},
+			},
 
-      scaleProfile: {
-        type: "object",
-        properties: {
-          baseScoreMap: {
-            type: "object",
-            additionalProperties: { type: "number" }
-          },
-          outcomePotential: {
-            type: "object",
-            additionalProperties: {
-              type: "object",
-              properties: {
-                sumAbsWeight: { type: "number" },
-                numItems: { type: "integer" },
-                numReverseItems: { type: "integer" },
-                numTwoOutcomeItems: { type: "integer" },
-                maxRaw: { type: "number" },
-                minRaw: { type: "number" }
-              }
-            }
-          },
-          normalization: {
-            anyOf: [
-              { type: "string" },
-              { type: "object" }
-            ]
-          },
-          interpretationBands: {
-            anyOf: [
-              { type: "array" },
-              { type: "object" }
-            ]
-          },
+			scaleProfile: {
+				type: "object",
+				properties: {
+					baseScoreMap: {
+						type: "object",
+						additionalProperties: { type: "number" },
+					},
+					outcomePotential: {
+						type: "object",
+						additionalProperties: {
+							type: "object",
+							properties: {
+								sumAbsWeight: { type: "number" },
+								numItems: { type: "integer" },
+								numReverseItems: { type: "integer" },
+								numTwoOutcomeItems: { type: "integer" },
+								maxRaw: { type: "number" },
+								minRaw: { type: "number" },
+							},
+						},
+					},
+					normalization: {
+						anyOf: [{ type: "string" }, { type: "object" }],
+					},
+					interpretationBands: {
+						anyOf: [{ type: "array" }, { type: "object" }],
+					},
 
-          // NEW: facet coverage report
-          facetCoverageReport: {
-            type: "object",
-            properties: {
-              facetStatus: { type: "array" },
-              uncoveredFacets: { type: "array" },
-              summary: { type: "string" }
-            }
-          },
+					// NEW: facet coverage report
+					facetCoverageReport: {
+						type: "object",
+						properties: {
+							facetStatus: { type: "array" },
+							uncoveredFacets: { type: "array" },
+							summary: { type: "string" },
+						},
+					},
 
-          // NEW: semantic audit report
-          semanticAuditReport: {
-            type: "object",
-            properties: {
-              totalPairwiseComparisons: { type: "integer" },
-              redundantPairs: { type: "integer" },
-              nearDuplicates: { type: "integer" },
-              averageSimilarity: { type: "number" },
-              maxSimilarity: { type: "number" },
-              summary: { type: "string" }
-            }
-          },
+					// NEW: semantic audit report
+					semanticAuditReport: {
+						type: "object",
+						properties: {
+							totalPairwiseComparisons: { type: "integer" },
+							redundantPairs: { type: "integer" },
+							nearDuplicates: { type: "integer" },
+							averageSimilarity: { type: "number" },
+							maxSimilarity: { type: "number" },
+							summary: { type: "string" },
+						},
+					},
 
-          // NEW: reverse item report
-          reverseItemReport: {
-            type: "object",
-            properties: {
-              targetReverse: { type: "integer" },
-              actualReverse: { type: "integer" },
-              byOutcome: { type: "object" },
-              qualityCheck: { type: "string" },
-              summary: { type: "string" }
-            }
-          },
+					// NEW: reverse item report
+					reverseItemReport: {
+						type: "object",
+						properties: {
+							targetReverse: { type: "integer" },
+							actualReverse: { type: "integer" },
+							byOutcome: { type: "object" },
+							qualityCheck: { type: "string" },
+							summary: { type: "string" },
+						},
+					},
 
-          // NEW: dual outcome report
-          dualOutcomeReport: {
-            type: "object",
-            properties: {
-              targetDualPercentage: { type: "string" },
-              dualItems: { type: "integer" },
-              totalItems: { type: "integer" },
-              actualPercentage: { type: "string" },
-              pairs: { type: "array" },
-              hubCheck: { type: "string" },
-              summary: { type: "string" }
-            }
-          },
+					// NEW: dual outcome report
+					dualOutcomeReport: {
+						type: "object",
+						properties: {
+							targetDualPercentage: { type: "string" },
+							dualItems: { type: "integer" },
+							totalItems: { type: "integer" },
+							actualPercentage: { type: "string" },
+							pairs: { type: "array" },
+							hubCheck: { type: "string" },
+							summary: { type: "string" },
+						},
+					},
 
-          // qualityChecks (у тебя уже есть как anyOf, оставляем, но делаем ожидаемую структуру)
-          qualityChecks: {
-            anyOf: [
-              {
-                type: "object",
-                properties: {
-                  semanticDiversity: { type: "string" },
-                  facetCoverage: { type: "string" },
-                  reverseBalance: { type: "string" },
-                  weightDistribution: { type: "string" },
-                  overallValidity: { type: "string" },
-                  concerns: { type: "array" }
-                }
-              },
-              { type: "array" },
-              { type: "object" }
-            ]
-          },
+					// qualityChecks (у тебя уже есть как anyOf, оставляем, но делаем ожидаемую структуру)
+					qualityChecks: {
+						anyOf: [
+							{
+								type: "object",
+								properties: {
+									semanticDiversity: { type: "string" },
+									facetCoverage: { type: "string" },
+									reverseBalance: { type: "string" },
+									weightDistribution: { type: "string" },
+									overallValidity: { type: "string" },
+									concerns: { type: "array" },
+								},
+							},
+							{ type: "array" },
+							{ type: "object" },
+						],
+					},
 
-          outcomes: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                id: { type: "string" },
-                name: { type: "string" },
-                description: { type: "string" },
-                highInterpretation: { type: "string" },
-                lowInterpretation: { type: "string" }
-              },
-              required: ["id", "name"]
-            }
-          }
-        }
-      },
+					outcomes: {
+						type: "array",
+						items: {
+							type: "object",
+							properties: {
+								id: { type: "string" },
+								name: { type: "string" },
+								description: { type: "string" },
+								highInterpretation: { type: "string" },
+								lowInterpretation: { type: "string" },
+							},
+							required: ["id", "name"],
+						},
+					},
+				},
+			},
 
-      questions: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            id: { type: "string" },
-            text: { type: "string" },
-            mapping: {
-              type: "array",
-              minItems: 1,
-              maxItems: 2,
-              items: {
-                type: "object",
-                properties: {
-                  outcomeId: { type: "string" },
-                  weight: {
-                    type: "number",
-                    enum: [-2.0, -1.0, -0.5, 0.5, 1.0, 2.0]
-                  }
-                },
-                required: ["outcomeId", "weight"]
-              }
-            },
-            polarity: {
-              type: "string",
-              enum: ["direct", "reverse", "mixed"]
-            },
+			questions: {
+				type: "array",
+				items: {
+					type: "object",
+					properties: {
+						id: { type: "string" },
+						text: { type: "string" },
+						mapping: {
+							type: "array",
+							minItems: 1,
+							maxItems: 2,
+							items: {
+								type: "object",
+								properties: {
+									outcomeId: { type: "string" },
+									weight: {
+										type: "number",
+										enum: [-2.0, -1.0, -0.5, 0.5, 1.0, 2.0],
+									},
+								},
+								required: ["outcomeId", "weight"],
+							},
+						},
+						polarity: {
+							type: "string",
+							enum: ["direct", "reverse", "mixed"],
+						},
 
-            // NEW: facetId вместо facetHint
-            facetId: { type: "string" }
-          },
-          required: ["text", "mapping"]
-        }
-      }
-    },
-    required: ["questions"]
-  },
+						// NEW: facetId вместо facetHint
+						facetId: { type: "string" },
+					},
+					required: ["text", "mapping"],
+				},
+			},
+		},
+		required: ["questions"],
+	},
 
-  // 2. QUIZ (без изменений)
-  quiz_blueprint: {
-    type: "object",
-    properties: {
-      testType: {
-        type: "string",
-        enum: ["quiz"]
-      },
-      outcomes: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            minScore: { type: "integer" },
-            maxScore: { type: "integer" },
-            name: { type: "string" },
-            description: { type: "string" }
-          },
-          required: ["minScore", "maxScore", "name", "description"]
-        }
-      }
-    },
-    required: ["testType", "outcomes"]
-  },
+	// 2. QUIZ (без изменений)
+	quiz_blueprint: {
+		type: "object",
+		properties: {
+			testType: {
+				type: "string",
+				enum: ["quiz"],
+			},
+			outcomes: {
+				type: "array",
+				items: {
+					type: "object",
+					properties: {
+						minScore: { type: "integer" },
+						maxScore: { type: "integer" },
+						name: { type: "string" },
+						description: { type: "string" },
+					},
+					required: ["minScore", "maxScore", "name", "description"],
+				},
+			},
+		},
+		required: ["testType", "outcomes"],
+	},
 
-  quiz_questions: {
-    type: "object",
-    properties: {
-      questions: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            text: { type: "string" },
-            options: {
-              type: "array",
-              items: { type: "string" }
-            },
-            correctIndex: { type: "integer" }
-          },
-          required: ["text", "options", "correctIndex"]
-        }
-      }
-    },
-    required: ["questions"]
-  }
+	quiz_questions: {
+		type: "object",
+		properties: {
+			questions: {
+				type: "array",
+				items: {
+					type: "object",
+					properties: {
+						text: { type: "string" },
+						options: {
+							type: "array",
+							items: { type: "string" },
+						},
+						correctIndex: { type: "integer" },
+					},
+					required: ["text", "options", "correctIndex"],
+				},
+			},
+		},
+		required: ["questions"],
+	},
 };
 
 // ===============================
@@ -357,8 +354,8 @@ const SCHEMAS = {
 
 // Здесь вставь свои обновлённые тексты architect_psy / generator_psy v3.0
 const PROMPT_TEXTS = {
-  // --- ARCHITECT: ПСИХОМЕТРИЧЕСКИЙ АРХИТЕКТОР ---
-  architect_psy: `
+	// --- ARCHITECT: ПСИХОМЕТРИЧЕСКИЙ АРХИТЕКТОР ---
+	architect_psy: `
 Ты — Главный Архитектор Психометрических Систем (Senior Psychometrician 15+ лет опыта).
 Твоя задача — спроектировать СТРУКТУРУ теста, которую потом получит отдельная модель‑генератор вопросов.
 
@@ -398,9 +395,9 @@ const PROMPT_TEXTS = {
   "testType": "dimensional" | "categorical",
 
   "constructDefinition": {
-    "name": "Краткое название конструкта (например: \"Экстраверсия-Интроверсия\")",
+    "name": "Краткое название конструкта (например: "Экстраверсия-Интроверсия")",
     "theoreticalBackground": "1–3 предложения, зачем измерять этот конструкт и на какие подходы он опирается (Big Five, когнитивная психология и т.п.).",
-    "targetPopulation": "Кто проходит тест (например: \"Взрослые 18–65 лет, широкой аудитории\").",
+    "targetPopulation": "Кто проходит тест (например: "Взрослые 18–65 лет, широкой аудитории").",
     "expectedOutcomeCount": 3-7
   },
   ...
@@ -441,7 +438,7 @@ const PROMPT_TEXTS = {
 {
   "id": "o1_behavior",                // pattern: outcomeId + "_" + тип
   "type": "behavior",                 // один из: behavior, cognition, emotion, preference, stress_response
-  "label": "Краткий ярлык (3–7 слов, без \"Я/Мне/Мой\")",
+  "label": "Краткий ярлык (3–7 слов, без "Я/Мне/Мой")",
   "rationale": "1–2 предложения, почему этот фасет — валидный индикатор именно ЭТОГО outcome и чем он отличается от фасетов других outcomes."
 }
 
@@ -579,7 +576,7 @@ const PROMPT_TEXTS = {
   }
 }
 `,
-  generator_psy: `
+	generator_psy: `
 Ты — Профессиональный Автор Психометрических Тестов и Психометрист.
 Ты получаешь на вход blueprint (структуру теста) от архитектора и по нему создаешь КОНКРЕТНЫЕ ВОПРОСЫ.
 
@@ -880,7 +877,7 @@ reverseCount ≈ round(totalQuestions * 0.33)
   ]
 }
 `,
-  architect_quiz: `Ты — Геймдизайнер Интеллектуальных Викторин.
+	architect_quiz: `Ты — Геймдизайнер Интеллектуальных Викторин.
 Твоя задача — создать систему грейдов (званий) на основе количества правильных ответов.
 Весь диапазон возможных очков (от 0 до MAX) должен быть покрыт.
 
@@ -893,7 +890,7 @@ reverseCount ≈ round(totalQuestions * 0.33)
 ВАЖНО:
 - Названия званий должны соответствовать Теме (для Гарри Поттера: "Маггл", "Ученик", "Мракоборец").
 - Язык: Строго РУССКИЙ.`,
-  generator_quiz: `Ты — Ведущий Интеллектуальной Викторины.
+	generator_quiz: `Ты — Ведущий Интеллектуальной Викторины.
 Твоя задача — создать вопросы для проверки знаний по теме.
 
 ПРАВИЛА ДЛЯ ВОПРОСОВ:
@@ -901,15 +898,15 @@ reverseCount ≈ round(totalQuestions * 0.33)
 2. **Сложность**: Вопросы должны быть интересными, не банальными.
 3. **Количество вариантов**: Строго следуй указанию из запроса (2, 3 или 4). Только один верный, остальные ложные, но правдоподобные.
 4. **Юмор**: Если тема позволяет, иногда добавляй легкий юмор в один или несколько неправильных ответов.
-5. Всегда указывай точный correctIndex.`
+5. Всегда указывай точный correctIndex.`,
 };
 
 // PROMPTS для разных провайдеров
 
 const PROMPTS = {
-  openrouter: {
-    // --- OPENROUTER JSON Examples Included ---
-    architect_psy: `
+	openrouter: {
+		// --- OPENROUTER JSON Examples Included ---
+		architect_psy: `
 ${PROMPT_TEXTS.architect_psy}
 !!! FORMAT JSON !!!
 Верни строго один JSON-объект без markdown.
@@ -922,7 +919,7 @@ ${PROMPT_TEXTS.architect_psy}
   ]
 }
 `,
-    generator_psy: `
+		generator_psy: `
 ${PROMPT_TEXTS.generator_psy}
 !!! FORMAT JSON !!!
 Верни строго один JSON-объект:
@@ -940,7 +937,7 @@ ${PROMPT_TEXTS.generator_psy}
   ]
 }
 `,
-    architect_quiz: `
+		architect_quiz: `
 ${PROMPT_TEXTS.architect_quiz}
 !!! FORMAT JSON !!!
 Верни JSON вида:
@@ -951,7 +948,7 @@ ${PROMPT_TEXTS.architect_quiz}
   ]
 }
 `,
-    generator_quiz: `
+		generator_quiz: `
 ${PROMPT_TEXTS.generator_quiz}
 !!! FORMAT JSON !!!
 Верни JSON вида:
@@ -964,19 +961,20 @@ ${PROMPT_TEXTS.generator_quiz}
     }
   ]
 }
-`
-  },
+`,
+	},
 
-  // --- GEMINI Schema Driven Strategy ---
-  gemini: {
-    architect_psy: PROMPT_TEXTS.architect_psy,
-    generator_psy: PROMPT_TEXTS.generator_psy,
-    architect_quiz: PROMPT_TEXTS.architect_quiz,
-    generator_quiz: PROMPT_TEXTS.generator_quiz
-  }
+	// --- GEMINI Schema Driven Strategy ---
+	gemini: {
+		architect_psy: PROMPT_TEXTS.architect_psy,
+		generator_psy: PROMPT_TEXTS.generator_psy,
+		architect_quiz: PROMPT_TEXTS.architect_quiz,
+		generator_quiz: PROMPT_TEXTS.generator_quiz,
+	},
 };
 
 console.log("App Settings Loaded v6.5 Final");
 
 // Secrets
-const TINYTOKEN = "lBjFvZGQQmPD56gcBpQBgdyMlezZCxwNShVIlh9wA3W4HFtDOI0418CnoXBx";
+const TINYTOKEN =
+	"lBjFvZGQQmPD56gcBpQBgdyMlezZCxwNShVIlh9wA3W4HFtDOI0418CnoXBx";
