@@ -13,6 +13,13 @@ tsc_errors.log
 node_modules/
 package-lock.json
 
+# Build output
+dist/
+
+# Test output
+playwright-report/
+test-results/
+
 # Tooling (TypeScript / Biome)
 tsconfig.json
 globals.d.ts
