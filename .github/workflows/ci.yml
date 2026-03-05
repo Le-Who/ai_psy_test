@@ -24,7 +24,7 @@ jobs:
         run: npm install
 
       - name: Biome Check
-        run: npx @biomejs/biome check src/ tests/
+        run: npx @biomejs/biome check src/api.js src/app-settings.js src/app.js src/scoring.js src/storage.js src/store.js src/utils.js src/validator.js index.html style.css sw.js tests/
 
       - name: TypeScript Check
         run: npx tsc --noEmit --allowJs --checkJs src/**/*.js

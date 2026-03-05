@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("Psychometric Test Flow", () => {
 	test("User can generate and complete a test successfully", async ({

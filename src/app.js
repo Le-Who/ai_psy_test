@@ -241,7 +241,7 @@ export const app = {
 		const prefix = supportedPrefixes.find((pfx) => hash.startsWith(pfx));
 		if (!prefix) return null;
 
-		const { default: LZString } = await import("lz-string");
+		const { default: LZString } = await import("./lib/lz-string.js");
 
 		const compressed = hash.substring(prefix.length);
 		const decompressed = LZString.decompressFromEncodedURIComponent(compressed);
@@ -254,7 +254,7 @@ export const app = {
 	},
 
 	async buildDuelHashFromPayload(payload) {
-		const { default: LZString } = await import("lz-string");
+		const { default: LZString } = await import("./lib/lz-string.js");
 
 		const jsonString = JSON.stringify(payload);
 		const compressed = LZString.compressToEncodedURIComponent(jsonString);
@@ -909,7 +909,7 @@ export const app = {
 
 		container.innerHTML = html;
 
-		import("canvas-confetti")
+		import("./lib/confetti.js")
 			.then(({ default: confetti }) => {
 				confetti({
 					particleCount: 150,
