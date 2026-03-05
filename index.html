@@ -46,8 +46,8 @@
     />
 
     <!-- PWA -->
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="apple-touch-icon" href="/icon.svg" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="apple-touch-icon" href="./icon.svg" />
     <meta name="theme-color" content="#6366f1" />
 
     <link rel="stylesheet" href="style.css" />
@@ -451,7 +451,7 @@
     </div>
 
     <!-- СКРИПТЫ -->
-    <script type="module" src="/src/app.js"></script>
+    <script type="module" src="./src/app.js"></script>
 
     <!-- UI Scripts -->
     <script>
@@ -535,7 +535,7 @@
       // Service Worker Registration
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("/sw.js").catch((err) => {
+          navigator.serviceWorker.register("./sw.js").catch((err) => {
             console.log("SW registration failed: ", err);
           });
         });
