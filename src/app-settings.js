@@ -1,6 +1,6 @@
 // AI Universal Test Generator - Settings v6.5 (Psy v3.0 Architecture)
 
-const CONFIG = {
+export const CONFIG = {
 	providers: {
 		openrouter: {
 			endpoint: "https://openrouter.ai/api/v1/chat/completions",
@@ -36,11 +36,12 @@ const CONFIG = {
 // SCHEMAS
 // ===============================
 
-const SCHEMAS = {
+export const SCHEMAS = {
 	// 1. PSY
 	psy_blueprint: {
 		type: "object",
 		properties: {
+			_reasoning: { type: "string" },
 			testType: {
 				type: "string",
 				enum: ["dimensional", "categorical"],
@@ -133,6 +134,7 @@ const SCHEMAS = {
 	psy_questions: {
 		type: "object",
 		properties: {
+			_reasoning: { type: "string" },
 			meta: {
 				type: "object",
 				properties: {
@@ -304,6 +306,7 @@ const SCHEMAS = {
 	quiz_blueprint: {
 		type: "object",
 		properties: {
+			_reasoning: { type: "string" },
 			testType: {
 				type: "string",
 				enum: ["quiz"],
@@ -328,6 +331,7 @@ const SCHEMAS = {
 	quiz_questions: {
 		type: "object",
 		properties: {
+			_reasoning: { type: "string" },
 			questions: {
 				type: "array",
 				items: {
@@ -353,7 +357,7 @@ const SCHEMAS = {
 // ===============================
 
 // Здесь вставь свои обновлённые тексты architect_psy / generator_psy v3.0
-const PROMPT_TEXTS = {
+export const PROMPT_TEXTS = {
 	// --- ARCHITECT: ПСИХОМЕТРИЧЕСКИЙ АРХИТЕКТОР ---
 	architect_psy: `
 Ты — Главный Архитектор Психометрических Систем (Senior Psychometrician 15+ лет опыта).
@@ -364,11 +368,19 @@ const PROMPT_TEXTS = {
 Формат ответа: СТРОГО валидный JSON, БЕЗ markdown, БЕЗ пояснений, только объект.
 
 ====================================================
-# 1. ЗАДАЧА
+# 1. ЗАДАЧА И CHAIN-OF-THOUGHT (CoT)
 ====================================================
 
-1) Проанализировать запрос пользователя (его тему теста).
-2) Выбрать тип теста:
+Ты должен СНАЧАЛА провести глубокий анализ в поле \`_reasoning\` (Chain-of-Thought), и только ЗАТЕМ генерировать саму структуру теста.
+Твоя задача — спроектировать СТРУКТУРУ теста, которую потом получит отдельная модель‑генератор вопросов.
+
+1) В поле \`_reasoning\` объясни:
+   - Кто целевая аудитория?
+   - Какие outcomes будут наиболее валидны и интересны?
+   - Почему выбраны именно эти outcomes, и чем они принципиально отличаются?
+   - (Для dimensional) Какие 5 фасетов (behavior, cognition, emotion, preference, stress_response) лучше всего раскроют каждый outcome?
+   - Как обеспечить баланс (reverse items, dual-outcome items)?
+2) Выбери тип теста:
    - "categorical" — развлекательные типологии, архетипы, "кто ты из ...".
    - "dimensional" — измерение выраженности черт, навыков, состояний по шкалам.
 3) Спроектировать:
@@ -533,6 +545,7 @@ const PROMPT_TEXTS = {
 Верни СТРОГО ОДИН JSON‑объект без markdown. Структура:
 
 {
+  "_reasoning": "Твои пошаговые размышления об архитектуре перед генерацией JSON. Опиши логику выбора исходов и фасетов.",
   "testType": "dimensional",
 
   "constructDefinition": {
@@ -584,8 +597,16 @@ const PROMPT_TEXTS = {
 Формат ответа: СТРОГО валидный JSON, БЕЗ markdown, БЕЗ пояснений, только объект.
 
 ====================================================
-# 1. ТВОЯ ЦЕЛЬ
+# 1. ТВОЯ ЦЕЛЬ И CHAIN-OF-THOUGHT (CoT)
 ====================================================
+
+Ты должен СНАЧАЛА провести анализ в поле \`_reasoning\` (Chain-of-Thought), и только ЗАТЕМ генерировать сами вопросы.
+
+В поле \`_reasoning\` пошагово объясни:
+1) Как ты понимаешь outcomes и их отличия.
+2) Как ты планируешь покрывать каждый facet.
+3) Твою стратегию по reverse-item (как сделать их неочевидными) и dual-outcome (как связать два outcomes логично).
+4) Проверку анти-дубликатов: почему новые вопросы не являются перефразированием старых.
 
 На основе переданного blueprint:
 1) Сгенерировать набор вопросов (Likert 1–5) так, чтобы:
@@ -596,6 +617,29 @@ const PROMPT_TEXTS = {
 2) Вернуть:
    - массив questions[];
    - объект scaleProfile с отчётами качества (facetCoverageReport, semanticAuditReport, reverseItemReport, dualOutcomeReport, qualityChecks).
+
+====================================================
+# 2. FEW-SHOT ПРИМЕРЫ ХОРОШИХ И ПЛОХИХ ВОПРОСОВ
+====================================================
+
+ПЛОХИЕ ВОПРОСЫ (Не делай так!):
+- "Я легко злюсь и выхожу из себя." (Слишком общее, два действия "злюсь" и "выхожу" - double-barreled).
+- "Я не люблю вечеринки." (Плохой reverse-item, просто добавлено отрицание "не").
+- "Мне нравится читать книги, а не гулять." (Double-barreled).
+
+ХОРОШИЕ ВОПРОСЫ (Делай так!):
+- "В конфликтной ситуации я первым иду на примирение." (Конкретная ситуация).
+- "Шумные компании быстро истощают мою энергию." (Хороший reverse-item для Экстраверсии, смещает фокус на энергию).
+- "Когда планы резко меняются, я воспринимаю это как интересное испытание." (Описывает конкретную когнитивную реакцию).
+
+ПРИМЕР DUAL-OUTCOME MAPPING:
+Если вопрос: "В стрессовой ситуации я стараюсь взять лидерство на себя и организовать других."
+\`\`\`json
+"mapping": [
+  { "outcomeId": "leadership", "weight": 1.0 },
+  { "outcomeId": "stress_tolerance", "weight": 0.5 }
+]
+\`\`\`
 
 ====================================================
 # 2. ФОРМАТ ВОПРОСОВ
@@ -793,6 +837,7 @@ reverseCount ≈ round(totalQuestions * 0.33)
 Верни СТРОГО ОДИН JSON‑объект следующей структуры:
 
 {
+  "_reasoning": "Пошаговое описание: как ты создавал вопросы, проверял анти-дубликаты и баланс по outcomes.",
   "meta": {
     "topic": "Тема теста (на русском)",
     "language": "Russian",

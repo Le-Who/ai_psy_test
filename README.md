@@ -20,8 +20,9 @@ The project has been refactored to emphasize modularity despite not using a modu
 - `style.css` - Custom styling using CSS variables, glassmorphism, and responsive layouts.
 - `app-settings.js` - Configuration, Prompts, and JSON Schemas used for guiding the LLMs.
 - `api.js` - Dedicated API abstraction layer for handling Gemini and OpenRouter interactions.
-- `utils.js` - Security and utility helpers (e.g. `escapeHtml`, `togglePasswordVisibility`).
+- `utils.js` - Security, Observability (`Logger`), and utility helpers (e.g. `escapeHtml`, `togglePasswordVisibility`).
 - `storage.js` - Encapsulates `localStorage` interactions, caching, and DOM string compilation for the library view.
+- `scoring.js` - A highly decoupled, pure mathematical engine for calculating psychometric scales and mapping questionnaire results to outcomes.
 - `app.js` - The main state machine orchestrating the UI flow, question rendering, and result calculations.
 
 ## 🛠 Setup & Usage
@@ -36,7 +37,7 @@ Since this is a vanilla JS application, no build steps are required.
 2. Enter your API Key (supports Gemini or OpenRouter).
 3. Type a topic and configure your test.
 
-## 🛡️ Code Quality & Linters
+## 🛡️ Code Quality, Linters & Tests
 
 The project relies on standard JavaScript with comprehensive JSDoc definitions to ensure type safety without a build step.
 
@@ -53,10 +54,20 @@ To run the Biome JS formatter and linter:
 npx @biomejs/biome check ./
 ```
 
+To run the **Vitest** unit test suite (tests `scoring.js` isolated logic):
+
+```bash
+npx vitest run
+```
+
 ## 📝 Recent Audits & Improvements
 
-- Fixed HTML types, unified naming conventions (`AppStorage` vs built-in `Storage`), and resolved Biome styling/accessibility infractions.
-- Improved error handling through `safeParseJSON` error suppression and enhanced structural validations.
-- Hash-routing for "Duels" works securely with LZ-String compression and `tiny.one` link shims.
+- Extract scoring calculation logic to `scoring.js` from `app.js` to break the God Object anti-pattern.
+- Enhance XSS mitigation by substituting `innerHTML` with `textContent` where applicable.
+- Introduce `_reasoning` fields in JSON Prompts to force the LLM to use Chain-of-Thought (CoT).
+- Adopt `vitest` for reliable continuous logic integration testing.
+- Implement event delegation in the UI to minimize inline `onclick` vulnerabilities.
+- Add Frontend Design Pro Max guidelines to uplift the typography to 'Outfit' and add tactile 3D hover/entrance micro-animations.
+- Implement observability via a persistent `localStorage` error `Logger`.
 
 Enjoy generating tests! 🪄

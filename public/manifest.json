@@ -1,0 +1,17 @@
+{
+  "name": "AI Psy Test Generator",
+  "short_name": "AI PsyTest",
+  "description": "Создайте уникальный психологический тест или викторину за секунды.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

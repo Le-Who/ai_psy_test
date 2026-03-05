@@ -1,7 +1,8 @@
 // API Handler
 // Separated from app.js for better modularity
+import { CONFIG, PROMPT_TEXTS } from "./app-settings.js";
 
-const api = {
+export const api = {
 	detectProvider(key) {
 		return key.startsWith("AIza") ? "gemini" : "openrouter";
 	},
@@ -30,7 +31,7 @@ const api = {
 
 	async call(task, prompt, schema, key) {
 		const provider = this.detectProvider(key);
-		const sysPrompt = PROMPTS[provider][task];
+		const sysPrompt = PROMPT_TEXTS[task];
 		console.log("API provider", provider, "task", task);
 
 		// task: 'architect_psy', 'generator_psy', 'architect_quiz', 'generator_quiz'
@@ -68,8 +69,19 @@ const api = {
 			}),
 		});
 
+		if (!res.ok) {
+			const errorText = await res.text();
+			throw new Error(`OpenRouter API Error (${res.status}): ${errorText}`);
+		}
+
 		const data = await res.json();
-		return this.safeParseJSON(data.choices[0].message.content);
+		const content = data?.choices?.[0]?.message?.content;
+		if (!content) {
+			throw new Error(
+				"Invalid response format from OpenRouter: " + JSON.stringify(data),
+			);
+		}
+		return this.safeParseJSON(content);
 	},
 
 	async callGemini(sys, user, schema, type, key) {
@@ -100,7 +112,18 @@ const api = {
 			},
 		);
 
+		if (!res.ok) {
+			const errorText = await res.text();
+			throw new Error(`Gemini API Error (${res.status}): ${errorText}`);
+		}
+
 		const data = await res.json();
-		return this.safeParseJSON(data.candidates[0].content.parts[0].text);
+		const content = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+		if (!content) {
+			throw new Error(
+				"Invalid response format from Gemini: " + JSON.stringify(data),
+			);
+		}
+		return this.safeParseJSON(content);
 	},
 };
