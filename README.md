@@ -14,7 +14,7 @@ A client-side, single-page web application that uses AI to generate psychometric
 - **Runtime Validation:** AI-generated outputs are validated against strict JSON schemas with automatic retry on hallucination.
 - **Code Splitting:** `lz-string` and `canvas-confetti` are dynamically imported only when needed.
 - **Local Storage Library:** All generated tests are saved for future replay.
-- **Custom UI System:** Responsive, themable (Light, Dark, Gray), with confetti celebrations and toast notifications.
+- **Custom UI System:** Responsive, deeply themable (Облака, Кабинет, Вайб, Авангард), with confetti celebrations and toast notifications.
 
 ## 🗂 Project Structure
 

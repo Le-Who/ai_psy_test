@@ -4,7 +4,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Schibsted+Grotesk:ital,wght@0,400..800;1,400..800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Cormorant+Garamond:ital,wght@0,400..700;1,400..700&family=Figtree:wght@400..700&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Quicksand:wght@400..700&family=Schibsted+Grotesk:ital,wght@0,400..800;1,400..800&family=Sora:wght@400..800&family=Space+Grotesk:wght@300..700&display=swap"
       rel="stylesheet"
     />
     <meta charset="UTF-8" />
@@ -50,7 +50,7 @@
     <link rel="apple-touch-icon" href="./icon.svg" />
     <meta name="theme-color" content="#6366f1" />
 
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=2" />
   </head>
   <body>
     <div class="container">
@@ -82,24 +82,37 @@
           🎨
         </button>
         <div class="theme-menu" id="themeMenu">
-          <button type="button" class="theme-opt" onclick="setTheme('light')">
+          <button type="button" class="theme-opt" onclick="setTheme('prof')">
             <div
               class="theme-circle"
-              style="background: #fff; border: 1px solid #ddd"
+              style="background: #3b2314; border: 1px solid #6b5744"
             ></div>
-            Светленькая
+            Кабинет
           </button>
-          <button type="button" class="theme-opt" onclick="setTheme('dark')">
-            <div class="theme-circle" style="background: #1e293b"></div>
-            Темненькая
-          </button>
-          <button type="button" class="theme-opt" onclick="setTheme('gray')">
+          <button type="button" class="theme-opt" onclick="setTheme('youth')">
             <div
               class="theme-circle"
-              style="background: #e5e5e5; border: 1px solid #999"
+              style="
+                background: linear-gradient(135deg, #c4b5fd, #fdba74);
+                border: 1px solid #c4b5fd;
+              "
             ></div>
-            Серенькая
+            Вайб
           </button>
+          <button type="button" class="theme-opt" onclick="setTheme('candy')">
+            <div
+              class="theme-circle"
+              style="background: #fbcfe8; border: 1px solid #f9a8d4"
+            ></div>
+            Облака
+          </button>
+          <button type="button" class="theme-opt" onclick="setTheme('avant')">
+            <div class="theme-circle" style="background: #000000; border: 1px solid #FF6B00"
+            ></div>
+            Авангард
+          </button>
+          
+          
         </div>
       </div>
 
@@ -511,24 +524,14 @@
       }
 
       function setTheme(themeName) {
-        if (themeName === "light") document.body.removeAttribute("data-theme");
-        else document.body.setAttribute("data-theme", themeName);
+        document.body.setAttribute("data-theme", themeName);
         localStorage.setItem("user-theme", themeName);
         closeThemeMenu();
       }
 
       function initTheme() {
-        const saved = localStorage.getItem("user-theme");
-        if (saved) {
-          if (saved !== "light")
-            document.body.setAttribute("data-theme", saved);
-          else document.body.removeAttribute("data-theme");
-        } else if (
-          window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches
-        ) {
-          document.body.setAttribute("data-theme", "dark");
-        }
+        const saved = localStorage.getItem("user-theme") || "candy";
+        document.body.setAttribute("data-theme", saved);
       }
       initTheme();
 
