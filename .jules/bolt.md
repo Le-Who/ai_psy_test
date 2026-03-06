@@ -18,3 +18,7 @@
 ## 2024-05-25 - [Persistent Set Cache for Collision Checks]
 **Learning:** Even with O(1) lookups via `Set`, rebuilding the `Set` from a large array on every `save()` operation remains O(N) and blocks the main thread during bulk operations or frequent saves.
 **Action:** Maintain a persistent `_themesCache` (Set) in the `Storage` class and update it incrementally (add/delete) to keep `save()` complexity closer to O(1).
+
+## 2026-03-01 - [O(1) DOM Removal vs String Re-rendering]
+**Learning:** Deleting an item and triggering a full UI re-render with `innerHTML` causes unnecessary O(N) string concatenation and layout thrashing, which is slow for large lists.
+**Action:** When deleting an element visually, use direct O(1) DOM manipulation (e.g., `card.remove()`) instead of rebuilding and re-rendering the entire list from storage, with a fallback re-render only if the element isn't found or the list becomes empty.
