@@ -55,10 +55,13 @@
   <body>
     <div class="container">
       <!-- HEADER -->
-      <div class="header-row">
-        <div class="header-content">
+      <div class="header-row" style="margin-top: 5vh; margin-bottom: 3vh">
+        <div
+          class="header-content"
+          style="display: flex; flex-direction: column-reverse"
+        >
           <h1
-            style="cursor: pointer"
+            style="cursor: pointer; margin-top: 10px"
             onclick="location.reload()"
             title="Дом Дуни"
           >
@@ -68,7 +71,7 @@
             >
             💅
           </h1>
-          <p>Работает на хлопьях с молоком 🥣</p>
+          <p style="margin-bottom: 0">Работает на хлопьях с молоком 🥣</p>
         </div>
 
         <button
@@ -107,12 +110,12 @@
             Облака
           </button>
           <button type="button" class="theme-opt" onclick="setTheme('avant')">
-            <div class="theme-circle" style="background: #000000; border: 1px solid #FF6B00"
+            <div
+              class="theme-circle"
+              style="background: #000000; border: 1px solid #ff6b00"
             ></div>
             Авангард
           </button>
-          
-          
         </div>
       </div>
 
@@ -141,8 +144,7 @@
 
         <div class="card">
           <div class="card-header-row">
-            <h2 class="card-title">Новый тест</h2>
-            <div class="mode-tabs">
+            <div class="mode-tabs" style="margin-left: auto">
               <button
                 type="button"
                 class="mode-tab active"
@@ -210,9 +212,19 @@
                 <input
                   type="text"
                   id="audienceInput"
+                  list="audienceOptions"
                   value=""
                   placeholder="Подростки?"
                 />
+                <datalist id="audienceOptions">
+                  <option value="Дети (до 12 лет)"></option>
+                  <option value="Подростки (13-17 лет)"></option>
+                  <option value="Студенты и зумеры"></option>
+                  <option value="Взрослые (строгий тон)"></option>
+                  <option value="Айтишники и технари"></option>
+                  <option value="Миллениалы (ностальгия)"></option>
+                  <option value="Пенсионеры"></option>
+                </datalist>
               </div>
               <div id="difficultyGroup" style="display: none">
                 <label>Вариантов ответа</label>
