@@ -1321,3 +1321,70 @@ body[data-theme="avant"] {
     color: var(--bg);
   }
 }
+
+
+/* =========================================
+   UX REFINEMENTS: DESKTOP FITTING & TEXT SELECTION
+   ========================================= */
+
+/* Disable text selection globally to prevent accidental highlighting */
+body {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Enable text selection specifically for inputs, test questions/answers, and diagnostic results/links */
+input, 
+textarea, 
+#qText, 
+.likert-opt, 
+.quiz-opt, 
+.diag-card,
+.diag-body,
+.diag-row,
+.diag-sub,
+.diag-meta,
+.share-url,
+#share-url,
+#resContent,
+#duelView p strong {
+  user-select: auto;
+  -webkit-user-select: auto;
+}
+
+/* Force standard vertical themes to fit within 100vh on wide screens without external scrolling */
+@media (min-width: 1024px) {
+  body:not([data-theme="avant"]) .container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    padding: 2vh 20px;
+    box-sizing: border-box;
+  }
+  
+  body:not([data-theme="avant"]) .header-row {
+    margin-bottom: 2vh;
+    padding-top: 0;
+  }
+  
+  body:not([data-theme="avant"]) .card {
+    padding: 3vh 32px;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  
+  body:not([data-theme="avant"]) .form-group {
+    margin-bottom: 1.5vh;
+  }
+  
+  body:not([data-theme="avant"]) .form-row {
+    margin-bottom: 1.5vh;
+  }
+  
+  body:not([data-theme="avant"]) textarea {
+    height: 8vh;
+    min-height: 60px;
+  }
+}
