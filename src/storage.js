@@ -175,10 +175,11 @@ export const AppStorage = {
 			// OPTIMIZATION: Remove from htmlItems cache incrementally
 			if (this._htmlItems) {
 				this._htmlItems.splice(index, 1);
+				// OPTIMIZATION: Rebuild string cache from array instead of full invalidation
+				this._renderedHtmlCache = this._htmlItems.join("");
+			} else {
+				this._renderedHtmlCache = null;
 			}
-
-			// Invalidate rendered string because removing from middle is complex to patch
-			this._renderedHtmlCache = null;
 		}
 	},
 
