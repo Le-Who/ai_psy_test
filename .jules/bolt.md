@@ -18,3 +18,7 @@
 ## 2024-05-25 - [Persistent Set Cache for Collision Checks]
 **Learning:** Even with O(1) lookups via `Set`, rebuilding the `Set` from a large array on every `save()` operation remains O(N) and blocks the main thread during bulk operations or frequent saves.
 **Action:** Maintain a persistent `_themesCache` (Set) in the `Storage` class and update it incrementally (add/delete) to keep `save()` complexity closer to O(1).
+
+## 2026-03-08 - [High-Frequency DOM Manipulation Overhead]
+**Learning:** Rendering complex list elements using large string concatenation assigned to `innerHTML` causes layout thrashing and repeated execution of the HTML parser. In addition, un-cached `querySelectorAll` calls within user interaction handlers cause redundant traversal overhead.
+**Action:** Use `document.createDocumentFragment()` combined with programmatic node creation and `textContent` for generating lists iteratively to optimize browser reflow. Cache static or repeated DOM query results locally to avoid unnecessary traversals.
