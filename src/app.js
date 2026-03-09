@@ -1122,7 +1122,15 @@ export const app = {
 
 		// Confirmed delete
 		AppStorage.delete(id);
-		this.openLibrary();
+		const card = btn ? btn.closest(".card") : null;
+		if (card) {
+			card.remove();
+			if (AppStorage.getAll().length === 0) {
+				this.openLibrary();
+			}
+		} else {
+			this.openLibrary();
+		}
 		this.showToast("Тест удален 🗑");
 	},
 
