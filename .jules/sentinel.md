@@ -1,0 +1,4 @@
+## 2024-05-15 - Hardcoded API Token Vulnerability
+**Vulnerability:** A hardcoded API key (`TINYTOKEN`) was present in `src/app-settings.js`. This is a critical security vulnerability as it exposes the key to anyone with access to the codebase.
+**Learning:** External API keys must never be hardcoded in the source code. They should be managed securely, either through environment variables on the backend or using a 'Bring Your Own Key' (BYOK) model for client-side applications, where users provide their own tokens and they are stored securely in `localStorage`.
+**Prevention:** Implement strict code review processes and automated static analysis tools to detect hardcoded secrets before they are merged. Always use dynamic retrieval methods (e.g., `localStorage`, environment variables) for sensitive information.
