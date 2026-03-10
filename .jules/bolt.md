@@ -18,3 +18,7 @@
 ## 2024-05-25 - [Persistent Set Cache for Collision Checks]
 **Learning:** Even with O(1) lookups via `Set`, rebuilding the `Set` from a large array on every `save()` operation remains O(N) and blocks the main thread during bulk operations or frequent saves.
 **Action:** Maintain a persistent `_themesCache` (Set) in the `Storage` class and update it incrementally (add/delete) to keep `save()` complexity closer to O(1).
+
+## 2024-10-25 - [O(1) DOM Deletion vs O(N) Re-render]
+**Learning:** For a UI component containing lists, re-rendering the entire list from state upon deletion causes an O(N) recalculation and layout thrashing. Bypassing state and executing O(1) DOM operations (`element.remove()`) skips the re-render completely.
+**Action:** Remove the associated DOM element natively in O(1) time (`element.remove()`) while invalidating the string cache lazily in storage to be rebuilt only on the next view transition. Always provide a fallback to full state-driven re-renders if the UI and DOM become desynchronized or if the state crosses an empty boundary.
