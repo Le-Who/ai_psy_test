@@ -1,0 +1,4 @@
+## 2024-10-25 - Hardcoded Token Exposed in Settings
+**Vulnerability:** A hardcoded `TINYTOKEN` API key was exposed in `src/app-settings.js`, accessible directly by any client interacting with the single-page application.
+**Learning:** In purely client-side applications without a backend proxy, secrets cannot be securely embedded within the frontend codebase because all source code is shipped to the client's browser. Exposing tokens allows third-party misuse and potential quota exhaustion or account compromise.
+**Prevention:** External API tokens for client-side functionality (like TinyURL link generation) should rely on a "Bring Your Own Key" (BYOK) model where users input their own tokens, which are then securely stored client-side in `localStorage` rather than hardcoding them in the source.
