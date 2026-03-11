@@ -18,3 +18,7 @@
 ## 2024-05-25 - [Persistent Set Cache for Collision Checks]
 **Learning:** Even with O(1) lookups via `Set`, rebuilding the `Set` from a large array on every `save()` operation remains O(N) and blocks the main thread during bulk operations or frequent saves.
 **Action:** Maintain a persistent `_themesCache` (Set) in the `Storage` class and update it incrementally (add/delete) to keep `save()` complexity closer to O(1).
+
+## 2026-03-05 - [High-Frequency UI Updates with innerHTML]
+**Learning:** Using string concatenation and `innerHTML` for rendering multiple items in high-frequency functions (like `renderQ` when switching questions) introduces overhead from HTML parsing and regex-based string manipulation (`escapeHtml`), which can degrade responsiveness.
+**Action:** Replace `innerHTML` loops with `document.createDocumentFragment()` and `document.createElement()`, assigning safe strings via `textContent` to ensure O(N) DOM node construction without string-parsing penalties.
