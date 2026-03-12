@@ -165,7 +165,7 @@
           </div>
 
           <form onsubmit="app.start(event)" novalidate>
-            <label
+            <label for="themeInput"
               >Тема
               <span
                 class="text-danger"
@@ -181,7 +181,7 @@
               required
             />
 
-            <label
+            <label for="notesInput"
               >Уточнения
               <span style="font-weight: normal; opacity: 0.7; font-size: 12px"
                 >(опционально)</span
@@ -208,7 +208,7 @@
               style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px"
             >
               <div id="audienceGroup">
-                <label>Аудитория</label>
+                <label for="audienceInput">Аудитория</label>
                 <input
                   type="text"
                   id="audienceInput"
@@ -227,7 +227,7 @@
                 </datalist>
               </div>
               <div id="difficultyGroup" style="display: none">
-                <label>Вариантов ответа</label>
+                <label for="difficultyInput">Вариантов ответа</label>
                 <select id="difficultyInput">
                   <option value="2">2 (Да/Нет)</option>
                   <option value="3">3 (Легко)</option>
@@ -236,7 +236,7 @@
               </div>
 
               <div>
-                <label>Вопросов</label>
+                <label for="qCountInput">Вопросов</label>
                 <select id="qCountInput">
                   <option value="5">5</option>
                   <option value="10" selected>10</option>
@@ -249,7 +249,7 @@
               </div>
             </div>
 
-            <label
+            <label for="apiKeyInput"
               >API Ключ
               <span
                 class="text-danger"
@@ -472,7 +472,7 @@
           </button>
         </div>
       </div>
-      <div id="toast">Ссылка скопирована! 📋</div>
+      <div id="toast" role="status" aria-live="polite">Ссылка скопирована! 📋</div>
     </div>
 
     <!-- СКРИПТЫ -->
