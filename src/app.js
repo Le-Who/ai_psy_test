@@ -639,11 +639,12 @@ export const app = {
 			btn.classList.add("wrong");
 		}
 
+		// OPTIMIZATION: Cache querySelectorAll to avoid redundant DOM lookups
 		const allBtns = document.querySelectorAll(".quiz-opt");
 		if (allBtns[q.correctIndex]) {
 			allBtns[q.correctIndex].classList.add("correct");
 		}
-		document.querySelectorAll(".quiz-opt").forEach((/** @type {any} */ b) => {
+		allBtns.forEach((/** @type {any} */ b) => {
 			b.classList.add("disabled");
 			b.disabled = true;
 		});

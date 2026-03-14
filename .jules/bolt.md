@@ -18,3 +18,6 @@
 ## 2024-05-25 - [Persistent Set Cache for Collision Checks]
 **Learning:** Even with O(1) lookups via `Set`, rebuilding the `Set` from a large array on every `save()` operation remains O(N) and blocks the main thread during bulk operations or frequent saves.
 **Action:** Maintain a persistent `_themesCache` (Set) in the `Storage` class and update it incrementally (add/delete) to keep `save()` complexity closer to O(1).
+## 2026-03-14 - [Redundant DOM NodeList Lookups]
+**Learning:** Calling `document.querySelectorAll` multiple times for the exact same semi-static set of elements (like answer buttons in `handleQuizAnswer`) adds measurable and unnecessary DOM traversal overhead in interaction paths.
+**Action:** Cache the resulting NodeList from the first `querySelectorAll` in a variable, then reuse that list for subsequent property checks and iterative updates like `.forEach`.
