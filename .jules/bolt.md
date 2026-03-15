@@ -18,3 +18,11 @@
 ## 2024-05-25 - [Persistent Set Cache for Collision Checks]
 **Learning:** Even with O(1) lookups via `Set`, rebuilding the `Set` from a large array on every `save()` operation remains O(N) and blocks the main thread during bulk operations or frequent saves.
 **Action:** Maintain a persistent `_themesCache` (Set) in the `Storage` class and update it incrementally (add/delete) to keep `save()` complexity closer to O(1).
+
+## 2026-03-15 - [DocumentFragment vs innerHTML for High-Frequency Updates]
+**Learning:** Repeatedly escaping strings and concatenating HTML for high-frequency DOM updates (`renderQ` during a fast quiz) wastes CPU cycles on serialization and parsing.
+**Action:** Use `document.createDocumentFragment()` combined with `document.createElement()` and `textContent` instead of `innerHTML` to skip string escaping and DOM parsing overhead entirely.
+
+## 2026-03-15 - [Redundant DOM NodeList Lookups]
+**Learning:** Calling `document.querySelectorAll` multiple times within the same function block for semi-static node lists (like answer buttons in `handleQuizAnswer`) duplicates expensive tree traversal work.
+**Action:** Always cache the result of `document.querySelectorAll` into a local variable if it needs to be iterated or indexed multiple times in the same function.
