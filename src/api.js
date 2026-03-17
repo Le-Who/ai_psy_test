@@ -34,7 +34,6 @@ export const api = {
 	async call(task, prompt, schema, key) {
 		const provider = this.detectProvider(key);
 		const sysPrompt = PROMPT_TEXTS[task];
-		console.log("API provider", provider, "task", task);
 
 		// task: 'architect_psy', 'generator_psy', 'architect_quiz', 'generator_quiz'
 		const isArchitect = task.startsWith("architect_");
