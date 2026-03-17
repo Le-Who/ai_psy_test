@@ -11,19 +11,21 @@ export const api = {
 		if (!text || typeof text !== "string") return text;
 		try {
 			return JSON.parse(text);
-		} catch (e) {
-			// Попытка вытащить JSON из markdown/текста
-			const match = text.match(/\{[\s\S]*\}$/);
-			if (match) {
+		} catch (_e) {
+			// ⚡ Bolt: Removed slow greedy regex match(/\{[\s\S]*\}$/)
+			// indexOf/lastIndexOf is O(N) instead of potentially O(N^2)
+			const firstBrace = text.indexOf("{");
+			const lastBrace = text.lastIndexOf("}");
+			if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
 				try {
-					return JSON.parse(match[0]);
-				} catch (e2) {}
+					return JSON.parse(text.substring(firstBrace, lastBrace + 1));
+				} catch (_e2) {}
 			}
 			const mdMatch = text.match(/```json([\s\S]*?)```/);
 			if (mdMatch) {
 				try {
 					return JSON.parse(mdMatch[1]);
-				} catch (e3) {}
+				} catch (_e3) {}
 			}
 			throw new Error("JSON Parse Error");
 		}
@@ -78,7 +80,7 @@ export const api = {
 		const content = data?.choices?.[0]?.message?.content;
 		if (!content) {
 			throw new Error(
-				"Invalid response format from OpenRouter: " + JSON.stringify(data),
+				`Invalid response format from OpenRouter: ${JSON.stringify(data)}`,
 			);
 		}
 		return this.safeParseJSON(content);
@@ -97,7 +99,7 @@ export const api = {
 			user;
 
 		const res = await fetch(
-			CONFIG.providers.gemini.endpoint + model + ":generateContent?key=" + key,
+			`${CONFIG.providers.gemini.endpoint + model}:generateContent?key=${key}`,
 			{
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -121,7 +123,7 @@ export const api = {
 		const content = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 		if (!content) {
 			throw new Error(
-				"Invalid response format from Gemini: " + JSON.stringify(data),
+				`Invalid response format from Gemini: ${JSON.stringify(data)}`,
 			);
 		}
 		return this.safeParseJSON(content);
