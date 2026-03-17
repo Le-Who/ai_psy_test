@@ -35,7 +35,8 @@ export const Scoring = {
 			return null;
 		}
 		if (typeof bands === "object") {
-			for (const key of Object.keys(bands)) {
+			for (const key in bands) {
+				if (!Object.prototype.hasOwnProperty.call(bands, key)) continue;
 				const b = bands[key];
 				if (!b || typeof b !== "object") continue;
 				const min =
