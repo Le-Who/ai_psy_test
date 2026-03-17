@@ -4,6 +4,14 @@
  */
 const HTML_ESCAPE_REGEX = /[&<>"']/g;
 
+const ESCAPE_MAP = {
+	"&": "&amp;",
+	"<": "&lt;",
+	">": "&gt;",
+	'"': "&quot;",
+	"'": "&#039;",
+};
+
 export const Utils = {
 	/**
 	 * Escapes HTML special characters to prevent XSS
@@ -12,20 +20,7 @@ export const Utils = {
 	 */
 	escapeHtml: (unsafe) => {
 		if (typeof unsafe !== "string") return unsafe;
-		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => {
-			switch (m) {
-				case "&":
-					return "&amp;";
-				case "<":
-					return "&lt;";
-				case ">":
-					return "&gt;";
-				case '"':
-					return "&quot;";
-				case "'":
-					return "&#039;";
-			}
-		});
+		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
 
