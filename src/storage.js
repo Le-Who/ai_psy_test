@@ -188,9 +188,12 @@ export const AppStorage = {
 	renderLibraryHTML() {
 		const list = this.getAll();
 		if (list.length === 0) {
-			return `<div style="text-align:center; padding:40px; color:var(--text-muted);">
-                <div style="font-size:40px; margin-bottom:10px;">📭</div>
-                Библиотека пуста.<br>Создайте свой первый тест!
+			return `<div class="card" style="text-align:center; padding:40px; margin-top:20px; color:var(--text-muted);">
+                <div style="font-size:40px; margin-bottom:15px;">📭</div>
+                <div style="margin-bottom:20px;">Библиотека пуста.<br>Создайте свой первый тест!</div>
+                <button type="button" class="btn" data-action="closeLibrary">
+                    Создать тест
+                </button>
             </div>`;
 		}
 
