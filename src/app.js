@@ -576,11 +576,19 @@ export const app = {
 			if (psyDiv) psyDiv.style.display = "none";
 			if (quizDiv) {
 				quizDiv.style.display = "flex";
-				let html = "";
+				quizDiv.innerHTML = "";
+				// ⚡ Bolt: Use DocumentFragment and createElement instead of innerHTML string concatenation.
+				// This avoids expensive HTML parsing on every rapid UI update and handles escaping natively via textContent.
+				const fragment = document.createDocumentFragment();
 				q.options.forEach((opt, idx) => {
-					html += `<button class="quiz-opt" data-action="quizAnswer" data-index="${idx}">${Utils.escapeHtml(opt)}</button>`;
+					const btn = document.createElement("button");
+					btn.className = "quiz-opt";
+					btn.dataset.action = "quizAnswer";
+					btn.dataset.index = idx.toString();
+					btn.textContent = opt;
+					fragment.appendChild(btn);
 				});
-				quizDiv.innerHTML = html;
+				quizDiv.appendChild(fragment);
 			}
 		} else {
 			if (psyDiv) psyDiv.style.display = "grid";
@@ -639,11 +647,12 @@ export const app = {
 			btn.classList.add("wrong");
 		}
 
+		// ⚡ Bolt: Cache querySelectorAll result instead of querying the DOM twice.
 		const allBtns = document.querySelectorAll(".quiz-opt");
 		if (allBtns[q.correctIndex]) {
 			allBtns[q.correctIndex].classList.add("correct");
 		}
-		document.querySelectorAll(".quiz-opt").forEach((/** @type {any} */ b) => {
+		allBtns.forEach((/** @type {any} */ b) => {
 			b.classList.add("disabled");
 			b.disabled = true;
 		});
