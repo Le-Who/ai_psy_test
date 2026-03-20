@@ -1,6 +1,7 @@
 // API Handler
 // Separated from app.js for better modularity
 import { CONFIG, PROMPT_TEXTS } from "./app-settings.js";
+import { Logger } from "./utils.js";
 
 export const api = {
 	detectProvider(key) {
@@ -19,13 +20,25 @@ export const api = {
 			if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
 				try {
 					return JSON.parse(text.substring(firstBrace, lastBrace + 1));
-				} catch (_e2) {}
+				} catch (_e2) {
+					Logger.saveLog({
+						type: "error",
+						message: _e2.message,
+						context: "safeParseJSON_braces",
+					});
+				}
 			}
 			const mdMatch = text.match(/```json([\s\S]*?)```/);
 			if (mdMatch) {
 				try {
 					return JSON.parse(mdMatch[1]);
-				} catch (_e3) {}
+				} catch (_e3) {
+					Logger.saveLog({
+						type: "error",
+						message: _e3.message,
+						context: "safeParseJSON_markdown",
+					});
+				}
 			}
 			throw new Error("JSON Parse Error");
 		}
