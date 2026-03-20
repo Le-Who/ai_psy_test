@@ -204,8 +204,13 @@ export const app = {
 			}
 
 			if (!q.polarity) {
-				const hasPos = mapping.some((m) => m.weight > 0);
-				const hasNeg = mapping.some((m) => m.weight < 0);
+				let hasPos = false;
+				let hasNeg = false;
+				for (const m of mapping) {
+					if (m.weight > 0) hasPos = true;
+					else if (m.weight < 0) hasNeg = true;
+					if (hasPos && hasNeg) break;
+				}
 				let polarity = "direct";
 				if (hasPos && hasNeg) polarity = "mixed";
 				else if (hasNeg && !hasPos) polarity = "reverse";
