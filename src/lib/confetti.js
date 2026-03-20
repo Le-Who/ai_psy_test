@@ -674,6 +674,7 @@ var module = {};
 		}
 
 		function fire(options) {
+			var resizeTimeout;
 			var disableForReducedMotion =
 				globalDisableForReducedMotion ||
 				prop(options, "disableForReducedMotion", Boolean);
@@ -716,23 +717,29 @@ var module = {};
 
 			function onResize() {
 				if (worker) {
-					// TODO this really shouldn't be immediate, because it is expensive
-					var obj = {
-						getBoundingClientRect: () => {
-							if (!isLibCanvas) {
-								return canvas.getBoundingClientRect();
-							}
-						},
-					};
+					if (resizeTimeout) {
+						global.clearTimeout(resizeTimeout);
+					}
 
-					resizer(obj);
+					resizeTimeout = global.setTimeout(() => {
+						var obj = {
+							getBoundingClientRect: () => {
+								if (!isLibCanvas) {
+									return canvas.getBoundingClientRect();
+								}
+							},
+						};
 
-					worker.postMessage({
-						resize: {
-							width: obj.width,
-							height: obj.height,
-						},
-					});
+						resizer(obj);
+
+						worker.postMessage({
+							resize: {
+								width: obj.width,
+								height: obj.height,
+							},
+						});
+					}, 100);
+
 					return;
 				}
 
@@ -743,6 +750,10 @@ var module = {};
 
 			function done() {
 				animationObj = null;
+
+				if (resizeTimeout) {
+					global.clearTimeout(resizeTimeout);
+				}
 
 				if (allowResize) {
 					hasResizeEventRegistered = false;
