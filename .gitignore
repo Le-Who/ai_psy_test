@@ -11,7 +11,6 @@ tsc_errors.log
 
 # Node
 node_modules/
-package-lock.json
 
 # Build output
 dist/
@@ -33,6 +32,8 @@ globals.d.ts
 *.njsproj
 *.sln
 *.sw?
+.agents/
+.jules/
 
 # OS Files
 .DS_Store
