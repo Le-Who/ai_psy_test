@@ -1,4 +1,18 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// Mock the global environment before importing app.js
+if (typeof global.window === "undefined") {
+	global.window = {};
+}
+if (typeof window === "undefined") {
+	global.window = {};
+}
+if (typeof document === "undefined") {
+	global.document = {
+		addEventListener: vi.fn(),
+	};
+}
+
 import { app } from "../src/app.js";
 
 describe("normalizePsyQuestions", () => {
