@@ -944,9 +944,20 @@ export const app = {
 	// SHARE LINK / SAVE
 	// =========================
 
+	getTinyToken() {
+		let token = localStorage.getItem("user_tiny_token");
+		if (!token) {
+			token = prompt("Введите TinyURL API Token для создания коротких ссылок:");
+			if (token) {
+				localStorage.setItem("user_tiny_token", token);
+			}
+		}
+		return token;
+	},
+
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
+		const tinyToken = this.getTinyToken();
+		if (!tinyToken) return;
 
 		const btn =
 			btnEl ||
@@ -984,7 +995,7 @@ export const app = {
 			const response = await fetch("https://api.tinyurl.com/create", {
 				method: "POST",
 				headers: {
-					Authorization: `Bearer ${TINYTOKEN}`,
+					Authorization: `Bearer ${tinyToken}`,
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
@@ -1021,40 +1032,41 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
-				const isQuiz = this.state.blueprint.testType === "quiz";
-				const score = this.state.quizScore;
+			if (typeof LZString !== "undefined") {
+				const tinyToken = this.getTinyToken();
+				if (tinyToken) {
+					const isQuiz = this.state.blueprint.testType === "quiz";
+					const score = this.state.quizScore;
 
-				const payload = {
-					h: "Аноним",
-					s: isQuiz ? score : 0,
-					r: isQuiz ? null : this.state.lastResultName || null,
-					t: this.state.blueprint,
-					q: this.state.questions,
-				};
+					const payload = {
+						h: "Аноним",
+						s: isQuiz ? score : 0,
+						r: isQuiz ? null : this.state.lastResultName || null,
+						t: this.state.blueprint,
+						q: this.state.questions,
+					};
 
-				if (!payload.t.theme) payload.t.theme = theme;
+					if (!payload.t.theme) payload.t.theme = theme;
 
-				const compressedHash = await this.buildDuelHashFromPayload(payload);
-				const longUrl = `${window.location.origin}${window.location.pathname}${compressedHash}`;
+					const compressedHash = await this.buildDuelHashFromPayload(payload);
+					const longUrl = `${window.location.origin}${window.location.pathname}${compressedHash}`;
 
-				const response = await fetch("https://api.tinyurl.com/create", {
-					method: "POST",
-					headers: {
-						Authorization: `Bearer ${TINYTOKEN}`,
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
-				});
+					const response = await fetch("https://api.tinyurl.com/create", {
+						method: "POST",
+						headers: {
+							Authorization: `Bearer ${tinyToken}`,
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
+					});
 
-				if (response.ok) {
-					const data = await response.json();
-					shortUrl =
-						data && data.data && data.data.tiny_url ? data.data.tiny_url : null;
+					if (response.ok) {
+						const data = await response.json();
+						shortUrl =
+							data && data.data && data.data.tiny_url
+								? data.data.tiny_url
+								: null;
+					}
 				}
 			}
 		} catch (e) {
@@ -1157,5 +1169,6 @@ export const app = {
 	},
 };
 
-window.app = app; // Expose globally for legacy script interop if any
-document.addEventListener("DOMContentLoaded", () => app.init());
+if (typeof window !== "undefined") window.app = app; // Expose globally for legacy script interop if any
+if (typeof document !== "undefined")
+	document.addEventListener("DOMContentLoaded", () => app.init());
