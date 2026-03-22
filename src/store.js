@@ -19,6 +19,9 @@ export const store = new Proxy(
 	{ ...initialState },
 	{
 		set(target, prop, value) {
+			// OPTIMIZATION: Short-circuit if value hasn't changed to prevent redundant listeners
+			if (target[prop] === value) return true;
+
 			target[prop] = value;
 			listeners.forEach((fn) => {
 				fn(prop, value, target);
