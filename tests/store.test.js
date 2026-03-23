@@ -50,4 +50,17 @@ describe("Store", () => {
 		);
 		unsubscribe();
 	});
+
+	it("should not call the listener if the property value has not changed", () => {
+		const listener = vi.fn();
+		const unsubscribe = subscribe(listener);
+
+		store.step = 3;
+		store.step = 3;
+
+		expect(listener).toHaveBeenCalledTimes(1);
+		expect(listener).toHaveBeenCalledWith("step", 3, expect.any(Object));
+
+		unsubscribe();
+	});
 });
