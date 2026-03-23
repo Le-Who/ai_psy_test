@@ -19,6 +19,10 @@ export const store = new Proxy(
 	{ ...initialState },
 	{
 		set(target, prop, value) {
+			// OPTIMIZATION: Prevent redundant listener callbacks and UI re-renders
+			// when state properties are updated with identical values
+			if (target[prop] === value) return true;
+
 			target[prop] = value;
 			listeners.forEach((fn) => {
 				fn(prop, value, target);
