@@ -941,12 +941,31 @@ export const app = {
 	},
 
 	// =========================
+	// TOKEN MANAGEMENT
+	// =========================
+	getTinyToken() {
+		let token = localStorage.getItem("tiny_token");
+		if (!token) {
+			token = window.prompt(
+				"Введите ваш TinyURL API Token для создания коротких ссылок:",
+			);
+			if (token) {
+				localStorage.setItem("tiny_token", token.trim());
+				token = token.trim();
+			}
+		}
+		return token;
+	},
+
+	// =========================
 	// SHARE LINK / SAVE
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
+		const TINYTOKEN = this.getTinyToken();
+		if (!TINYTOKEN) {
 			return alert("Нужен TinyURL Token!");
+		}
 
 		const btn =
 			btnEl ||
@@ -1021,11 +1040,8 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
+			const TINYTOKEN = localStorage.getItem("tiny_token");
+			if (typeof LZString !== "undefined" && TINYTOKEN) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
 
@@ -1157,5 +1173,9 @@ export const app = {
 	},
 };
 
-window.app = app; // Expose globally for legacy script interop if any
-document.addEventListener("DOMContentLoaded", () => app.init());
+if (typeof window !== "undefined") {
+	window.app = app; // Expose globally for legacy script interop if any
+}
+if (typeof document !== "undefined") {
+	document.addEventListener("DOMContentLoaded", () => app.init());
+}
