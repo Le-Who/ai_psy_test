@@ -944,9 +944,22 @@ export const app = {
 	// SHARE LINK / SAVE
 	// =========================
 
+	getTinyToken() {
+		let token = localStorage.getItem("user_tiny_token");
+		if (!token) {
+			token = prompt(
+				"Введите ваш TinyURL API токен для создания короткой ссылки:",
+			);
+			if (token) {
+				localStorage.setItem("user_tiny_token", token.trim());
+			}
+		}
+		return token ? token.trim() : null;
+	},
+
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
+		const token = this.getTinyToken();
+		if (!token) return alert("Нужен TinyURL Token!");
 
 		const btn =
 			btnEl ||
@@ -984,7 +997,7 @@ export const app = {
 			const response = await fetch("https://api.tinyurl.com/create", {
 				method: "POST",
 				headers: {
-					Authorization: `Bearer ${TINYTOKEN}`,
+					Authorization: `Bearer ${token}`,
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
@@ -1021,11 +1034,8 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
+			const token = localStorage.getItem("user_tiny_token");
+			if (typeof LZString !== "undefined" && token) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
 
@@ -1045,7 +1055,7 @@ export const app = {
 				const response = await fetch("https://api.tinyurl.com/create", {
 					method: "POST",
 					headers: {
-						Authorization: `Bearer ${TINYTOKEN}`,
+						Authorization: `Bearer ${token}`,
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
@@ -1157,5 +1167,9 @@ export const app = {
 	},
 };
 
-window.app = app; // Expose globally for legacy script interop if any
-document.addEventListener("DOMContentLoaded", () => app.init());
+if (typeof window !== "undefined") {
+	window.app = app; // Expose globally for legacy script interop if any
+}
+if (typeof document !== "undefined") {
+	document.addEventListener("DOMContentLoaded", () => app.init());
+}
