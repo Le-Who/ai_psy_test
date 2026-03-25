@@ -22,3 +22,7 @@
 ## 2026-03-01 - [Inefficient Regex Backtracking and Switch Execution]
 **Learning:** `safeParseJSON` used a greedy regex `match(/\{[\s\S]*\}$/)` which is extremely slow on large text blobs when the structure fails to match immediately, and `escapeHtml` used a switch statement inside its `.replace()` callback which limits JS engine optimizations compared to an object map.
 **Action:** Always prefer `indexOf`/`lastIndexOf` or constrained matching when extracting large blocks like JSON from markdown, and use static object mapping (`const MAP = { ... }; match => MAP[match];`) instead of `switch` for basic character replacements in hot loops.
+
+## 2026-03-01 - [Redundant Reactive Re-renders in State Proxy]
+**Learning:** The custom reactive state manager built with a Proxy (`src/store.js`) lacked a short-circuit check for identical values. Reassigning a property to its current value (e.g., `store.mode = 'quiz'` when it's already `'quiz'`) fired all subscriber callbacks, leading to redundant and potentially expensive UI re-renders across the application.
+**Action:** Always include a short-circuit equality check (`if (target[prop] === value) return true;`) in Proxy `set` traps or custom setters to prevent unnecessary reactivity propagation and DOM updates.
