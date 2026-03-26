@@ -19,6 +19,10 @@ export const store = new Proxy(
 	{ ...initialState },
 	{
 		set(target, prop, value) {
+			// ⚡ Bolt: Prevent redundant listener callbacks and UI re-renders
+			// if the value hasn't actually changed.
+			if (target[prop] === value) return true;
+
 			target[prop] = value;
 			listeners.forEach((fn) => {
 				fn(prop, value, target);
