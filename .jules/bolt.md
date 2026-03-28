@@ -22,3 +22,7 @@
 ## 2026-03-01 - [Inefficient Regex Backtracking and Switch Execution]
 **Learning:** `safeParseJSON` used a greedy regex `match(/\{[\s\S]*\}$/)` which is extremely slow on large text blobs when the structure fails to match immediately, and `escapeHtml` used a switch statement inside its `.replace()` callback which limits JS engine optimizations compared to an object map.
 **Action:** Always prefer `indexOf`/`lastIndexOf` or constrained matching when extracting large blocks like JSON from markdown, and use static object mapping (`const MAP = { ... }; match => MAP[match];`) instead of `switch` for basic character replacements in hot loops.
+
+## 2026-03-02 - [Inefficient Full List Re-rendering on Deletion]
+**Learning:** `deleteTest` called `this.openLibrary()` which forces a complete O(N) re-render and re-joining of the entire library list just to remove a single item.
+**Action:** Use O(1) DOM manipulations (like `element.remove()`) for targeted deletions within lists, maintaining a fallback to full re-render only if the element cannot be found or the list becomes empty.
