@@ -945,8 +945,15 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
+		let token = localStorage.getItem("tinyurl_api_key");
+		if (!token) {
+			token = prompt(
+				"Для создания короткой ссылки нужен TinyURL API Token. Введите его:",
+			);
+			if (!token) return;
+			localStorage.setItem("tinyurl_api_key", token.trim());
+		}
+		const TINYTOKEN = token.trim();
 
 		const btn =
 			btnEl ||
@@ -1021,11 +1028,8 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
+			const TINYTOKEN = localStorage.getItem("tinyurl_api_key");
+			if (typeof LZString !== "undefined" && TINYTOKEN) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
 
