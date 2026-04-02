@@ -945,8 +945,15 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
+		let tinyToken = localStorage.getItem("tiny_api_key");
+		if (!tinyToken) {
+			tinyToken = window.prompt("Введите ваш TinyURL API Token для создания коротких ссылок:");
+			if (!tinyToken) {
+				return alert("Нужен TinyURL Token для создания короткой ссылки!");
+			}
+			localStorage.setItem("tiny_api_key", tinyToken.trim());
+			tinyToken = tinyToken.trim();
+		}
 
 		const btn =
 			btnEl ||
@@ -984,7 +991,7 @@ export const app = {
 			const response = await fetch("https://api.tinyurl.com/create", {
 				method: "POST",
 				headers: {
-					Authorization: `Bearer ${TINYTOKEN}`,
+					Authorization: `Bearer ${tinyToken}`,
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
@@ -1021,10 +1028,10 @@ export const app = {
 		let shortUrl = null;
 
 		try {
+			const tinyToken = localStorage.getItem("tiny_api_key");
 			if (
 				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
+				tinyToken
 			) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
@@ -1045,7 +1052,7 @@ export const app = {
 				const response = await fetch("https://api.tinyurl.com/create", {
 					method: "POST",
 					headers: {
-						Authorization: `Bearer ${TINYTOKEN}`,
+						Authorization: `Bearer ${tinyToken}`,
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
@@ -1157,5 +1164,7 @@ export const app = {
 	},
 };
 
-window.app = app; // Expose globally for legacy script interop if any
-document.addEventListener("DOMContentLoaded", () => app.init());
+if (typeof window !== "undefined") {
+	window.app = app; // Expose globally for legacy script interop if any
+	document.addEventListener("DOMContentLoaded", () => app.init());
+}
