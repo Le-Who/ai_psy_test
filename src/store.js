@@ -19,6 +19,8 @@ export const store = new Proxy(
 	{ ...initialState },
 	{
 		set(target, prop, value) {
+			// ⚡ Bolt: Prevent redundant downstream renders if state value hasn't changed (O(1) vs O(N) listener executions)
+			if (target[prop] === value) return true;
 			target[prop] = value;
 			listeners.forEach((fn) => {
 				fn(prop, value, target);
