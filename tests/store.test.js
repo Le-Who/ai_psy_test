@@ -50,4 +50,15 @@ describe("Store", () => {
 		);
 		unsubscribe();
 	});
+
+	it("should not call listeners if the property is set to its existing value", () => {
+		store.step = 5; // Initial set
+		const listener = vi.fn();
+		const unsubscribe = subscribe(listener);
+
+		store.step = 5; // Redundant set
+
+		expect(listener).not.toHaveBeenCalled();
+		unsubscribe();
+	});
 });
