@@ -19,6 +19,10 @@ export const store = new Proxy(
 	{ ...initialState },
 	{
 		set(target, prop, value) {
+			// Performance Optimization: Short-circuit on redundant state assignments
+			// Prevents O(N) listener executions and subsequent expensive UI render tree
+			// rebuilds when a value hasn't actually changed.
+			if (target[prop] === value) return true;
 			target[prop] = value;
 			listeners.forEach((fn) => {
 				fn(prop, value, target);
