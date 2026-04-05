@@ -944,9 +944,23 @@ export const app = {
 	// SHARE LINK / SAVE
 	// =========================
 
+	getTinyUrlToken() {
+		let token = localStorage.getItem("tinyurl_api_token");
+		if (!token) {
+			token = prompt("Пожалуйста, введите ваш TinyURL API Token для создания коротких ссылок:");
+			if (token) {
+				localStorage.setItem("tinyurl_api_token", token.trim());
+			}
+		}
+		return token ? token.trim() : null;
+	},
+
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
+		const token = this.getTinyUrlToken();
+		if (!token) {
+			this.showToast("TinyURL Token не предоставлен. Короткая ссылка не будет создана.");
+			return;
+		}
 
 		const btn =
 			btnEl ||
@@ -984,13 +998,19 @@ export const app = {
 			const response = await fetch("https://api.tinyurl.com/create", {
 				method: "POST",
 				headers: {
-					Authorization: `Bearer ${TINYTOKEN}`,
+					Authorization: `Bearer ${token}`,
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
 			});
 
-			if (!response.ok) throw new Error("API Error");
+			if (!response.ok) {
+				if (response.status === 401) {
+					localStorage.removeItem("tinyurl_api_token");
+					throw new Error("Неверный TinyURL Token");
+				}
+				throw new Error("API Error");
+			}
 			const data = await response.json();
 			const tinyUrl = data.data.tiny_url;
 
@@ -1021,10 +1041,10 @@ export const app = {
 		let shortUrl = null;
 
 		try {
+			const token = localStorage.getItem("tinyurl_api_token");
 			if (
 				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
+				token
 			) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
@@ -1045,7 +1065,7 @@ export const app = {
 				const response = await fetch("https://api.tinyurl.com/create", {
 					method: "POST",
 					headers: {
-						Authorization: `Bearer ${TINYTOKEN}`,
+						Authorization: `Bearer ${token}`,
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
