@@ -345,7 +345,7 @@ export const app = {
 		const dvH1 = dv.querySelector("h1");
 		if (dvH1) dvH1.innerText = title;
 		const dvP = dv.querySelector("p");
-		if (dvP) dvP.innerHTML = desc;
+		if (dvP) dvP.textContent = desc;
 
 		document.getElementById("duelThemeTitle").innerText =
 			this.state.blueprint.theme || "";
