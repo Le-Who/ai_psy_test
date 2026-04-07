@@ -19,6 +19,9 @@ export const store = new Proxy(
 	{ ...initialState },
 	{
 		set(target, prop, value) {
+			// ⚡ Bolt: Short-circuit to prevent redundant listener executions
+			// and expensive UI updates if the value hasn't actually changed.
+			if (target[prop] === value) return true;
 			target[prop] = value;
 			listeners.forEach((fn) => {
 				fn(prop, value, target);
