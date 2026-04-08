@@ -1,3 +1,6 @@
+## 2026-04-10 - [Redundant Reactive Listeners]
+**Learning:** The reactive state manager in `store.js` uses a Proxy to intercept assignments. It blindly fires all listeners even if the new value is strictly equal to the old value, causing redundant UI updates and processing for operations that assign identical state.
+**Action:** Add a short-circuit check (`if (target[prop] === value) return true;`) in the Proxy `set` handler.
 ## 2024-05-22 - [Synchronous LocalStorage & String Concatenation]
 **Learning:** This app uses `localStorage` for potentially large datasets and generates UI via massive string concatenation in `storage.js`.
 **Action:** Always look for caching opportunities in `Storage` methods (like `renderLibraryHTML`) to avoid repeated expensive serialization/deserialization and string operations on the main thread.
