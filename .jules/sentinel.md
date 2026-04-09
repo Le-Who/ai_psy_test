@@ -1,0 +1,4 @@
+## 2024-03-12 - Critical Secret Exposure: Hardcoded TinyURL API Token
+**Vulnerability:** A hardcoded, plaintext API token for TinyURL (`TINYTOKEN`) was exposed directly in `src/app-settings.js`, creating a critical risk of unauthorized access and potential API quota abuse.
+**Learning:** Hardcoded credentials should never be committed into source code, especially in client-side Javascript where it is readable by end-users. This app relies on a Bring Your Own Key (BYOK) architecture for other API interactions, but the TinyURL integration bypassed this model.
+**Prevention:** Always enforce a BYOK model or securely proxy third-party API requests through a backend. Do not leave hardcoded tokens in `.js` or `.env` files if they get served to the frontend. Utilize client-side `localStorage` with `prompt()` (or secure input fields) to collect tokens from individual users instead.
