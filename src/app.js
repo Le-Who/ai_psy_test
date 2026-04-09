@@ -945,9 +945,6 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
-
 		const btn =
 			btnEl ||
 			document.getElementById("shareBtn") ||
@@ -956,6 +953,17 @@ export const app = {
 		if (btn) {
 			btn.innerHTML = "⏳ Создаем ссылку...";
 			btn.disabled = true;
+		}
+
+		let tinyToken = localStorage.getItem("tinyurl_api_key");
+		if (!tinyToken) {
+			tinyToken = prompt(
+				"Для создания короткой ссылки нужен TinyURL API Token. Оставьте пустым, чтобы использовать длинную ссылку:",
+			);
+			if (tinyToken) {
+				localStorage.setItem("tinyurl_api_key", tinyToken.trim());
+				tinyToken = tinyToken.trim();
+			}
 		}
 
 		try {
@@ -980,26 +988,42 @@ export const app = {
 
 			const compressedHash = await this.buildDuelHashFromPayload(payload);
 			const longUrl = `${window.location.origin}${window.location.pathname}${compressedHash}`;
+			let shareUrl = longUrl;
 
-			const response = await fetch("https://api.tinyurl.com/create", {
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${TINYTOKEN}`,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
-			});
+			if (tinyToken) {
+				try {
+					const response = await fetch("https://api.tinyurl.com/create", {
+						method: "POST",
+						headers: {
+							Authorization: `Bearer ${tinyToken}`,
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
+					});
 
-			if (!response.ok) throw new Error("API Error");
-			const data = await response.json();
-			const tinyUrl = data.data.tiny_url;
+					if (response.ok) {
+						const data = await response.json();
+						shareUrl = data.data.tiny_url;
+					} else {
+						console.warn("TinyURL API error, falling back to long URL");
+						this.showToast(
+							"Ошибка сокращения ссылки. Используется длинная ссылка.",
+						);
+					}
+				} catch (err) {
+					console.warn("TinyURL request failed, falling back to long URL", err);
+					this.showToast(
+						"Не удалось сократить ссылку. Используется длинная ссылка.",
+					);
+				}
+			}
 
 			// --- UX IMPROVEMENT: CLIPBOARD + TOAST ---
 			if (navigator.clipboard && window.isSecureContext) {
-				await navigator.clipboard.writeText(tinyUrl);
+				await navigator.clipboard.writeText(shareUrl);
 				this.showToast("Ссылка скопирована! Отправь другу 🚀");
 			} else {
-				prompt("Скопируй ссылку:", tinyUrl);
+				prompt("Скопируй ссылку:", shareUrl);
 			}
 		} catch (e) {
 			console.error(e);
@@ -1021,40 +1045,41 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
-				const isQuiz = this.state.blueprint.testType === "quiz";
-				const score = this.state.quizScore;
+			if (typeof LZString !== "undefined") {
+				const tinyToken = localStorage.getItem("tinyurl_api_key");
+				if (tinyToken) {
+					const isQuiz = this.state.blueprint.testType === "quiz";
+					const score = this.state.quizScore;
 
-				const payload = {
-					h: "Аноним",
-					s: isQuiz ? score : 0,
-					r: isQuiz ? null : this.state.lastResultName || null,
-					t: this.state.blueprint,
-					q: this.state.questions,
-				};
+					const payload = {
+						h: "Аноним",
+						s: isQuiz ? score : 0,
+						r: isQuiz ? null : this.state.lastResultName || null,
+						t: this.state.blueprint,
+						q: this.state.questions,
+					};
 
-				if (!payload.t.theme) payload.t.theme = theme;
+					if (!payload.t.theme) payload.t.theme = theme;
 
-				const compressedHash = await this.buildDuelHashFromPayload(payload);
-				const longUrl = `${window.location.origin}${window.location.pathname}${compressedHash}`;
+					const compressedHash = await this.buildDuelHashFromPayload(payload);
+					const longUrl = `${window.location.origin}${window.location.pathname}${compressedHash}`;
 
-				const response = await fetch("https://api.tinyurl.com/create", {
-					method: "POST",
-					headers: {
-						Authorization: `Bearer ${TINYTOKEN}`,
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
-				});
+					const response = await fetch("https://api.tinyurl.com/create", {
+						method: "POST",
+						headers: {
+							Authorization: `Bearer ${tinyToken}`,
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
+					});
 
-				if (response.ok) {
-					const data = await response.json();
-					shortUrl =
-						data && data.data && data.data.tiny_url ? data.data.tiny_url : null;
+					if (response.ok) {
+						const data = await response.json();
+						shortUrl =
+							data && data.data && data.data.tiny_url
+								? data.data.tiny_url
+								: null;
+					}
 				}
 			}
 		} catch (e) {
