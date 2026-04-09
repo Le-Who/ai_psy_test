@@ -13,3 +13,7 @@
 ## 2025-05-23 - [Dynamic Button States]
 **Learning:** When a button's visual text changes to convey a new state (like "Delete" -> "Confirm?"), the `aria-label` MUST update simultaneously. Screen reader users miss the context switch if the label remains static.
 **Action:** Use `dataset` to store the original label, update `aria-label` during the confirmation state, and restore it on timeout or cancellation.
+
+## 2024-05-23 - [Form Label Accessibility Linkage]
+**Learning:** Identified an accessibility pattern in the app's core generator form where `<label>` elements were visually placed near inputs but lacked explicit `for` attributes. This prevented click-to-focus behavior, substantially reducing the clickable target area for touch/mouse users and breaking context for screen readers on critical inputs (Theme, Notes, Audience).
+**Action:** Always verify that every custom form `<label>` explicitly references its target input's `id` (`for="inputId"`) to ensure large clickable areas and proper semantic association.
