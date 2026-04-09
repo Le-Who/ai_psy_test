@@ -581,11 +581,18 @@ export const app = {
 			if (psyDiv) psyDiv.style.display = "none";
 			if (quizDiv) {
 				quizDiv.style.display = "flex";
-				let html = "";
+				// OPTIMIZATION: Use DocumentFragment and textContent for efficient DOM updates
+				const fragment = document.createDocumentFragment();
 				q.options.forEach((opt, idx) => {
-					html += `<button class="quiz-opt" data-action="quizAnswer" data-index="${idx}">${Utils.escapeHtml(opt)}</button>`;
+					const btn = document.createElement("button");
+					btn.className = "quiz-opt";
+					btn.dataset.action = "quizAnswer";
+					btn.dataset.index = idx.toString();
+					btn.textContent = opt; // Safe by default, replaces Utils.escapeHtml
+					fragment.appendChild(btn);
 				});
-				quizDiv.innerHTML = html;
+				quizDiv.innerHTML = ""; // Clear existing content
+				quizDiv.appendChild(fragment);
 			}
 		} else {
 			if (psyDiv) psyDiv.style.display = "grid";
@@ -644,11 +651,12 @@ export const app = {
 			btn.classList.add("wrong");
 		}
 
+		// OPTIMIZATION: Cache the DOM query result for reuse
 		const allBtns = document.querySelectorAll(".quiz-opt");
 		if (allBtns[q.correctIndex]) {
 			allBtns[q.correctIndex].classList.add("correct");
 		}
-		document.querySelectorAll(".quiz-opt").forEach((/** @type {any} */ b) => {
+		allBtns.forEach((/** @type {any} */ b) => {
 			b.classList.add("disabled");
 			b.disabled = true;
 		});
