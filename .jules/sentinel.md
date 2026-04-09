@@ -1,0 +1,4 @@
+## 2024-05-18 - [Exposed Hardcoded Secrets in Config File]
+**Vulnerability:** A hardcoded API token for TinyURL (`TINYTOKEN`) was present in `src/app-settings.js` in plain text. This exposes the secret and violates the "Bring Your Own Key" architecture of the app, as this token could be abused or depleted.
+**Learning:** Even client-only, serverless applications are vulnerable to credential leakage if developer keys are committed alongside standard configuration variables. This is exacerbated in pure frontend apps without build-time secret injection.
+**Prevention:** Hardcoded secrets should never exist in the source code. Instead, implement dynamic retrieval logic using `localStorage`, environment variables (if built), or prompt the user for their keys (BYOK - Bring Your Own Key) to maintain a zero-trust model.
