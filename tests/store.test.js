@@ -50,4 +50,15 @@ describe("Store", () => {
 		);
 		unsubscribe();
 	});
+
+	it("should not call the listener when property value hasn't changed", () => {
+		const listener = vi.fn();
+		store.quizScore = 10; // Setup initial value
+		const unsubscribe = subscribe(listener);
+
+		store.quizScore = 10; // Set to same value
+
+		expect(listener).not.toHaveBeenCalled();
+		unsubscribe();
+	});
 });
