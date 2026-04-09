@@ -1127,7 +1127,15 @@ export const app = {
 
 		// Confirmed delete
 		AppStorage.delete(id);
-		this.openLibrary();
+
+		// OPTIMIZATION: O(1) DOM removal instead of full re-render
+		const card = btn ? btn.closest(".card") : null;
+		if (card && AppStorage.getAll().length > 0) {
+			card.remove();
+		} else {
+			this.openLibrary();
+		}
+
 		this.showToast("Тест удален 🗑");
 	},
 
