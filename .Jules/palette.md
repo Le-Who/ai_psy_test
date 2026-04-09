@@ -1,3 +1,7 @@
+## 2026-03-13 - [Form and Toast Accessibility]
+**Learning:** Implicit label association (wrapping) isn't used here, but without explicit `for` attributes on `<label>` elements, form inputs become disconnected, harming screen reader access and click-to-focus behavior. Additionally, dynamic toast notifications without `role="status"` and `aria-live="polite"` are invisible to assistive technologies.
+**Action:** Always include explicit `for` attributes on form labels matching their input IDs, and ensure dynamic non-intrusive notifications (like toasts) use the appropriate `aria-live` attributes.
+
 ## 2026-02-01 - [Form Validation & Feedback]
 **Learning:** Standard HTML5 `required` attribute allows whitespace, which can lead to empty submissions. Replacing intrusive `alert()` calls with Toasts and focus management creates a much smoother flow.
 **Action:** Always combine `required` attributes with explicit JS validation (`.trim()`) for text inputs, and use visual indicators (asterisks) to make expectations clear upfront.
