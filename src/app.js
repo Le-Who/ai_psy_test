@@ -944,9 +944,22 @@ export const app = {
 	// SHARE LINK / SAVE
 	// =========================
 
+	getTinyToken(promptUser) {
+		let token = localStorage.getItem("tinyurl_token");
+		if (!token && promptUser) {
+			token = prompt(
+				"Введите ваш TinyURL API Token для создания коротких ссылок:",
+			);
+			if (token) {
+				localStorage.setItem("tinyurl_token", token);
+			}
+		}
+		return token;
+	},
+
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
+		const token = this.getTinyToken(true);
+		if (!token) return alert("Нужен TinyURL Token!");
 
 		const btn =
 			btnEl ||
@@ -984,7 +997,7 @@ export const app = {
 			const response = await fetch("https://api.tinyurl.com/create", {
 				method: "POST",
 				headers: {
-					Authorization: `Bearer ${TINYTOKEN}`,
+					Authorization: `Bearer ${token}`,
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
@@ -1021,11 +1034,8 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
+			const token = this.getTinyToken(false);
+			if (typeof LZString !== "undefined" && token) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
 
@@ -1045,7 +1055,7 @@ export const app = {
 				const response = await fetch("https://api.tinyurl.com/create", {
 					method: "POST",
 					headers: {
-						Authorization: `Bearer ${TINYTOKEN}`,
+						Authorization: `Bearer ${token}`,
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
