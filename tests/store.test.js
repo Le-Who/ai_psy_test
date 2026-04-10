@@ -50,4 +50,23 @@ describe("Store", () => {
 		);
 		unsubscribe();
 	});
+
+	it("should not call listeners if the assigned value is the same as the current value", () => {
+		const listener = vi.fn();
+		const unsubscribe = subscribe(listener);
+
+		// The store retains state across tests. We need to assign a known state,
+		// clear the mock, and then re-assign the identical state.
+		store.mode = "psy";
+		store.step = 0;
+		listener.mockClear();
+
+		store.mode = "psy";
+		expect(listener).not.toHaveBeenCalled();
+
+		store.step = 0;
+		expect(listener).not.toHaveBeenCalled();
+
+		unsubscribe();
+	});
 });
