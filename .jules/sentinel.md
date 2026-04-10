@@ -1,0 +1,4 @@
+## 2024-04-10 - Hardcoded Secrets / API Keys
+**Vulnerability:** A hardcoded API token (`TINYTOKEN`) was embedded directly into the frontend code (`src/app-settings.js`).
+**Learning:** Hardcoded secrets in client-side code are fully exposed to anyone viewing the source. They allow unauthorized use of associated external services (in this case, TinyURL), potentially leading to quota exhaustion or abuse.
+**Prevention:** Use a Bring Your Own Key (BYOK) model to securely prompt the user for API keys when required, or utilize environment variables during build pipelines for backend processes. Avoid shipping unencrypted secrets to production.
