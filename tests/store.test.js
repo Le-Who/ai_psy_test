@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { store, subscribe } from "../src/store.js";
 
 describe("Store", () => {
@@ -25,6 +25,27 @@ describe("Store", () => {
 
 		unsub1();
 		unsub2();
+	});
+
+	it("should not call listener for redundant updates", () => {
+		const listener = vi.fn();
+		const unsubscribe = subscribe(listener);
+
+		// Reset state to ensure isolation
+		store.step = 0;
+		listener.mockClear();
+
+		store.step = 0; // Redundant update
+		expect(listener).not.toHaveBeenCalled();
+
+		store.step = 5;
+		expect(listener).toHaveBeenCalledTimes(1);
+
+		listener.mockClear();
+		store.step = 5; // Redundant update
+		expect(listener).not.toHaveBeenCalled();
+
+		unsubscribe();
 	});
 
 	it("should unsubscribe correctly", () => {
