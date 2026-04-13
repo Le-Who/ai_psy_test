@@ -19,6 +19,7 @@ export const store = new Proxy(
 	{ ...initialState },
 	{
 		set(target, prop, value) {
+			if (target[prop] === value) return true; // prevent redundant subscriber calls
 			target[prop] = value;
 			listeners.forEach((fn) => {
 				fn(prop, value, target);
