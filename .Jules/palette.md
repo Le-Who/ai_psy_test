@@ -13,3 +13,7 @@
 ## 2025-05-23 - [Dynamic Button States]
 **Learning:** When a button's visual text changes to convey a new state (like "Delete" -> "Confirm?"), the `aria-label` MUST update simultaneously. Screen reader users miss the context switch if the label remains static.
 **Action:** Use `dataset` to store the original label, update `aria-label` during the confirmation state, and restore it on timeout or cancellation.
+
+## 2026-02-01 - [Form Label Accessibility & Test Resiliency]
+**Learning:** Omission of `for` attributes on `<label>` elements not only hurts screen reader users and click-to-focus UX, but also creates fragile end-to-end tests. When labels contain nested elements (like `<span>*</span>` for required fields), strict text matching in Playwright (e.g. `getByText('Тема')`) often fails.
+**Action:** Always link `<label>` to inputs using `for`/`id`. This allows tests to reliably use explicit CSS locators (e.g., `locator("label[for='themeInput']")`) which bypasses nested text node issues and verifies structural accessibility simultaneously.
