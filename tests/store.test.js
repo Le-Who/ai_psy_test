@@ -50,4 +50,20 @@ describe("Store", () => {
 		);
 		unsubscribe();
 	});
+
+	it("should not call listeners when setting identical values", () => {
+		const listener = vi.fn();
+		const unsubscribe = subscribe(listener);
+
+		// Reset state baseline
+		store.quizScore = 0;
+		listener.mockClear();
+
+		// Set identical value
+		store.quizScore = 0;
+		store.quizScore = 0;
+
+		expect(listener).not.toHaveBeenCalled();
+		unsubscribe();
+	});
 });
