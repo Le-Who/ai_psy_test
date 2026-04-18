@@ -53,6 +53,14 @@ export const app = {
 			);
 			if (input) input.value = savedKey;
 		}
+
+		const savedTinyKey = localStorage.getItem("tiny_api_token");
+		if (savedTinyKey) {
+			const tinyInput = /** @type {HTMLInputElement | null} */ (
+				document.getElementById("tinyApiTokenInput")
+			);
+			if (tinyInput) tinyInput.value = savedTinyKey;
+		}
 		this.checkHash();
 		this.runDuelHashRegressionCheck();
 
@@ -432,6 +440,15 @@ export const app = {
 			return;
 		}
 		localStorage.setItem("user_api_key", apiKey);
+
+		const tinyApiToken = /** @type {HTMLInputElement} */ (
+			document.getElementById("tinyApiTokenInput")
+		)?.value.trim();
+		if (tinyApiToken) {
+			localStorage.setItem("tiny_api_token", tinyApiToken);
+		} else {
+			localStorage.removeItem("tiny_api_token");
+		}
 
 		const isQuiz = this.state.mode === "quiz";
 		const contextParam = isQuiz
@@ -945,8 +962,9 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
+		const tinyToken = localStorage.getItem("tiny_api_token");
+		if (!tinyToken)
+			return alert("Нужен TinyURL Token! Укажите его на главном экране.");
 
 		const btn =
 			btnEl ||
@@ -984,7 +1002,7 @@ export const app = {
 			const response = await fetch("https://api.tinyurl.com/create", {
 				method: "POST",
 				headers: {
-					Authorization: `Bearer ${TINYTOKEN}`,
+					Authorization: `Bearer ${tinyToken}`,
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
@@ -1021,11 +1039,8 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
+			const tinyToken = localStorage.getItem("tiny_api_token");
+			if (typeof LZString !== "undefined" && tinyToken) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
 
@@ -1045,7 +1060,7 @@ export const app = {
 				const response = await fetch("https://api.tinyurl.com/create", {
 					method: "POST",
 					headers: {
-						Authorization: `Bearer ${TINYTOKEN}`,
+						Authorization: `Bearer ${tinyToken}`,
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
