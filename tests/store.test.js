@@ -50,4 +50,16 @@ describe("Store", () => {
 		);
 		unsubscribe();
 	});
+
+	it("should not call the listener when a store property is set to its existing value", () => {
+		const listener = vi.fn();
+		const unsubscribe = subscribe(listener);
+
+		store.mode = "new_mode";
+		listener.mockClear();
+
+		store.mode = "new_mode";
+		expect(listener).not.toHaveBeenCalled();
+		unsubscribe();
+	});
 });
