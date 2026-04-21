@@ -945,8 +945,17 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
+		// 🛡️ Sentinel: Removed hardcoded TINYTOKEN and implement BYOK via localStorage
+		let tinyToken = localStorage.getItem("tiny_api_token");
+		if (!tinyToken) {
+			tinyToken = prompt(
+				"Введите ваш TinyURL API Token для создания коротких ссылок:",
+			);
+			if (!tinyToken) {
+				return alert("Нужен TinyURL Token!");
+			}
+			localStorage.setItem("tiny_api_token", tinyToken);
+		}
 
 		const btn =
 			btnEl ||
@@ -984,7 +993,7 @@ export const app = {
 			const response = await fetch("https://api.tinyurl.com/create", {
 				method: "POST",
 				headers: {
-					Authorization: `Bearer ${TINYTOKEN}`,
+					Authorization: `Bearer ${tinyToken}`,
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
@@ -1021,11 +1030,9 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
+			// 🛡️ Sentinel: Read token from localStorage, gracefully skip if not present
+			const tinyToken = localStorage.getItem("tiny_api_token");
+			if (typeof LZString !== "undefined" && tinyToken) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
 
@@ -1045,7 +1052,7 @@ export const app = {
 				const response = await fetch("https://api.tinyurl.com/create", {
 					method: "POST",
 					headers: {
-						Authorization: `Bearer ${TINYTOKEN}`,
+						Authorization: `Bearer ${tinyToken}`,
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
