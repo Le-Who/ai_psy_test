@@ -2,6 +2,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { store, subscribe } from "../src/store.js";
 
 describe("Store", () => {
+	beforeEach(() => {
+		store.step = 0;
+		store.mode = "psy";
+		store.quizScore = 0;
+	});
+
 	it("should call the listener when a store property changes", () => {
 		const listener = vi.fn();
 		const unsubscribe = subscribe(listener);
@@ -48,6 +54,24 @@ describe("Store", () => {
 			10,
 			expect.objectContaining({ quizScore: 10 }),
 		);
+		unsubscribe();
+	});
+
+	it("should not call listeners when setting the same value", () => {
+		const listener = vi.fn();
+		const unsubscribe = subscribe(listener);
+
+		store.step = 0; // Already 0
+
+		expect(listener).not.toHaveBeenCalled();
+
+		store.step = 1;
+		expect(listener).toHaveBeenCalledTimes(1);
+
+		listener.mockClear();
+		store.step = 1; // Already 1
+		expect(listener).not.toHaveBeenCalled();
+
 		unsubscribe();
 	});
 });
