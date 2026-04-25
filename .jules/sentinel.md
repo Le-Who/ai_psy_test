@@ -1,0 +1,4 @@
+## 2024-05-18 - XSS Array Bypass Vulnerability in `escapeHtml`
+**Vulnerability:** The `Utils.escapeHtml` function checked `if (typeof unsafe !== "string") return unsafe;`. This allowed arrays containing malicious HTML strings (e.g., `['<img src=x onerror=alert(1)>']`) to bypass the filter and return the unescaped array. When subsequently interpolated into HTML strings via template literals, the array was implicitly converted to a string, executing the XSS.
+**Learning:** Checking for exact string types when sanitizing inputs can lead to bypasses if the framework or JavaScript later implicitly coerces those non-string types into strings.
+**Prevention:** Always coerce inputs to string (e.g., `String(unsafe)`) prior to running XSS replacements, while explicitly handling intentional null/undefined values to prevent 'null'/'undefined' text appearing in the UI.

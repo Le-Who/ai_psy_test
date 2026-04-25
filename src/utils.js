@@ -15,12 +15,12 @@ const ESCAPE_MAP = {
 export const Utils = {
 	/**
 	 * Escapes HTML special characters to prevent XSS
-	 * @param {string} unsafe
-	 * @returns {string}
+	 * @param {any} unsafe
+	 * @returns {string | null | undefined}
 	 */
 	escapeHtml: (unsafe) => {
-		if (typeof unsafe !== "string") return unsafe;
-		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
+		if (unsafe === null || unsafe === undefined) return unsafe;
+		return String(unsafe).replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
 
