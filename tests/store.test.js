@@ -50,4 +50,19 @@ describe("Store", () => {
 		);
 		unsubscribe();
 	});
+
+	it("should not call the listener when assigning the same value", () => {
+		const listener = vi.fn();
+
+		// Set initial value without tracking
+		store.step = 0;
+
+		const unsubscribe = subscribe(listener);
+
+		// Assign identical value
+		store.step = 0;
+
+		expect(listener).not.toHaveBeenCalled();
+		unsubscribe();
+	});
 });
