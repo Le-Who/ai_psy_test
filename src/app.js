@@ -644,11 +644,14 @@ export const app = {
 			btn.classList.add("wrong");
 		}
 
-		const allBtns = document.querySelectorAll(".quiz-opt");
+		// ⚡ Bolt: Cache NodeList and scope query to UI container to avoid redundant full-document traversals
+		const allBtns = (this.ui.quizContainer || document).querySelectorAll(
+			".quiz-opt",
+		);
 		if (allBtns[q.correctIndex]) {
 			allBtns[q.correctIndex].classList.add("correct");
 		}
-		document.querySelectorAll(".quiz-opt").forEach((/** @type {any} */ b) => {
+		allBtns.forEach((/** @type {any} */ b) => {
 			b.classList.add("disabled");
 			b.disabled = true;
 		});
