@@ -945,8 +945,7 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
+		const token = import.meta.env.VITE_TINYTOKEN;
 
 		const btn =
 			btnEl ||
@@ -981,25 +980,37 @@ export const app = {
 			const compressedHash = await this.buildDuelHashFromPayload(payload);
 			const longUrl = `${window.location.origin}${window.location.pathname}${compressedHash}`;
 
-			const response = await fetch("https://api.tinyurl.com/create", {
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${TINYTOKEN}`,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
-			});
+			let shareUrl = longUrl;
 
-			if (!response.ok) throw new Error("API Error");
-			const data = await response.json();
-			const tinyUrl = data.data.tiny_url;
+			if (token) {
+				try {
+					const response = await fetch("https://api.tinyurl.com/create", {
+						method: "POST",
+						headers: {
+							Authorization: `Bearer ${token}`,
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
+					});
+
+					if (response.ok) {
+						const data = await response.json();
+						shareUrl = data.data.tiny_url;
+					}
+				} catch (e) {
+					console.warn(
+						"Short link generation failed, falling back to long URL",
+						e,
+					);
+				}
+			}
 
 			// --- UX IMPROVEMENT: CLIPBOARD + TOAST ---
 			if (navigator.clipboard && window.isSecureContext) {
-				await navigator.clipboard.writeText(tinyUrl);
+				await navigator.clipboard.writeText(shareUrl);
 				this.showToast("Ссылка скопирована! Отправь другу 🚀");
 			} else {
-				prompt("Скопируй ссылку:", tinyUrl);
+				prompt("Скопируй ссылку:", shareUrl);
 			}
 		} catch (e) {
 			console.error(e);
@@ -1021,11 +1032,8 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
+			const token = import.meta.env.VITE_TINYTOKEN;
+			if (typeof LZString !== "undefined" && token) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
 
@@ -1045,7 +1053,7 @@ export const app = {
 				const response = await fetch("https://api.tinyurl.com/create", {
 					method: "POST",
 					headers: {
-						Authorization: `Bearer ${TINYTOKEN}`,
+						Authorization: `Bearer ${token}`,
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
