@@ -1,0 +1,4 @@
+## 2024-05-18 - [CRITICAL] Fix XSS array bypass in HTML escaping
+**Vulnerability:** XSS Array Bypass in `Utils.escapeHtml`
+**Learning:** `Utils.escapeHtml` previously checked if the input was a string and returned the original input if it was not (`if (typeof unsafe !== "string") return unsafe;`). This allowed attackers to bypass the XSS filter by passing an array of strings (e.g., `['<script>alert(1)</script>']`). When the array was later concatenated into an HTML template string, JavaScript automatically called `.toString()` on the array, joining its elements and inserting the malicious payload into the DOM without escaping.
+**Prevention:** Coerce all non-null inputs to strings (`String(unsafe)`) before replacing characters to ensure that arrays and other objects cannot bypass the string-type check and are properly escaped before injection.
