@@ -50,4 +50,21 @@ describe("Store", () => {
 		);
 		unsubscribe();
 	});
+
+	it("should not call the listener when setting a property to its identical existing value", () => {
+		const listener = vi.fn();
+
+		// Reset state and attach listener
+		store.step = 0;
+		const unsubscribe = subscribe(listener);
+
+		// Ensure clear mock functions before assertion
+		listener.mockClear();
+
+		// Set to identical value
+		store.step = 0;
+
+		expect(listener).not.toHaveBeenCalled();
+		unsubscribe();
+	});
 });
