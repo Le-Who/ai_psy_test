@@ -9,6 +9,9 @@ import { validatePsyOutput } from "./validator.js";
 // AI Universal Test Generator - Core Logic v6.0 Final
 // UI/UX Polish, Features: Glassmorphism, Clipboard API, Confetti, Toast Notifications
 
+// 🛡️ Sentinel: Fetching TinyURL token securely from environment variables instead of hardcoding
+const TINYTOKEN = import.meta.env.VITE_TINYTOKEN;
+
 export const app = {
 	get state() {
 		return store;
@@ -945,8 +948,7 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
+		if (!TINYTOKEN) return alert("Нужен TinyURL Token!");
 
 		const btn =
 			btnEl ||
@@ -1021,11 +1023,7 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
+			if (typeof LZString !== "undefined" && TINYTOKEN) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
 
