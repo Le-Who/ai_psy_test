@@ -13,3 +13,7 @@
 ## 2025-05-23 - [Dynamic Button States]
 **Learning:** When a button's visual text changes to convey a new state (like "Delete" -> "Confirm?"), the `aria-label` MUST update simultaneously. Screen reader users miss the context switch if the label remains static.
 **Action:** Use `dataset` to store the original label, update `aria-label` during the confirmation state, and restore it on timeout or cancellation.
+
+## 2025-06-15 - [Label Focus Accessibility with Nested Spans]
+**Learning:** In this application, form labels frequently contain nested helper `<span>` tags (e.g., for asterisks or optional subtext). Due to this pattern, relying on implicit label wrapping or simple text matching is unreliable for screen readers and click-focus events.
+**Action:** Always add explicit `for` attributes to `<label>` elements that perfectly match the `id` of their target input to guarantee robust click-focus functionality and accessibility, especially when the label text contains nested HTML.
