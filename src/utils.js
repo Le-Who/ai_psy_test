@@ -19,7 +19,9 @@ export const Utils = {
 	 * @returns {string}
 	 */
 	escapeHtml: (unsafe) => {
-		if (typeof unsafe !== "string") return unsafe;
+		// 🛡️ Sentinel: Fix XSS array bypass by enforcing string coercion
+		if (unsafe == null) return unsafe;
+		unsafe = String(unsafe);
 		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
