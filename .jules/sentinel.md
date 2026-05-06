@@ -1,0 +1,4 @@
+## 2025-05-06 - XSS Array Bypass in String Interpolation
+**Vulnerability:** The `escapeHtml` function checked `typeof unsafe !== "string"` to return early, assuming non-strings were safe. However, when arrays containing malicious strings (e.g. `['<script>alert(1)</script>']`) are interpolated into HTML templates (like `container.innerHTML = \`<div>${array}</div>\``), JavaScript implicitly calls `.toString()` on the array, which joins the elements and injects the raw string, bypassing the escape logic.
+**Learning:** Checking `typeof !== "string"` is insufficient for XSS protection in JavaScript due to implicit type coercion during template literal interpolation.
+**Prevention:** Always explicitly coerce inputs to strings (e.g. `String(unsafe)`) before escaping, while safely handling `null` and `undefined` to prevent runtime errors.

@@ -19,8 +19,10 @@ export const Utils = {
 	 * @returns {string}
 	 */
 	escapeHtml: (unsafe) => {
-		if (typeof unsafe !== "string") return unsafe;
-		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
+		// 🛡️ Sentinel: Fixed XSS array bypass. Implicit stringification of arrays (e.g. ['<script>'])
+		// bypassed the typeof string check. Now we explicitly coerce to string after null check.
+		if (unsafe == null) return unsafe;
+		return String(unsafe).replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
 
