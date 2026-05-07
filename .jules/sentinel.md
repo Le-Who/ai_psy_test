@@ -1,0 +1,4 @@
+## 2024-11-20 - XSS Array Bypass in escapeHtml
+**Vulnerability:** XSS array bypass vulnerability due to strict type checking in `Utils.escapeHtml`. The original logic skipped processing `typeof unsafe !== "string"`, which caused malicious payload strings inside an array to remain unescaped and stringified into the DOM.
+**Learning:** Checking for `typeof === "string"` before replacing characters does not protect against array payloads that implicitly coerce to string inside DOM concatenation (e.g. `innerHTML = "<div>" + ["<script>"] + "</div>"`).
+**Prevention:** In escaping functions for XSS prevention, always coerce inputs to strings (`String(unsafe)`) after explicitly handling missing values (`null`/`undefined`) instead of bypassing validation based strictly on typeof check.
