@@ -15,5 +15,13 @@ describe("Utils", () => {
 			expect(Utils.escapeHtml(null)).toBe(null);
 			expect(Utils.escapeHtml(undefined)).toBe(undefined);
 		});
+
+		it("should escape arrays to prevent XSS array bypass", () => {
+			const maliciousArray = ['<script>alert("XSS")</script>'];
+			const safe = Utils.escapeHtml(maliciousArray);
+			expect(safe).toBe(
+				"&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;",
+			);
+		});
 	});
 });
