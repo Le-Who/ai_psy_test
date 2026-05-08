@@ -19,6 +19,9 @@ export const store = new Proxy(
 	{ ...initialState },
 	{
 		set(target, prop, value) {
+			// ⚡ Bolt: Prevent redundant listener triggers for identical values
+			if (target[prop] === value) return true;
+
 			target[prop] = value;
 			listeners.forEach((fn) => {
 				fn(prop, value, target);
