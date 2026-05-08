@@ -37,6 +37,17 @@ describe("Store", () => {
 		expect(listener).not.toHaveBeenCalled();
 	});
 
+	it("should not call the listener when a store property is set to its existing value", () => {
+		store.step = 1;
+		const listener = vi.fn();
+		const unsubscribe = subscribe(listener);
+
+		store.step = 1;
+
+		expect(listener).not.toHaveBeenCalled();
+		unsubscribe();
+	});
+
 	it("should pass the target object to the listener", () => {
 		const listener = vi.fn();
 		const unsubscribe = subscribe(listener);
