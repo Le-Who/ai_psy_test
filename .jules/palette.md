@@ -13,3 +13,7 @@
 ## 2025-05-23 - [Dynamic Button States]
 **Learning:** When a button's visual text changes to convey a new state (like "Delete" -> "Confirm?"), the `aria-label` MUST update simultaneously. Screen reader users miss the context switch if the label remains static.
 **Action:** Use `dataset` to store the original label, update `aria-label` during the confirmation state, and restore it on timeout or cancellation.
+
+## 2025-05-23 - [Explicit Label Associations]
+**Learning:** Implicitly nesting inputs inside `<label>` tags or relying purely on text matches can fail accessibility checks and test automation, especially when labels contain nested `<span>` tags (like required asterisks). This breaks strict text matching in tools like Playwright and can affect screen reader reliability.
+**Action:** Always use explicit `for` attributes on `<label>` elements matching the exact `id` of their target inputs. Verify using specific CSS selectors like `page.locator("label[for='inputId']").click({ force: true })`.
