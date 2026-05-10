@@ -1,0 +1,4 @@
+## 2024-03-20 - Hardcoded API Token Risk
+**Vulnerability:** Found a hardcoded API token (`TINYTOKEN`) directly in `src/app-settings.js`, which could expose the secret to anyone accessing the client-side code or the source repository.
+**Learning:** External API integrations that shouldn't require user input for keys must retrieve those secrets securely at build time or via environment variables instead of hardcoding them into the codebase.
+**Prevention:** Always use `import.meta.env` combined with `.env` files for frontend configurations requiring secrets. Ensure the application degrades gracefully when the secret is not available.
