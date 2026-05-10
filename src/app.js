@@ -644,11 +644,13 @@ export const app = {
 			btn.classList.add("wrong");
 		}
 
-		const allBtns = document.querySelectorAll(".quiz-opt");
+		// ⚡ Bolt: Cache DOM node list and scope queries to container instead of full document
+		const container = (this && this.ui && this.ui.quizContainer) || document;
+		const allBtns = container.querySelectorAll(".quiz-opt");
 		if (allBtns[q.correctIndex]) {
 			allBtns[q.correctIndex].classList.add("correct");
 		}
-		document.querySelectorAll(".quiz-opt").forEach((/** @type {any} */ b) => {
+		allBtns.forEach((/** @type {any} */ b) => {
 			b.classList.add("disabled");
 			b.disabled = true;
 		});
@@ -1157,5 +1159,9 @@ export const app = {
 	},
 };
 
-window.app = app; // Expose globally for legacy script interop if any
-document.addEventListener("DOMContentLoaded", () => app.init());
+if (typeof window !== "undefined") {
+	window.app = app; // Expose globally for legacy script interop if any
+}
+if (typeof document !== "undefined") {
+	document.addEventListener("DOMContentLoaded", () => app.init());
+}
