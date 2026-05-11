@@ -1021,5 +1021,8 @@ ${PROMPT_TEXTS.generator_quiz}
 console.log("App Settings Loaded v6.5 Final");
 
 // Secrets
+// 🛡️ Sentinel: Removed hardcoded TinyURL token. Use environment variables instead to prevent secret leakage.
 const TINYTOKEN =
-	"lBjFvZGQQmPD56gcBpQBgdyMlezZCxwNShVIlh9wA3W4HFtDOI0418CnoXBx";
+	typeof import.meta !== "undefined" && import.meta.env
+		? import.meta.env.VITE_TINYTOKEN
+		: undefined;
