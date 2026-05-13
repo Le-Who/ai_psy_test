@@ -1,0 +1,4 @@
+## 2025-02-14 - Hardcoded API Secret Removal
+**Vulnerability:** A hardcoded third-party API secret (`TINYTOKEN`) was embedded directly within the client-side JavaScript module (`src/app-settings.js`), exposing it publicly to all users.
+**Learning:** For third-party integrations (like TinyURL) that don't have user-facing input UIs for "Bring Your Own Key" (unlike the main OpenRouter/Gemini keys), tokens were being mistakenly hardcoded into source files rather than managed securely. This causes immediate secret leakage.
+**Prevention:** Always retrieve tokens for background/implicit integrations via environment variables (e.g., `import.meta.env.VITE_TINYTOKEN`) injected at build time, and use defensive checks (`typeof import.meta !== 'undefined'`) to prevent environment errors in non-module or testing contexts.
