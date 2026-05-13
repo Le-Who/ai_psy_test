@@ -945,6 +945,8 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
+		// 🛡️ Sentinel: Fetching TINYTOKEN securely from environment variables
+		const TINYTOKEN = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_TINYTOKEN : undefined;
 		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
 			return alert("Нужен TinyURL Token!");
 
@@ -1021,6 +1023,8 @@ export const app = {
 		let shortUrl = null;
 
 		try {
+			// 🛡️ Sentinel: Fetching TINYTOKEN securely from environment variables
+			const TINYTOKEN = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_TINYTOKEN : undefined;
 			if (
 				typeof LZString !== "undefined" &&
 				typeof TINYTOKEN !== "undefined" &&
