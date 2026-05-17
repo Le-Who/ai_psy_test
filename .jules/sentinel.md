@@ -1,0 +1,4 @@
+## 2024-05-18 - Hardcoded Third-Party API Keys
+**Vulnerability:** A hardcoded API key (`TINYTOKEN`) for the TinyURL API was stored in plaintext directly in `src/app-settings.js`, exposing it to anyone with source code access.
+**Learning:** Even though the application uses a "Bring Your Own Key" (BYOK) model for the main AI integrations, auxiliary third-party integrations (like TinyURL link shortening) lacked a secure input mechanism or environment injection, leading to the secret being hardcoded.
+**Prevention:** For APIs without a user-facing input field in a serverless application, secrets must be injected at build time using environment variables (e.g., `import.meta.env.VITE_TINYTOKEN`) with appropriate defensive checks (`typeof import.meta !== "undefined"`) to prevent reference errors in non-module or testing environments.
