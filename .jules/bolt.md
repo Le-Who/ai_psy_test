@@ -22,3 +22,7 @@
 ## 2026-03-01 - [Inefficient Regex Backtracking and Switch Execution]
 **Learning:** `safeParseJSON` used a greedy regex `match(/\{[\s\S]*\}$/)` which is extremely slow on large text blobs when the structure fails to match immediately, and `escapeHtml` used a switch statement inside its `.replace()` callback which limits JS engine optimizations compared to an object map.
 **Action:** Always prefer `indexOf`/`lastIndexOf` or constrained matching when extracting large blocks like JSON from markdown, and use static object mapping (`const MAP = { ... }; match => MAP[match];`) instead of `switch` for basic character replacements in hot loops.
+
+## 2026-05-18 - [DOM Query Optimization in Event Handlers]
+**Learning:** Frequent redundant `document.querySelectorAll` calls on the same set of elements inside event handlers add measurable overhead.
+**Action:** Cache NodeLists (e.g., from `container.querySelectorAll`) and reuse them for multiple operations instead of querying the document repeatedly.
