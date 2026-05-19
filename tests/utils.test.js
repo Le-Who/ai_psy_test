@@ -15,5 +15,11 @@ describe("Utils", () => {
 			expect(Utils.escapeHtml(null)).toBe(null);
 			expect(Utils.escapeHtml(undefined)).toBe(undefined);
 		});
+
+		it("should properly coerce and escape non-string values like arrays to prevent XSS", () => {
+			const arrayPayload = ['<script>alert("XSS")</script>'];
+			const safe = Utils.escapeHtml(arrayPayload);
+			expect(safe).toBe("&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;");
+		});
 	});
 });
