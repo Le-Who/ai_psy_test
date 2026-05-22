@@ -13,3 +13,7 @@
 ## 2025-05-23 - [Dynamic Button States]
 **Learning:** When a button's visual text changes to convey a new state (like "Delete" -> "Confirm?"), the `aria-label` MUST update simultaneously. Screen reader users miss the context switch if the label remains static.
 **Action:** Use `dataset` to store the original label, update `aria-label` during the confirmation state, and restore it on timeout or cancellation.
+
+## 2026-05-22 - [Label Accessibility Verification]
+**Learning:** Label accessibility (linking `<label>` to inputs via `for`/`id`) is verified in Playwright by clicking the explicit label locator rather than general text matching, as nested elements (like `<span>` asterisks) can cause strict text matching to fail. Due to CSS styling/visibility, use `force=True` (e.g., `page.locator("label[for='inputID']").click(force=True)`). Assert the target input receives focus via `expect(locator).to_be_focused()`.
+**Action:** Ensure all HTML `<label>` tags have explicit `for` attributes linking to the input's `id` for screen readers and click-focus.
