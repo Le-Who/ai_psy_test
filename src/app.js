@@ -945,6 +945,12 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
+		// 🛡️ Sentinel: Using environment variable instead of hardcoded secret
+		const TINYTOKEN =
+			typeof import.meta !== "undefined" && import.meta.env
+				? import.meta.env.VITE_TINYTOKEN
+				: undefined;
+
 		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
 			return alert("Нужен TinyURL Token!");
 
@@ -1021,6 +1027,12 @@ export const app = {
 		let shortUrl = null;
 
 		try {
+			// 🛡️ Sentinel: Using environment variable instead of hardcoded secret
+			const TINYTOKEN =
+				typeof import.meta !== "undefined" && import.meta.env
+					? import.meta.env.VITE_TINYTOKEN
+					: undefined;
+
 			if (
 				typeof LZString !== "undefined" &&
 				typeof TINYTOKEN !== "undefined" &&
@@ -1157,5 +1169,9 @@ export const app = {
 	},
 };
 
-window.app = app; // Expose globally for legacy script interop if any
-document.addEventListener("DOMContentLoaded", () => app.init());
+if (typeof window !== "undefined") {
+	window.app = app; // Expose globally for legacy script interop if any
+}
+if (typeof document !== "undefined") {
+	document.addEventListener("DOMContentLoaded", () => app.init());
+}
