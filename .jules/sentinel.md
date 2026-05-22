@@ -1,0 +1,4 @@
+## 2024-05-18 - [Hardcoded Secret Removal]
+**Vulnerability:** A hardcoded API token (`TINYTOKEN`) was present in `src/app-settings.js`, exposing a secret to anyone with source code access.
+**Learning:** For client-side apps using a BYOK (Bring Your Own Key) model or integrations without user-facing input UIs, keys should not be hardcoded. They should be passed via Vite environment variables. Using `import.meta.env` allows managing these safely at build time.
+**Prevention:** Always use environment variables (e.g., `import.meta.env.VITE_SECRET`) for secrets, and employ a defensive check like `typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SECRET : undefined` to prevent `ReferenceError` crashes in environments where `import.meta` is unavailable (e.g., non-module test environments).
