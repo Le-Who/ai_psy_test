@@ -1022,4 +1022,6 @@ console.log("App Settings Loaded v6.5 Final");
 
 // Secrets
 const TINYTOKEN =
-	"lBjFvZGQQmPD56gcBpQBgdyMlezZCxwNShVIlh9wA3W4HFtDOI0418CnoXBx";
+	typeof import.meta !== "undefined" && import.meta.env
+		? import.meta.env.VITE_TINYTOKEN
+		: undefined; // 🛡️ Sentinel: Removed hardcoded API key and replaced with environment variable to prevent secret leakage
