@@ -19,8 +19,10 @@ export const Utils = {
 	 * @returns {string}
 	 */
 	escapeHtml: (unsafe) => {
-		if (typeof unsafe !== "string") return unsafe;
-		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
+		// 🛡️ Sentinel: Prevent XSS array bypass by explicitly returning null/undefined
+		// and converting everything else (including arrays) to a string before escaping
+		if (unsafe == null) return unsafe;
+		return String(unsafe).replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
 
