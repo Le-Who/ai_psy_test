@@ -1,5 +1,5 @@
 import { api } from "./api.js";
-import { SCHEMAS } from "./app-settings.js";
+import { SCHEMAS, TINYTOKEN } from "./app-settings.js";
 import { Scoring } from "./scoring.js";
 import { AppStorage } from "./storage.js";
 import { store, subscribe } from "./store.js";
@@ -945,8 +945,7 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
+		if (!TINYTOKEN) return alert("Нужен TinyURL Token!");
 
 		const btn =
 			btnEl ||
@@ -1021,11 +1020,7 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
+			if (typeof LZString !== "undefined" && TINYTOKEN) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
 
