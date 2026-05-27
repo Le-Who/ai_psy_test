@@ -20,7 +20,7 @@ describe("api.safeParseJSON", () => {
 	});
 
 	it("should parse JSON in markdown code blocks", () => {
-		const text = "```json\n{\"key\": \"value\"}\n```";
+		const text = '```json\n{"key": "value"}\n```';
 		expect(api.safeParseJSON(text)).toEqual({ key: "value" });
 	});
 
@@ -37,7 +37,7 @@ describe("api.safeParseJSON", () => {
 		expect(Logger.saveLog).toHaveBeenCalled();
 	});
 
-    it("should log errors when markdown JSON parsing fails", () => {
+	it("should log errors when markdown JSON parsing fails", () => {
 		const textWithMd = "```json\n{ invalid }\n```";
 		expect(() => api.safeParseJSON(textWithMd)).toThrow("JSON Parse Error");
 		expect(Logger.saveLog).toHaveBeenCalled();
