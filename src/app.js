@@ -37,6 +37,8 @@ export const app = {
 		this.ui.quizContainer = document.getElementById("quizContainer");
 		this.ui.inProgressSaveBtn = document.getElementById("inProgressSaveBtn");
 		this.ui.inProgressShareBtn = document.getElementById("inProgressShareBtn");
+		this.ui.loadingOverlay = document.getElementById("loadingOverlay");
+		this.ui.loadingText = document.getElementById("loadingText");
 
 		// Static Psy Buttons
 		this.ui.psyButtons = this.ui.psyContainer.querySelectorAll(".likert-opt");
@@ -644,11 +646,13 @@ export const app = {
 			btn.classList.add("wrong");
 		}
 
-		const allBtns = document.querySelectorAll(".quiz-opt");
-		if (allBtns[q.correctIndex]) {
-			allBtns[q.correctIndex].classList.add("correct");
-		}
-		document.querySelectorAll(".quiz-opt").forEach((/** @type {any} */ b) => {
+		// ⚡ Bolt: Scoped querySelectorAll to cached container to avoid redundant full document traversals
+		const container = (this && this.ui && this.ui.quizContainer) || document;
+		const allBtns = container.querySelectorAll(".quiz-opt");
+		allBtns.forEach((/** @type {any} */ b, i) => {
+			if (i === q.correctIndex) {
+				b.classList.add("correct");
+			}
 			b.classList.add("disabled");
 			b.disabled = true;
 		});
@@ -1148,10 +1152,12 @@ export const app = {
 	},
 
 	setLoading(active, text) {
-		const el = document.getElementById("loadingOverlay");
+		// ⚡ Bolt: Use cached DOM elements to avoid document.getElementById on every API state change
+		const el =
+			this.ui.loadingOverlay || document.getElementById("loadingOverlay");
 		if (el) el.style.display = active ? "flex" : "none";
 		if (text) {
-			const t = document.getElementById("loadingText");
+			const t = this.ui.loadingText || document.getElementById("loadingText");
 			if (t) t.innerText = text;
 		}
 	},
