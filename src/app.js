@@ -808,7 +808,7 @@ export const app = {
 				diagnosticsHtml += `
           <div class="diag-qc">
             <div class="diag-qc-title">qualityChecks (self-report LLM)</div>
-            <pre class="diag-code">${qcText}</pre>
+            <pre class="diag-code">${/* 🛡️ Sentinel: Pass JSON stringified values through Utils.escapeHtml() to prevent XSS vulnerabilities */ Utils.escapeHtml(qcText)}</pre>
           </div>
         `;
 			}

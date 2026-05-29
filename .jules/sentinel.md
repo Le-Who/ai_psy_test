@@ -1,0 +1,4 @@
+## 2024-05-15 - XSS Array Bypass and JSON Serialization
+**Vulnerability:** XSS array bypass via `Utils.escapeHtml` due to `typeof unsafe !== "string"` check, and XSS injection in `src/app.js` via JSON-stringified variables (`qcText`).
+**Learning:** `JSON.stringify` does not escape HTML special characters. If an array with a malicious string is passed to `Utils.escapeHtml`, the `typeof` check fails and the array is returned directly. When interpolating arrays or JSON strings into HTML templates, XSS vulnerabilities can be exploited.
+**Prevention:** Enforce string coercion (`String(unsafe)`) in `Utils.escapeHtml` instead of a strict type check, and explicitly handle `null`/`undefined` to prevent crashes. Always pass JSON-stringified values through an escaping function when rendering them in HTML templates.
