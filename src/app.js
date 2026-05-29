@@ -1136,6 +1136,11 @@ export const app = {
 	// =========================
 
 	setView(view) {
+		// ⚡ Bolt: Cache current view to prevent redundant O(N) DOM writes
+		// on every reactive state update (e.g., when step increments).
+		if (this._currentView === view) return;
+		this._currentView = view;
+
 		["setupView", "testView", "resultsView", "libraryView", "duelView"].forEach(
 			(v) => {
 				const el = this.ui[v] || document.getElementById(v);
