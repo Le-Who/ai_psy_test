@@ -1,0 +1,4 @@
+## 2024-05-30 - XSS Bypass in Array Rendering
+**Vulnerability:** XSS bypass via `Utils.escapeHtml` processing array objects instead of enforcing string types. `JSON.stringify` in `src/app.js` bypasses the check for XSS since it renders HTML templates without correct escaping if the value is an array object passed to `Utils.escapeHtml`. The string type check `typeof unsafe !== "string"` caused array types to immediately return without being escaped, allowing an array payload `['<script>']` to be interpolated.
+**Learning:** Checking for string primitives strictly using `typeof` bypasses array interpolations in JS which invoke `.toString()` under the hood implicitly anyway when inserted in HTML.
+**Prevention:** Force variable conversion to String via `String(unsafe)` before performing replacement. Allow simple `null` / `undefined` bypass checks.
