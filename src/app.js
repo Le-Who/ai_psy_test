@@ -760,9 +760,10 @@ export const app = {
 			let qcText = null;
 			if (scaleProfile && scaleProfile.qualityChecks) {
 				try {
-					qcText = JSON.stringify(scaleProfile.qualityChecks, null, 2);
+					// 🛡️ Sentinel: XSS via unescaped qcText in innerHTML. Always pass stringified JSON to Utils.escapeHtml.
+					qcText = Utils.escapeHtml(JSON.stringify(scaleProfile.qualityChecks, null, 2));
 				} catch (e) {
-					qcText = String(scaleProfile.qualityChecks);
+					qcText = Utils.escapeHtml(String(scaleProfile.qualityChecks));
 				}
 			}
 			diagnosticsHtml += `<div class="diag-card">`;
