@@ -1,0 +1,4 @@
+## 2024-05-24 - Hardcoded External API Secrets in Global Scope
+**Vulnerability:** The application contained a hardcoded third-party API token (`TINYTOKEN`) directly in `app-settings.js`, exposing it in the client-side bundle and version control.
+**Learning:** Even for "infrastructure" modules separated from main logic, secrets must never be hardcoded. The project's existing 'Bring Your Own Key' (BYOK) model (e.g., using `localStorage` for Gemini/OpenRouter keys) wasn't uniformly applied. For integrations lacking user UI (like TinyURL), the token should be loaded via Vite environment variables.
+**Prevention:** Use `import.meta.env` (with defensive `typeof` checks to prevent crashes in non-module test environments) to inject secrets at build time, rather than storing them in plain text within the repository.
