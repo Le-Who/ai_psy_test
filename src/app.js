@@ -6,6 +6,12 @@ import { store, subscribe } from "./store.js";
 import { Logger, togglePasswordVisibility, Utils } from "./utils.js";
 import { validatePsyOutput } from "./validator.js";
 
+// 🛡️ Sentinel: Removed hardcoded TINYTOKEN secret and replaced with Vite env variable.
+const getTinyToken = () =>
+	typeof import.meta !== "undefined" && import.meta.env
+		? import.meta.env.VITE_TINYTOKEN
+		: undefined;
+
 // AI Universal Test Generator - Core Logic v6.0 Final
 // UI/UX Polish, Features: Glassmorphism, Clipboard API, Confetti, Toast Notifications
 
@@ -945,8 +951,7 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
+		if (!getTinyToken()) return alert("Нужен TinyURL Token!");
 
 		const btn =
 			btnEl ||
@@ -984,7 +989,7 @@ export const app = {
 			const response = await fetch("https://api.tinyurl.com/create", {
 				method: "POST",
 				headers: {
-					Authorization: `Bearer ${TINYTOKEN}`,
+					Authorization: `Bearer ${getTinyToken()}`,
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
@@ -1021,11 +1026,7 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
+			if (typeof LZString !== "undefined" && getTinyToken()) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
 
@@ -1045,7 +1046,7 @@ export const app = {
 				const response = await fetch("https://api.tinyurl.com/create", {
 					method: "POST",
 					headers: {
-						Authorization: `Bearer ${TINYTOKEN}`,
+						Authorization: `Bearer ${getTinyToken()}`,
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
