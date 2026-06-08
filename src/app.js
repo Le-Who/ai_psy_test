@@ -945,7 +945,8 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
+		const TINYTOKEN = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_TINYTOKEN : undefined;
+		if (!TINYTOKEN)
 			return alert("Нужен TinyURL Token!");
 
 		const btn =
@@ -1021,9 +1022,9 @@ export const app = {
 		let shortUrl = null;
 
 		try {
+			const TINYTOKEN = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_TINYTOKEN : undefined;
 			if (
 				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
 				TINYTOKEN
 			) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
