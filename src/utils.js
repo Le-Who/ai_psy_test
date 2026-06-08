@@ -2,16 +2,6 @@
  * Shared Utilities
  * Includes security helpers
  */
-const HTML_ESCAPE_REGEX = /[&<>"']/g;
-
-const ESCAPE_MAP = {
-	"&": "&amp;",
-	"<": "&lt;",
-	">": "&gt;",
-	'"': "&quot;",
-	"'": "&#039;",
-};
-
 export const Utils = {
 	/**
 	 * Escapes HTML special characters to prevent XSS
@@ -19,8 +9,44 @@ export const Utils = {
 	 * @returns {string}
 	 */
 	escapeHtml: (unsafe) => {
+		if (unsafe == null) return unsafe;
 		if (typeof unsafe !== "string") return unsafe;
-		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
+		const str = String(unsafe);
+
+		// ⚡ Bolt: Fast path to avoid overhead on safe strings using single pass regex test
+		if (!/[&<>"']/.test(str)) {
+			return str;
+		}
+
+		// ⚡ Bolt: Single-pass character code loop instead of regex and switch for O(n) complexity.
+		const len = str.length;
+		let escaped = "";
+		let lastMatchIndex = 0;
+
+		for (let i = 0; i < len; i++) {
+			const char = str.charCodeAt(i);
+			let replacement = null;
+
+			if (char === 38) replacement = "&amp;";
+			else if (char === 60) replacement = "&lt;";
+			else if (char === 62) replacement = "&gt;";
+			else if (char === 34) replacement = "&quot;";
+			else if (char === 39) replacement = "&#039;";
+
+			if (replacement !== null) {
+				if (lastMatchIndex !== i) {
+					escaped += str.substring(lastMatchIndex, i);
+				}
+				escaped += replacement;
+				lastMatchIndex = i + 1;
+			}
+		}
+
+		if (lastMatchIndex !== len) {
+			escaped += str.substring(lastMatchIndex);
+		}
+
+		return escaped;
 	},
 };
 
