@@ -945,6 +945,11 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
+		// 🛡️ Sentinel: Remove hardcoded token, use BYOK / Vite env
+		const TINYTOKEN =
+			typeof import.meta !== "undefined" && import.meta.env
+				? import.meta.env.VITE_TINYTOKEN
+				: undefined;
 		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
 			return alert("Нужен TinyURL Token!");
 
@@ -1021,6 +1026,11 @@ export const app = {
 		let shortUrl = null;
 
 		try {
+			// 🛡️ Sentinel: Remove hardcoded token, use BYOK / Vite env
+			const TINYTOKEN =
+				typeof import.meta !== "undefined" && import.meta.env
+					? import.meta.env.VITE_TINYTOKEN
+					: undefined;
 			if (
 				typeof LZString !== "undefined" &&
 				typeof TINYTOKEN !== "undefined" &&
