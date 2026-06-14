@@ -1,5 +1,6 @@
 import { api } from "./api.js";
 import { SCHEMAS } from "./app-settings.js";
+import { TINYTOKEN } from "./app-settings.js";
 import { Scoring } from "./scoring.js";
 import { AppStorage } from "./storage.js";
 import { store, subscribe } from "./store.js";
