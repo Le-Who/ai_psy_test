@@ -20,6 +20,17 @@ export const Utils = {
 	 */
 	escapeHtml: (unsafe) => {
 		if (typeof unsafe !== "string") return unsafe;
+		// Fast path: bypass regex entirely if no special characters are present.
+		// indexOf is highly optimized in V8/SpiderMonkey and avoids regex allocation overhead.
+		if (
+			unsafe.indexOf("&") === -1 &&
+			unsafe.indexOf("<") === -1 &&
+			unsafe.indexOf(">") === -1 &&
+			unsafe.indexOf('"') === -1 &&
+			unsafe.indexOf("'") === -1
+		) {
+			return unsafe;
+		}
 		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
