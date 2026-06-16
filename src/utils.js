@@ -3,6 +3,7 @@
  * Includes security helpers
  */
 const HTML_ESCAPE_REGEX = /[&<>"']/g;
+const HAS_ESCAPE_CHARS = /[&<>"']/;
 
 const ESCAPE_MAP = {
 	"&": "&amp;",
@@ -20,6 +21,8 @@ export const Utils = {
 	 */
 	escapeHtml: (unsafe) => {
 		if (typeof unsafe !== "string") return unsafe;
+		// ⚡ Bolt: Fast-path existence check to avoid O(N) regex engine allocation overhead for clean strings
+		if (!HAS_ESCAPE_CHARS.test(unsafe)) return unsafe;
 		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
