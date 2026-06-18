@@ -63,6 +63,10 @@ test.describe("Psychometric Test Flow", () => {
 		await page.goto("/");
 
 		// 2. Setup Phase
+		// Test accessibility of labels
+		await page.locator('label[for="themeInput"]').click({ force: true });
+		await expect(page.locator("#themeInput")).toBeFocused();
+
 		await page.fill("#themeInput", "Testing E2E");
 		await page.fill("#apiKeyInput", "sk-fake-key");
 		await page.click('button[type="submit"]');
