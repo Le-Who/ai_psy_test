@@ -20,6 +20,15 @@ export const Utils = {
 	 */
 	escapeHtml: (unsafe) => {
 		if (typeof unsafe !== "string") return unsafe;
+		if (
+			unsafe.indexOf("&") === -1 &&
+			unsafe.indexOf("<") === -1 &&
+			unsafe.indexOf(">") === -1 &&
+			unsafe.indexOf('"') === -1 &&
+			unsafe.indexOf("'") === -1
+		) {
+			return unsafe;
+		}
 		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
