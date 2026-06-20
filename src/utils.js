@@ -20,6 +20,17 @@ export const Utils = {
 	 */
 	escapeHtml: (unsafe) => {
 		if (typeof unsafe !== "string") return unsafe;
+		// ⚡ Bolt: Fast-path existence check using indexOf (O(n) native string scan)
+		// Bypasses slower RegExp .replace() execution and allocation for clean strings
+		if (
+			unsafe.indexOf("&") === -1 &&
+			unsafe.indexOf("<") === -1 &&
+			unsafe.indexOf(">") === -1 &&
+			unsafe.indexOf('"') === -1 &&
+			unsafe.indexOf("'") === -1
+		) {
+			return unsafe;
+		}
 		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
