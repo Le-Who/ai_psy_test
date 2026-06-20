@@ -1,0 +1,4 @@
+## 2024-06-20 - XSS Vulnerability in innerHTML Diagnostic Logging
+**Vulnerability:** Found a Cross-Site Scripting (XSS) vulnerability in `src/app.js` where user-provided (LLM-generated) input (`scaleProfile.qualityChecks`) was stringified into `qcText` and inserted directly into the page via `.innerHTML` without escaping.
+**Learning:** Even diagnostic or internal logs outputted to the DOM via innerHTML are susceptible to XSS if the data originates from an untrusted source (like LLM output). Stringifying objects does not prevent XSS (e.g. `"<img src=x onerror=alert(1)>"`).
+**Prevention:** Always escape any dynamic content inserted via innerHTML using `Utils.escapeHtml()` or similar sanitization functions, regardless of whether the content is intended for user viewing or internal diagnostics.
