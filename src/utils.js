@@ -20,6 +20,19 @@ export const Utils = {
 	 */
 	escapeHtml: (unsafe) => {
 		if (typeof unsafe !== "string") return unsafe;
+		// ⚡ Bolt: Fast path for strings without HTML entities.
+		// Using indexOf is significantly faster (O(N) search) than invoking
+		// the regex engine and its callback for strings that don't need escaping,
+		// which drastically improves performance in rendering loops.
+		if (
+			unsafe.indexOf("&") === -1 &&
+			unsafe.indexOf("<") === -1 &&
+			unsafe.indexOf(">") === -1 &&
+			unsafe.indexOf('"') === -1 &&
+			unsafe.indexOf("'") === -1
+		) {
+			return unsafe;
+		}
 		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
