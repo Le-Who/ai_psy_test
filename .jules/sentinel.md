@@ -1,0 +1,4 @@
+## 2025-02-14 - Fix Hardcoded API token for TinyURL
+**Vulnerability:** A critical security vulnerability was present where a TinyURL API token (`TINYTOKEN`) was hardcoded within `src/app-settings.js` and used in `src/app.js`. Hardcoding secrets in client-side repositories exposes them to unauthorized users, enabling abuse.
+**Learning:** Due to the app being entirely client-side, there is no secure way to store backend API keys. Relying on an external API (like TinyURL) natively requires either a backend proxy or a user-provided token. Without a backend, passing raw URLs or using purely local functionality is the only secure method.
+**Prevention:** In serverless frontends, never include hardcoded API tokens. Whenever URL shortening or other authenticated external services are needed, either omit them, require the user to configure their own keys locally via UI, or accept raw hash payloads.

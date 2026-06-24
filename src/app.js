@@ -945,9 +945,6 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
-
 		const btn =
 			btnEl ||
 			document.getElementById("shareBtn") ||
@@ -981,25 +978,12 @@ export const app = {
 			const compressedHash = await this.buildDuelHashFromPayload(payload);
 			const longUrl = `${window.location.origin}${window.location.pathname}${compressedHash}`;
 
-			const response = await fetch("https://api.tinyurl.com/create", {
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${TINYTOKEN}`,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
-			});
-
-			if (!response.ok) throw new Error("API Error");
-			const data = await response.json();
-			const tinyUrl = data.data.tiny_url;
-
 			// --- UX IMPROVEMENT: CLIPBOARD + TOAST ---
 			if (navigator.clipboard && window.isSecureContext) {
-				await navigator.clipboard.writeText(tinyUrl);
+				await navigator.clipboard.writeText(longUrl);
 				this.showToast("Ссылка скопирована! Отправь другу 🚀");
 			} else {
-				prompt("Скопируй ссылку:", tinyUrl);
+				prompt("Скопируй ссылку:", longUrl);
 			}
 		} catch (e) {
 			console.error(e);
@@ -1021,11 +1005,7 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
+			if (typeof LZString !== "undefined") {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
 
@@ -1041,24 +1021,10 @@ export const app = {
 
 				const compressedHash = await this.buildDuelHashFromPayload(payload);
 				const longUrl = `${window.location.origin}${window.location.pathname}${compressedHash}`;
-
-				const response = await fetch("https://api.tinyurl.com/create", {
-					method: "POST",
-					headers: {
-						Authorization: `Bearer ${TINYTOKEN}`,
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
-				});
-
-				if (response.ok) {
-					const data = await response.json();
-					shortUrl =
-						data && data.data && data.data.tiny_url ? data.data.tiny_url : null;
-				}
+				shortUrl = longUrl;
 			}
 		} catch (e) {
-			console.warn("Short link generation failed (saveTest):", e);
+			console.warn("Link generation failed (saveTest):", e);
 		}
 
 		AppStorage.save(
@@ -1157,5 +1123,5 @@ export const app = {
 	},
 };
 
-window.app = app; // Expose globally for legacy script interop if any
-document.addEventListener("DOMContentLoaded", () => app.init());
+if (typeof window !== "undefined") window.app = app; // Expose globally for legacy script interop if any
+if (typeof document !== "undefined") document.addEventListener("DOMContentLoaded", () => app.init());
