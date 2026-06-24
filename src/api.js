@@ -28,16 +28,20 @@ export const api = {
 					});
 				}
 			}
-			const mdMatch = text.match(/```json([\s\S]*?)```/);
-			if (mdMatch) {
-				try {
-					return JSON.parse(mdMatch[1]);
-				} catch (_e3) {
-					Logger.saveLog({
-						type: "error",
-						message: _e3.message,
-						context: "safeParseJSON_markdown",
-					});
+			const mdStart = text.indexOf("```json");
+			if (mdStart !== -1) {
+				const contentStart = mdStart + 7;
+				const mdEnd = text.indexOf("```", contentStart);
+				if (mdEnd !== -1) {
+					try {
+						return JSON.parse(text.substring(contentStart, mdEnd));
+					} catch (_e3) {
+						Logger.saveLog({
+							type: "error",
+							message: _e3.message,
+							context: "safeParseJSON_markdown",
+						});
+					}
 				}
 			}
 			throw new Error("JSON Parse Error");

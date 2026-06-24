@@ -648,7 +648,7 @@ export const app = {
 		if (allBtns[q.correctIndex]) {
 			allBtns[q.correctIndex].classList.add("correct");
 		}
-		document.querySelectorAll(".quiz-opt").forEach((/** @type {any} */ b) => {
+		allBtns.forEach((/** @type {any} */ b) => {
 			b.classList.add("disabled");
 			b.disabled = true;
 		});
@@ -1157,5 +1157,7 @@ export const app = {
 	},
 };
 
-window.app = app; // Expose globally for legacy script interop if any
-document.addEventListener("DOMContentLoaded", () => app.init());
+if (typeof window !== "undefined") {
+	window.app = app; // Expose globally for legacy script interop if any
+	document.addEventListener("DOMContentLoaded", () => app.init());
+}
