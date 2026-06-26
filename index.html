@@ -144,11 +144,18 @@
 
         <div class="card">
           <div class="card-header-row">
-            <div class="mode-tabs" style="margin-left: auto">
+            <div
+              class="mode-tabs"
+              style="margin-left: auto"
+              role="tablist"
+              aria-label="Режим генерации"
+            >
               <button
                 type="button"
                 class="mode-tab active"
                 id="tabPsy"
+                role="tab"
+                aria-selected="true"
                 onclick="app.setMode('psy')"
               >
                 Тестикул
@@ -157,6 +164,8 @@
                 type="button"
                 class="mode-tab"
                 id="tabQuiz"
+                role="tab"
+                aria-selected="false"
                 onclick="app.setMode('quiz')"
               >
                 Виктория

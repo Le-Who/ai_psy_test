@@ -138,12 +138,22 @@ export const app = {
 
 			// 2. Reactive UI Mode Toggle
 			if (prop === "mode") {
-				document
-					.getElementById("tabPsy")
-					?.classList.toggle("active", value === "psy");
-				document
-					.getElementById("tabQuiz")
-					?.classList.toggle("active", value === "quiz");
+				const tabPsy = document.getElementById("tabPsy");
+				const tabQuiz = document.getElementById("tabQuiz");
+				if (tabPsy) {
+					tabPsy.classList.toggle("active", value === "psy");
+					tabPsy.setAttribute(
+						"aria-selected",
+						value === "psy" ? "true" : "false",
+					);
+				}
+				if (tabQuiz) {
+					tabQuiz.classList.toggle("active", value === "quiz");
+					tabQuiz.setAttribute(
+						"aria-selected",
+						value === "quiz" ? "true" : "false",
+					);
+				}
 
 				const audGrp = document.getElementById("audienceGroup");
 				const diffGrp = document.getElementById("difficultyGroup");
