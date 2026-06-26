@@ -12,6 +12,8 @@ const ESCAPE_MAP = {
 	"'": "&#039;",
 };
 
+const HTML_TEST_REGEX = /[&<>"']/;
+
 export const Utils = {
 	/**
 	 * Escapes HTML special characters to prevent XSS
@@ -20,6 +22,8 @@ export const Utils = {
 	 */
 	escapeHtml: (unsafe) => {
 		if (typeof unsafe !== "string") return unsafe;
+		// OPTIMIZATION: Fast path - skip expensive regex replace if string is safe
+		if (!HTML_TEST_REGEX.test(unsafe)) return unsafe;
 		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
@@ -75,6 +79,6 @@ export const Logger = {
 			logs.unshift({ ...data, time: new Date().toISOString() });
 			if (logs.length > 50) logs.pop();
 			localStorage.setItem("app_logs", JSON.stringify(logs));
-		} catch (e) {}
+		} catch (_e) {}
 	},
 };
