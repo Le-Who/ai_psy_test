@@ -253,7 +253,7 @@ export const app = {
 		if (!decompressed) return null;
 
 		const data = JSON.parse(decompressed);
-		if (!data || !data.t || !data.q) return null;
+		if (!data?.t || !data.q) return null;
 
 		return data;
 	},
@@ -339,7 +339,7 @@ export const app = {
 			const resultText = this.state.duelHostResultName
 				? `<strong style="color:var(--accent)">${Utils.escapeHtml(this.state.duelHostResultName)}</strong>`
 				: "";
-			desc = `<strong style="color:#fff">${Utils.escapeHtml(this.state.duelHostName)}</strong> уже прошёл(ла) этот тест. ${resultText ? "<br>" + resultText : ""}`;
+			desc = `<strong style="color:#fff">${Utils.escapeHtml(this.state.duelHostName)}</strong> уже прошёл(ла) этот тест. ${resultText ? `<br>${resultText}` : ""}`;
 		}
 
 		const dvH1 = dv.querySelector("h1");
@@ -467,7 +467,7 @@ export const app = {
 				}
 
 				this.state.blueprint = await api.call(
-					"architect_" + taskSuffix,
+					`architect_${taskSuffix}`,
 					archPrompt,
 					isQuiz ? SCHEMAS.quiz_blueprint : SCHEMAS.psy_blueprint,
 					apiKey,
@@ -494,7 +494,7 @@ export const app = {
 				}
 
 				const res = await api.call(
-					"generator_" + taskSuffix,
+					`generator_${taskSuffix}`,
 					genPrompt,
 					isQuiz ? SCHEMAS.quiz_questions : SCHEMAS.psy_questions,
 					apiKey,
@@ -557,13 +557,12 @@ export const app = {
 
 		// OPTIMIZATION: Use cached UI elements
 		if (this.ui.qNum)
-			this.ui.qNum.innerText =
-				(this.state.step + 1).toString() + "/" + total.toString();
+			this.ui.qNum.innerText = `${(this.state.step + 1).toString()}/${total.toString()}`;
 		if (this.ui.qText) this.ui.qText.innerText = q.text;
 
 		if (this.ui.progressBar) {
 			const percentage = Math.round(((this.state.step + 1) / total) * 100);
-			this.ui.progressBar.style.width = percentage + "%";
+			this.ui.progressBar.style.width = `${percentage}%`;
 			this.ui.progressBar.setAttribute("aria-valuenow", percentage.toString());
 		}
 
@@ -644,11 +643,13 @@ export const app = {
 			btn.classList.add("wrong");
 		}
 
+		// OPTIMIZATION: Cache querySelectorAll result to avoid redundant DOM query
 		const allBtns = document.querySelectorAll(".quiz-opt");
 		if (allBtns[q.correctIndex]) {
 			allBtns[q.correctIndex].classList.add("correct");
 		}
-		document.querySelectorAll(".quiz-opt").forEach((/** @type {any} */ b) => {
+
+		allBtns.forEach((/** @type {any} */ b) => {
 			b.classList.add("disabled");
 			b.disabled = true;
 		});
@@ -758,10 +759,10 @@ export const app = {
 
 			let diagnosticsHtml = "";
 			let qcText = null;
-			if (scaleProfile && scaleProfile.qualityChecks) {
+			if (scaleProfile?.qualityChecks) {
 				try {
 					qcText = JSON.stringify(scaleProfile.qualityChecks, null, 2);
-				} catch (e) {
+				} catch (_e) {
 					qcText = String(scaleProfile.qualityChecks);
 				}
 			}
@@ -1053,8 +1054,7 @@ export const app = {
 
 				if (response.ok) {
 					const data = await response.json();
-					shortUrl =
-						data && data.data && data.data.tiny_url ? data.data.tiny_url : null;
+					shortUrl = data?.data?.tiny_url ? data.data.tiny_url : null;
 				}
 			}
 		} catch (e) {
@@ -1112,7 +1112,7 @@ export const app = {
 
 			// Reset after 3 seconds
 			setTimeout(() => {
-				if (btn && btn.isConnected) {
+				if (btn?.isConnected) {
 					delete btn.dataset.confirm;
 					btn.classList.remove("confirming");
 					btn.innerHTML = "🗑";
@@ -1143,7 +1143,7 @@ export const app = {
 			},
 		);
 		const target =
-			this.ui[view + "View"] || document.getElementById(view + "View");
+			this.ui[`${view}View`] || document.getElementById(`${view}View`);
 		if (target) target.style.display = "block";
 	},
 
