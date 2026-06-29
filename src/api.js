@@ -28,10 +28,13 @@ export const api = {
 					});
 				}
 			}
-			const mdMatch = text.match(/```json([\s\S]*?)```/);
-			if (mdMatch) {
+			// ⚡ Bolt: Removed slow non-greedy regex match(/```json([\s\S]*?)```/)
+			// indexOf is O(N) and prevents backtracking overhead on large text blobs
+			const mdStart = text.indexOf("```json");
+			const mdEnd = mdStart !== -1 ? text.indexOf("```", mdStart + 7) : -1;
+			if (mdStart !== -1 && mdEnd !== -1) {
 				try {
-					return JSON.parse(mdMatch[1]);
+					return JSON.parse(text.substring(mdStart + 7, mdEnd));
 				} catch (_e3) {
 					Logger.saveLog({
 						type: "error",
