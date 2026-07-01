@@ -945,9 +945,6 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
-
 		const btn =
 			btnEl ||
 			document.getElementById("shareBtn") ||
@@ -981,18 +978,10 @@ export const app = {
 			const compressedHash = await this.buildDuelHashFromPayload(payload);
 			const longUrl = `${window.location.origin}${window.location.pathname}${compressedHash}`;
 
-			const response = await fetch("https://api.tinyurl.com/create", {
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${TINYTOKEN}`,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
-			});
-
+			// Create short link using tinyurl.com API without auth
+			const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
 			if (!response.ok) throw new Error("API Error");
-			const data = await response.json();
-			const tinyUrl = data.data.tiny_url;
+			const tinyUrl = await response.text();
 
 			// --- UX IMPROVEMENT: CLIPBOARD + TOAST ---
 			if (navigator.clipboard && window.isSecureContext) {
@@ -1021,11 +1010,7 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
+			if (typeof LZString !== "undefined") {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
 
@@ -1042,19 +1027,11 @@ export const app = {
 				const compressedHash = await this.buildDuelHashFromPayload(payload);
 				const longUrl = `${window.location.origin}${window.location.pathname}${compressedHash}`;
 
-				const response = await fetch("https://api.tinyurl.com/create", {
-					method: "POST",
-					headers: {
-						Authorization: `Bearer ${TINYTOKEN}`,
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
-				});
+				// Use TinyURL API that does not require an API key
+				const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
 
 				if (response.ok) {
-					const data = await response.json();
-					shortUrl =
-						data && data.data && data.data.tiny_url ? data.data.tiny_url : null;
+					shortUrl = await response.text();
 				}
 			}
 		} catch (e) {

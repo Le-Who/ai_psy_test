@@ -1,0 +1,29 @@
+--- src/app.js
++++ src/app.js
+@@ -947,5 +947,2 @@
+	async createShareLink(btnEl = null) {
+-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
+-			return alert("Нужен TinyURL Token!");
+-
+		const btn =
+@@ -985,8 +982,5 @@
+			const response = await fetch("https://api.tinyurl.com/create", {
+				method: "POST",
+				headers: {
+-					Authorization: `Bearer ${TINYTOKEN}`,
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
+@@ -1024,5 +1018,3 @@
+			if (
+-				typeof LZString !== "undefined" &&
+-				typeof TINYTOKEN !== "undefined" &&
+-				TINYTOKEN
++				typeof LZString !== "undefined"
+			) {
+@@ -1046,5 +1038,4 @@
+					headers: {
+-						Authorization: `Bearer ${TINYTOKEN}`,
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
