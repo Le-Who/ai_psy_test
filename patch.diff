@@ -1,0 +1,9 @@
+--- src/app-settings.js
++++ src/app-settings.js
+@@ -1021,5 +1021,2 @@
+
+ console.log("App Settings Loaded v6.5 Final");
+-
+-// Secrets
+-const TINYTOKEN =
+-	"lBjFvZGQQmPD56gcBpQBgdyMlezZCxwNShVIlh9wA3W4HFtDOI0418CnoXBx";
