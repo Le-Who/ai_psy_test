@@ -28,16 +28,22 @@ export const api = {
 					});
 				}
 			}
-			const mdMatch = text.match(/```json([\s\S]*?)```/);
-			if (mdMatch) {
-				try {
-					return JSON.parse(mdMatch[1]);
-				} catch (_e3) {
-					Logger.saveLog({
-						type: "error",
-						message: _e3.message,
-						context: "safeParseJSON_markdown",
-					});
+			// ⚡ Bolt: Replaced greedy regex text.match(/```json([\s\S]*?)```/)
+			// with indexOf/substring to prevent O(N^2) backtracking on large inputs
+			const jsonStart = text.indexOf("```json");
+			if (jsonStart !== -1) {
+				const contentStart = jsonStart + 7;
+				const jsonEnd = text.indexOf("```", contentStart);
+				if (jsonEnd !== -1) {
+					try {
+						return JSON.parse(text.substring(contentStart, jsonEnd));
+					} catch (_e3) {
+						Logger.saveLog({
+							type: "error",
+							message: _e3.message,
+							context: "safeParseJSON_markdown",
+						});
+					}
 				}
 			}
 			throw new Error("JSON Parse Error");
