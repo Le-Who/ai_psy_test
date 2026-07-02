@@ -1021,5 +1021,7 @@ ${PROMPT_TEXTS.generator_quiz}
 console.log("App Settings Loaded v6.5 Final");
 
 // Secrets
-const TINYTOKEN =
-	"lBjFvZGQQmPD56gcBpQBgdyMlezZCxwNShVIlh9wA3W4HFtDOI0418CnoXBx";
+export const TINYTOKEN =
+	typeof import.meta !== "undefined" && import.meta.env
+		? import.meta.env.VITE_TINYTOKEN
+		: undefined;
