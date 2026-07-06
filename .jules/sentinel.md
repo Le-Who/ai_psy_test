@@ -1,0 +1,4 @@
+## 2023-10-27 - Cross-Site Scripting (XSS) in Results Rendering
+**Vulnerability:** XSS vulnerability in `src/app.js` within the `calc()` method where `hostScore` and `qcText` were interpolated directly into the HTML without escaping. `hostScore` could be manipulated via URL parameters, and `qcText` comes from AI-generated JSON content.
+**Learning:** Even internal state properties or content originating from AI endpoints must be treated as untrusted and properly escaped before injecting into the DOM via `innerHTML`, especially when building string templates dynamically.
+**Prevention:** Always use `Utils.escapeHtml()` (or equivalent sanitization) on all dynamic data injected into HTML strings, even if it's expected to be a number (like `hostScore`) or JSON structure, as it could be maliciously manipulated before reaching the rendering logic.

@@ -733,7 +733,7 @@ export const app = {
                 <div>Ты</div>
               </div>
               <div>
-                <div><strong>${hostScore}</strong></div>
+                <div><strong>${Utils.escapeHtml(String(hostScore))}</strong></div>
                 <div>${Utils.escapeHtml(hostName)}</div>
               </div>
             </div>
@@ -808,7 +808,7 @@ export const app = {
 				diagnosticsHtml += `
           <div class="diag-qc">
             <div class="diag-qc-title">qualityChecks (self-report LLM)</div>
-            <pre class="diag-code">${qcText}</pre>
+            <pre class="diag-code">${Utils.escapeHtml(qcText)}</pre>
           </div>
         `;
 			}
