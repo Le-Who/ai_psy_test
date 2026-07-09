@@ -3,6 +3,7 @@
  * Includes security helpers
  */
 const HTML_ESCAPE_REGEX = /[&<>"']/g;
+const HTML_TEST_REGEX = /[&<>"']/; // Non-global for fast path testing
 
 const ESCAPE_MAP = {
 	"&": "&amp;",
@@ -20,6 +21,10 @@ export const Utils = {
 	 */
 	escapeHtml: (unsafe) => {
 		if (typeof unsafe !== "string") return unsafe;
+		// OPTIMIZATION: Fast path - skip expensive replace if no special chars present
+		// Important: HTML_TEST_REGEX must NOT have the 'g' flag, otherwise .test()
+		// becomes stateful and fails intermittently on consecutive calls.
+		if (!HTML_TEST_REGEX.test(unsafe)) return unsafe;
 		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
