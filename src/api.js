@@ -28,16 +28,21 @@ export const api = {
 					});
 				}
 			}
-			const mdMatch = text.match(/```json([\s\S]*?)```/);
-			if (mdMatch) {
-				try {
-					return JSON.parse(mdMatch[1]);
-				} catch (_e3) {
-					Logger.saveLog({
-						type: "error",
-						message: _e3.message,
-						context: "safeParseJSON_markdown",
-					});
+			// ⚡ Bolt: Replace greedy regex matching for markdown blocks with fast O(N) indexOf and substring
+			const mdStartIdx = text.indexOf("```json");
+			if (mdStartIdx !== -1) {
+				const contentStart = mdStartIdx + 7;
+				const mdEndIdx = text.indexOf("```", contentStart);
+				if (mdEndIdx !== -1) {
+					try {
+						return JSON.parse(text.substring(contentStart, mdEndIdx));
+					} catch (_e3) {
+						Logger.saveLog({
+							type: "error",
+							message: _e3.message,
+							context: "safeParseJSON_markdown",
+						});
+					}
 				}
 			}
 			throw new Error("JSON Parse Error");
