@@ -1021,5 +1021,6 @@ ${PROMPT_TEXTS.generator_quiz}
 console.log("App Settings Loaded v6.5 Final");
 
 // Secrets
-const TINYTOKEN =
-	"lBjFvZGQQmPD56gcBpQBgdyMlezZCxwNShVIlh9wA3W4HFtDOI0418CnoXBx";
+// SECURITY: TINYTOKEN should not be hardcoded in the client source code.
+// Provide this token via environment variables in a build process, or better, proxy request through a secure backend.
+const TINYTOKEN = import.meta.env.VITE_TINYTOKEN || "";
