@@ -1,5 +1,5 @@
 import { api } from "./api.js";
-import { SCHEMAS } from "./app-settings.js";
+import { SCHEMAS, TINYTOKEN } from "./app-settings.js";
 import { Scoring } from "./scoring.js";
 import { AppStorage } from "./storage.js";
 import { store, subscribe } from "./store.js";
@@ -1157,5 +1157,9 @@ export const app = {
 	},
 };
 
-window.app = app; // Expose globally for legacy script interop if any
-document.addEventListener("DOMContentLoaded", () => app.init());
+if (typeof window !== "undefined") {
+	window.app = app; // Expose globally for legacy script interop if any
+}
+if (typeof document !== "undefined") {
+	document.addEventListener("DOMContentLoaded", () => app.init());
+}
