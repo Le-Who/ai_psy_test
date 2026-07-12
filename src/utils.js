@@ -3,6 +3,7 @@
  * Includes security helpers
  */
 const HTML_ESCAPE_REGEX = /[&<>"']/g;
+const HTML_ESCAPE_TEST_REGEX = /[&<>"']/;
 
 const ESCAPE_MAP = {
 	"&": "&amp;",
@@ -20,6 +21,9 @@ export const Utils = {
 	 */
 	escapeHtml: (unsafe) => {
 		if (typeof unsafe !== "string") return unsafe;
+		// ⚡ Bolt: Fast-path for strings without HTML entities using a non-global regex test.
+		// Avoids the overhead of .replace() for plain text.
+		if (!HTML_ESCAPE_TEST_REGEX.test(unsafe)) return unsafe;
 		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
@@ -75,6 +79,6 @@ export const Logger = {
 			logs.unshift({ ...data, time: new Date().toISOString() });
 			if (logs.length > 50) logs.pop();
 			localStorage.setItem("app_logs", JSON.stringify(logs));
-		} catch (e) {}
+		} catch (_e) {}
 	},
 };
