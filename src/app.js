@@ -1157,5 +1157,5 @@ export const app = {
 	},
 };
 
-window.app = app; // Expose globally for legacy script interop if any
-document.addEventListener("DOMContentLoaded", () => app.init());
+if (typeof window !== "undefined") { window.app = app; } // Expose globally for legacy script interop if any
+if (typeof document !== "undefined") { document.addEventListener("DOMContentLoaded", () => app.init()); }
