@@ -945,6 +945,7 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
+		const TINYTOKEN = import.meta.env.VITE_TINYTOKEN;
 		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
 			return alert("Нужен TinyURL Token!");
 
@@ -1013,6 +1014,7 @@ export const app = {
 	},
 
 	async saveTest(btnEl = null) {
+		const TINYTOKEN = import.meta.env.VITE_TINYTOKEN;
 		const theme =
 			this.state.blueprint.theme ||
 			/** @type {HTMLInputElement} */ (document.getElementById("themeInput"))
@@ -1157,5 +1159,9 @@ export const app = {
 	},
 };
 
-window.app = app; // Expose globally for legacy script interop if any
-document.addEventListener("DOMContentLoaded", () => app.init());
+if (typeof window !== "undefined") {
+	window.app = app; // Expose globally for legacy script interop if any
+}
+if (typeof document !== "undefined") {
+	document.addEventListener("DOMContentLoaded", () => app.init());
+}
