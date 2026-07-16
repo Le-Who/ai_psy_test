@@ -3,6 +3,7 @@
  * Includes security helpers
  */
 const HTML_ESCAPE_REGEX = /[&<>"']/g;
+const HTML_ESCAPE_TEST_REGEX = /[&<>"']/; // ⚡ Bolt: fast-path regex without /g
 
 const ESCAPE_MAP = {
 	"&": "&amp;",
@@ -20,6 +21,9 @@ export const Utils = {
 	 */
 	escapeHtml: (unsafe) => {
 		if (typeof unsafe !== "string") return unsafe;
+		// ⚡ Bolt: fast-path optimization. Test() is significantly faster than replace()
+		// for strings without special characters, which are the majority case.
+		if (!HTML_ESCAPE_TEST_REGEX.test(unsafe)) return unsafe;
 		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };

@@ -80,7 +80,7 @@ export const app = {
 			?.addEventListener("click", (e) => this.handlePsyClick(e));
 
 		// Event Delegation for data-action buttons
-		document.addEventListener("click", (e) => {
+		if (typeof document !== "undefined") document.addEventListener("click", (e) => {
 			/** @type {HTMLElement | null} */
 			const btn = e.target.closest("[data-action]");
 			if (!btn) return;
@@ -1157,5 +1157,5 @@ export const app = {
 	},
 };
 
-window.app = app; // Expose globally for legacy script interop if any
-document.addEventListener("DOMContentLoaded", () => app.init());
+if (typeof window !== "undefined") window.app = app; // Expose globally for legacy script interop if any
+if (typeof document !== "undefined") document.addEventListener("DOMContentLoaded", () => app.init());
