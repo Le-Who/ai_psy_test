@@ -945,7 +945,10 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
+		if (
+			typeof import.meta.env.VITE_TINYTOKEN === "undefined" ||
+			!import.meta.env.VITE_TINYTOKEN
+		)
 			return alert("Нужен TinyURL Token!");
 
 		const btn =
@@ -984,7 +987,7 @@ export const app = {
 			const response = await fetch("https://api.tinyurl.com/create", {
 				method: "POST",
 				headers: {
-					Authorization: `Bearer ${TINYTOKEN}`,
+					Authorization: `Bearer ${import.meta.env.VITE_TINYTOKEN}`,
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
@@ -1023,8 +1026,8 @@ export const app = {
 		try {
 			if (
 				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
+				typeof import.meta.env.VITE_TINYTOKEN !== "undefined" &&
+				import.meta.env.VITE_TINYTOKEN
 			) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
@@ -1045,7 +1048,7 @@ export const app = {
 				const response = await fetch("https://api.tinyurl.com/create", {
 					method: "POST",
 					headers: {
-						Authorization: `Bearer ${TINYTOKEN}`,
+						Authorization: `Bearer ${import.meta.env.VITE_TINYTOKEN}`,
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({ url: longUrl, domain: "tiny.one" }),
@@ -1157,5 +1160,9 @@ export const app = {
 	},
 };
 
-window.app = app; // Expose globally for legacy script interop if any
-document.addEventListener("DOMContentLoaded", () => app.init());
+if (typeof window !== "undefined") {
+	window.app = app; // Expose globally for legacy script interop if any
+}
+if (typeof document !== "undefined") {
+	document.addEventListener("DOMContentLoaded", () => app.init());
+}
