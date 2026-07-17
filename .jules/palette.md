@@ -13,3 +13,7 @@
 ## 2025-05-23 - [Dynamic Button States]
 **Learning:** When a button's visual text changes to convey a new state (like "Delete" -> "Confirm?"), the `aria-label` MUST update simultaneously. Screen reader users miss the context switch if the label remains static.
 **Action:** Use `dataset` to store the original label, update `aria-label` during the confirmation state, and restore it on timeout or cancellation.
+
+## 2026-07-17 - [Form Input Association]
+**Learning:** Adding `for` attributes to `<label>` elements matching input `id`s provides crucial screen reader context and improves UX by allowing users to focus inputs by clicking the label text. This is a very simple change with high impact. When labels contain nested spans or are conditionally visible, Playwright locators may fail; use `page.evaluate` and DOM queries to bypass standard visibility/click checks.
+**Action:** Always verify that every `<label>` has a matching `for` attribute referencing an input ID, especially in complex forms with dynamic states.
