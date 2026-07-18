@@ -2,6 +2,7 @@
  * Shared Utilities
  * Includes security helpers
  */
+const HTML_TEST_REGEX = /[&<>"']/;
 const HTML_ESCAPE_REGEX = /[&<>"']/g;
 
 const ESCAPE_MAP = {
@@ -20,6 +21,7 @@ export const Utils = {
 	 */
 	escapeHtml: (unsafe) => {
 		if (typeof unsafe !== "string") return unsafe;
+		if (!HTML_TEST_REGEX.test(unsafe)) return unsafe;
 		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
