@@ -945,8 +945,8 @@ export const app = {
 	// =========================
 
 	async createShareLink(btnEl = null) {
-		if (typeof TINYTOKEN === "undefined" || !TINYTOKEN)
-			return alert("Нужен TinyURL Token!");
+		const TINYTOKEN = import.meta.env.VITE_TINYTOKEN;
+		if (!TINYTOKEN) return alert("Нужен TinyURL Token!");
 
 		const btn =
 			btnEl ||
@@ -1021,11 +1021,8 @@ export const app = {
 		let shortUrl = null;
 
 		try {
-			if (
-				typeof LZString !== "undefined" &&
-				typeof TINYTOKEN !== "undefined" &&
-				TINYTOKEN
-			) {
+			const TINYTOKEN = import.meta.env.VITE_TINYTOKEN;
+			if (typeof LZString !== "undefined" && TINYTOKEN) {
 				const isQuiz = this.state.blueprint.testType === "quiz";
 				const score = this.state.quizScore;
 
@@ -1157,5 +1154,9 @@ export const app = {
 	},
 };
 
-window.app = app; // Expose globally for legacy script interop if any
-document.addEventListener("DOMContentLoaded", () => app.init());
+if (typeof window !== "undefined") {
+	window.app = app; // Expose globally for legacy script interop if any
+}
+if (typeof document !== "undefined") {
+	document.addEventListener("DOMContentLoaded", () => app.init());
+}

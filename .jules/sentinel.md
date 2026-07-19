@@ -1,0 +1,4 @@
+## 2024-05-24 - [Hardcoded Unexported Secrets in Source Code]
+**Vulnerability:** A hardcoded API key (`TINYTOKEN`) was embedded directly into `src/app-settings.js` without being exported, relying on global scope leakage (or implicitly assuming module concatenation) to be accessible in `src/app.js`.
+**Learning:** Hardcoding secrets directly in client-side code exposes them to anyone who inspects the source or the build artifacts. Furthermore, relying on unexported variables implies a brittle architecture where sensitive configuration is tightly coupled to module implementation details.
+**Prevention:** Always use environment variables (e.g., `import.meta.env.VITE_TINYTOKEN` in Vite projects) to handle sensitive tokens or API keys, ensuring they are injected securely during the build process and never committed directly to the repository.
