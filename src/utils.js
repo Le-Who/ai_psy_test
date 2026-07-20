@@ -3,6 +3,7 @@
  * Includes security helpers
  */
 const HTML_ESCAPE_REGEX = /[&<>"']/g;
+const HTML_TEST_REGEX = /[&<>"']/;
 
 const ESCAPE_MAP = {
 	"&": "&amp;",
@@ -20,6 +21,12 @@ export const Utils = {
 	 */
 	escapeHtml: (unsafe) => {
 		if (typeof unsafe !== "string") return unsafe;
+
+		// ⚡ Bolt: Fast-path optimization
+		// Calling `.replace` with a callback is expensive.
+		// For strings that don't need escaping, early return using a simple regex test.
+		if (!HTML_TEST_REGEX.test(unsafe)) return unsafe;
+
 		return unsafe.replace(HTML_ESCAPE_REGEX, (m) => ESCAPE_MAP[m]);
 	},
 };
