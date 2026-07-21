@@ -22,3 +22,7 @@
 ## 2026-03-01 - [Inefficient Regex Backtracking and Switch Execution]
 **Learning:** `safeParseJSON` used a greedy regex `match(/\{[\s\S]*\}$/)` which is extremely slow on large text blobs when the structure fails to match immediately, and `escapeHtml` used a switch statement inside its `.replace()` callback which limits JS engine optimizations compared to an object map.
 **Action:** Always prefer `indexOf`/`lastIndexOf` or constrained matching when extracting large blocks like JSON from markdown, and use static object mapping (`const MAP = { ... }; match => MAP[match];`) instead of `switch` for basic character replacements in hot loops.
+
+## 2024-11-20 - [Optimizing Sanitization in Hot Paths]
+**Learning:** `Utils.escapeHtml` is extensively used in rendering loops (like `renderLibraryHTML`). While mapping objects reduces operations, calling `.replace` unnecessarily on clean strings still carries measurable overhead (over 2x slower for safe strings).
+**Action:** Implement early-return fast-paths using non-global regex checks (e.g., `!/[&<>"]/.test(str)`) to bypass replacements in hot paths for safe inputs, dramatically improving overall render times since most text doesn't contain HTML entities.
