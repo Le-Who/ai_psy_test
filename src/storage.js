@@ -191,6 +191,11 @@ export const AppStorage = {
 			return `<div style="text-align:center; padding:40px; color:var(--text-muted);">
                 <div style="font-size:40px; margin-bottom:10px;">📭</div>
                 Библиотека пуста.<br>Создайте свой первый тест!
+                <div style="margin-top: 20px;">
+                    <button class="btn" data-action="closeLibrary" style="width: auto; padding: 12px 24px; font-size: 16px;">
+                        ✨ Создать тест
+                    </button>
+                </div>
             </div>`;
 		}
 
